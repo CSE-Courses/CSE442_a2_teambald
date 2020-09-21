@@ -2,9 +2,12 @@ package com.teambald.cse442_project_team_bald;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,6 +16,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 public class HomeFragment extends Fragment {
+    private static final String TAG = "HOME_FRAGMENT: ";
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -33,7 +38,13 @@ public class HomeFragment extends Fragment {
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         view.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
-        TextView textViewCounter = view.findViewById(R.id.tv_counter);
-        textViewCounter.setText("Home");
+        ImageButton recorderButton = view.findViewById(R.id.recorder_button);
+        recorderButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //TODO: @Xuanhua: Implement record function here.
+                Log.i(TAG, "Record button is clicked.");
+            }
+        });
     }
 }
