@@ -74,30 +74,29 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
                 //TODO: @Chaoping: Add listener that play/pause the audio. Make sure to pause other playing audio if there is any.
                 Log.i(TAG, "Audio No. "+ (position + 1) + " is clicked");
                 //Swap the play/pause icon.
-                System.out.println(isPlaying);
-                if(!isPlaying) {
-                    mDataset.get(position).setPlay(false);
+                if(!isPlaying) { // if there is no other audio playing
+                    mDataset.get(position).setPlay(false); // set false in item
                     view.findViewById(R.id.recording_play_pause_button)
-                            .setBackgroundResource(R.drawable.ic_pause_button);
-                    isPlaying = true;
-                    preint = position;
-                    PlayingView = view;
-                }else{
-                    if(PlayingView==view){
-                        mDataset.get(position).setPlay(true);
+                            .setBackgroundResource(R.drawable.ic_pause_button); // change the background icon
+                    isPlaying = true; // set playing to true
+                    preint = position; // track the index
+                    PlayingView = view; // track the view
+                }else{ // if there exists a playing audio
+                    if(PlayingView==view){  // if playing = current click
+                        mDataset.get(position).setPlay(true); // set true in data
                         view.findViewById(R.id.recording_play_pause_button)
-                                .setBackgroundResource(mDataset.get(position).isPlay() ? R.drawable.ic_play_button : R.drawable.ic_play_button);
-                        isPlaying=false;
-                        preint=-1;
-                        PlayingView=null;
-                    }else{
-                        PlayingView.findViewById(R.id.recording_play_pause_button).setBackgroundResource(R.drawable.ic_play_button);
-                        mDataset.get(preint).setPlay(true);
-                        mDataset.get(position).setPlay(false);
-                        view.findViewById(R.id.recording_play_pause_button).setBackgroundResource(R.drawable.ic_pause_button);
-                        isPlaying=true;
-                        preint=position;
-                        PlayingView=view;
+                                .setBackgroundResource( R.drawable.ic_play_button); // set the icon back to pause status
+                        isPlaying=false; // set playing to false
+                        preint=-1; // stop tracking index
+                        PlayingView=null; // stop tracking view
+                    }else{ // if playing != current click
+                        PlayingView.findViewById(R.id.recording_play_pause_button).setBackgroundResource(R.drawable.ic_play_button); // have the previous view change the icon to pause status
+                        mDataset.get(preint).setPlay(true); // have the previous data set to true
+                        mDataset.get(position).setPlay(false); // have the current data set to false
+                        view.findViewById(R.id.recording_play_pause_button).setBackgroundResource(R.drawable.ic_pause_button); // change the current background to play status
+                        isPlaying=true;// set playing to true
+                        preint=position; // track index
+                        PlayingView=view; // track view
                     }
                 }
             }
