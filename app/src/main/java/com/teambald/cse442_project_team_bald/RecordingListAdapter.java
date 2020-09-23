@@ -19,6 +19,10 @@ import java.util.Date;
 public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdapter.MyViewHolder> {
     private ArrayList<RecordingItem> mDataset;
     private static final String TAG = "RECORDING_FRAGMENT: ";
+    private boolean isPlaying;
+    private View PlayingView;
+    private int preint;
+
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -35,6 +39,9 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
     // Provide a suitable constructor (depends on the kind of dataset)
     public RecordingListAdapter(ArrayList<RecordingItem> myDataset) {
         mDataset = myDataset;
+        isPlaying=false;
+        PlayingView=null;
+        preint=-1;
     }
 
     // Create new views (invoked by the layout manager)
@@ -66,12 +73,33 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
             public void onClick(View view) {
                 //TODO: @Chaoping: Add listener that play/pause the audio. Make sure to pause other playing audio if there is any.
                 Log.i(TAG, "Audio No. "+ (position + 1) + " is clicked");
-
                 //Swap the play/pause icon.
-                mDataset.get(position).setPlay(!mDataset.get(position).isPlay());
-                view.findViewById(R.id.recording_play_pause_button)
-                        .setBackgroundResource(mDataset.get(position).isPlay() ? R.drawable.ic_play_button : R.drawable.ic_pause_button);
-
+                System.out.println(isPlaying);
+                if(!isPlaying) {
+                    mDataset.get(position).setPlay(false);
+                    view.findViewById(R.id.recording_play_pause_button)
+                            .setBackgroundResource(R.drawable.ic_pause_button);
+                    isPlaying = true;
+                    preint = position;
+                    PlayingView = view;
+                }else{
+                    if(PlayingView==view){
+                        mDataset.get(position).setPlay(true);
+                        view.findViewById(R.id.recording_play_pause_button)
+                                .setBackgroundResource(mDataset.get(position).isPlay() ? R.drawable.ic_play_button : R.drawable.ic_play_button);
+                        isPlaying=false;
+                        preint=-1;
+                        PlayingView=null;
+                    }else{
+                        PlayingView.findViewById(R.id.recording_play_pause_button).setBackgroundResource(R.drawable.ic_play_button);
+                        mDataset.get(preint).setPlay(true);
+                        mDataset.get(position).setPlay(false);
+                        view.findViewById(R.id.recording_play_pause_button).setBackgroundResource(R.drawable.ic_pause_button);
+                        isPlaying=true;
+                        preint=position;
+                        PlayingView=view;
+                    }
+                }
             }
         });
     }
