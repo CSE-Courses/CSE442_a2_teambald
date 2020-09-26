@@ -6,14 +6,16 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.teambald.cse442_project_team_bald.TabsController.ViewPagerAdapter;
 
 public class MainActivity extends AppCompatActivity {
-    ViewPager2 viewPager;
-    TabLayout tabLayout;
-
+    private ViewPager2 viewPager;
+    private TabLayout tabLayout;
+    private ViewPagerAdapter vpa;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,8 +51,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }).attach();
     }
-
     private ViewPagerAdapter createTabAdapter() {
-        return new ViewPagerAdapter(this);
+        vpa = new ViewPagerAdapter(this);
+        return vpa;
     }
 }

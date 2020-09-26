@@ -12,6 +12,7 @@ import com.teambald.cse442_project_team_bald.RecordingListFragment;
 public class ViewPagerAdapter extends FragmentStateAdapter {
     private static final int TABS_SIZE = 3;
 
+
     public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
         super(fragmentActivity);
     }
