@@ -27,4 +27,5 @@
         android:textSize="18sp"
         android:text="@string/record_button_text" />
 
+
 </LinearLayout>
