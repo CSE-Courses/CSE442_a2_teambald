@@ -1,6 +1,5 @@
-package com.teambald.cse442_project_team_bald;
+package com.teambald.cse442_project_team_bald.TabsController;
 
-import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,10 +10,9 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
+import com.teambald.cse442_project_team_bald.R;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 
 public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdapter.MyViewHolder> {
     private ArrayList<RecordingItem> mDataset;

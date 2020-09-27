@@ -2,4 +2,6 @@
     <string name="app_name">SmartRecorder</string>
     <string name="record_button_text">Tab to Start Recording</string>
     <string name="recorder_description">Recorder Icon</string>
+    <string name="recording_length_text">Recording length</string>
+    <string name="recording_length_key">RECORDING LENGTH KEY</string>
 </resources>

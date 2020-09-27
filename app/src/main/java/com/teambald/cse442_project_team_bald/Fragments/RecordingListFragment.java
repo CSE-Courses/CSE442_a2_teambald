@@ -1,4 +1,4 @@
-package com.teambald.cse442_project_team_bald;
+package com.teambald.cse442_project_team_bald.Fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.teambald.cse442_project_team_bald.Objects.LocalTransfer;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
+import com.teambald.cse442_project_team_bald.R;
+import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
 
 import java.util.ArrayList;
 

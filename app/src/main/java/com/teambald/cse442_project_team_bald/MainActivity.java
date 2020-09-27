@@ -28,8 +28,9 @@ public class MainActivity extends AppCompatActivity {
         new TabLayoutMediator(tabLayout, viewPager,
                 new TabLayoutMediator.TabConfigurationStrategy() {
                     @Override public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
-                        tab.setText(position == 0 ? "Home" : "Recordings");
-                        tab.setIcon(position == 0 ? R.drawable.ic_home_icon : R.drawable.ic_recording_list_icon);
+                        tab.setText(position == 0 ? "Home" : position == 1 ? "Recordings" : "Settings");
+                        tab.setIcon(position == 0 ? R.drawable.ic_home_icon : position == 1 ?
+                                R.drawable.ic_recording_list_icon : R.drawable.ic_settings_icon);
                     }
                 }).attach();
     }
