@@ -23,12 +23,16 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.teambald.cse442_project_team_bald.TabsController.ViewPagerAdapter;
 
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+import com.teambald.cse442_project_team_bald.TabsController.ViewPagerAdapter;
+
 public class MainActivity extends AppCompatActivity {
+
     private ViewPager2 viewPager;
     private TabLayout tabLayout;
     private ViewPagerAdapter vpa;
     private final String TAG = "MainAct: ";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,4 +75,5 @@ public class MainActivity extends AppCompatActivity {
         vpa = new ViewPagerAdapter(this);
         return vpa;
     }
+
 }
