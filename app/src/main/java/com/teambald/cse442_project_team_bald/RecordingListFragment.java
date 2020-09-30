@@ -22,12 +22,9 @@ public class RecordingListFragment extends Fragment {
   
     private ArrayList<RecordingItem> recordingList = new ArrayList<>();
 
-    public RecordingListFragment() {}
-
-    private ArrayList<RecordingItem> recordingList;
 
     public RecordingListFragment() {
-        recordingList=new ArrayList<>();
+
     }
     public void load(){
         LocalTransfer transfer=new LocalTransfer();
