@@ -109,8 +109,13 @@ public class HomeFragment extends Fragment {
         //Get app external directory path
         String recordPath = getActivity().getExternalFilesDir("/").getAbsolutePath();
 
+        //Get current date and time
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss", Locale.US);
+        Date now = new Date();
         //initialize filename variable with date and time at the end to ensure the new file wont overwrite previous file
-        recordFile = "Recording_"+"test"+ ".3gp";
+        recordFile = "Recording_"+formatter.format(now)+ ".3gp";
+
+
         //Setup Media Recorder for recording
         mediaRecorder = new MediaRecorder();
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
