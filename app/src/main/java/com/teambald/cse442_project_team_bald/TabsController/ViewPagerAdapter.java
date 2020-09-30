@@ -5,11 +5,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
+import com.teambald.cse442_project_team_bald.CloudFragment;
 import com.teambald.cse442_project_team_bald.HomeFragment;
 import com.teambald.cse442_project_team_bald.RecordingListFragment;
 
 public class ViewPagerAdapter extends FragmentStateAdapter {
-    private static final int TABS_SIZE = 2;
+    private static final int TABS_SIZE = 3;
+
 
     public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
         super(fragmentActivity);
@@ -18,7 +20,13 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        return position == 0 ? HomeFragment.newInstance() : RecordingListFragment.newInstance();
+        switch(position){
+            case 0: return HomeFragment.newInstance();
+            case 1: return RecordingListFragment.newInstance();
+            case 2: return CloudFragment.newInstance();
+            default: return HomeFragment.newInstance();
+
+        }
     }
 
     @Override

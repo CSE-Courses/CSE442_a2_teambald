@@ -6,6 +6,11 @@ public class RecordingItem {
     String duration;
     boolean play;
 
+    public RecordingItem(String date, String duration, boolean play) {
+        this.date = date;
+        this.duration = duration;
+        this.play = play;
+    }
     public RecordingItem(String date, String duration,String path, boolean play) {
         this.date = date;
         this.duration = duration;
