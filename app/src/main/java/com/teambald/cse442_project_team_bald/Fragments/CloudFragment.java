@@ -1,13 +1,11 @@
-package com.teambald.cse442_project_team_bald;
+package com.teambald.cse442_project_team_bald.Fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,7 +15,7 @@ import android.view.ViewGroup;
 
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
-import com.teambald.cse442_project_team_bald.TabsController.dummy.DummyContent;
+import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
 
 import java.util.ArrayList;
 

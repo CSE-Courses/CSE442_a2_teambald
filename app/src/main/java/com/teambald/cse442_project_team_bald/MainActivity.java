@@ -61,9 +61,10 @@ public class MainActivity extends AppCompatActivity {
                                 tab.setText("Cloud");
                                 tab.setIcon(R.drawable.ic_cloud_icon);
                                 break;
-                            default:
-                                tab.setText("Home");
-                                tab.setIcon(R.drawable.ic_home_icon);
+                            case 3:
+                                tab.setText("Settings");
+                                tab.setIcon(R.drawable.ic_settings_icon);
+                                break;
                         }
 
                     }
