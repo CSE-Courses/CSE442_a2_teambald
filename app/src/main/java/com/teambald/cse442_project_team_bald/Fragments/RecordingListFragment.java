@@ -1,4 +1,4 @@
-package com.teambald.cse442_project_team_bald;
+package com.teambald.cse442_project_team_bald.Fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,15 +14,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.teambald.cse442_project_team_bald.Objects.LocalTransfer;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
+import com.teambald.cse442_project_team_bald.R;
+import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
 
 import java.util.ArrayList;
 
 public class RecordingListFragment extends Fragment {
     //TODO: @Chaoping: Create a list of recording object when you are done with it.
-    private ArrayList<RecordingItem> recordingList;
+  
+    private ArrayList<RecordingItem> recordingList = new ArrayList<>();
+
 
     public RecordingListFragment() {
-        recordingList=new ArrayList<>();
+
     }
     public void load(){
         LocalTransfer transfer=new LocalTransfer();
@@ -52,7 +56,6 @@ public class RecordingListFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
 
         //TODO: @Chaoping: This is only for test purpose, replace them with real data later.
-        //load(); need path
         recordingList.add(new RecordingItem("9/21/2020 1:25PM", "5 mins","", true));
         recordingList.add(new RecordingItem("9/21/2020 1:30PM", "5 mins", "",true));
         recordingList.add(new RecordingItem("9/21/2020 1:35PM", "5 mins", "",true));

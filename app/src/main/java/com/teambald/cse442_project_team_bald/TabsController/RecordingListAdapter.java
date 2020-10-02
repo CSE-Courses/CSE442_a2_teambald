@@ -1,6 +1,5 @@
-package com.teambald.cse442_project_team_bald;
+package com.teambald.cse442_project_team_bald.TabsController;
 
-import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,14 +10,14 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
+import com.teambald.cse442_project_team_bald.R;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 
 public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdapter.MyViewHolder> {
     private ArrayList<RecordingItem> mDataset;
     private static final String TAG = "RECORDING_FRAGMENT: ";
+
     private boolean isPlaying;
     private View PlayingView;
     private int preint;
@@ -39,6 +38,7 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
     // Provide a suitable constructor (depends on the kind of dataset)
     public RecordingListAdapter(ArrayList<RecordingItem> myDataset) {
         mDataset = myDataset;
+
         isPlaying=false;
         PlayingView=null;
         preint=-1;
@@ -73,6 +73,12 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
             public void onClick(View view) {
                 //TODO: @Chaoping: Add listener that play/pause the audio. Make sure to pause other playing audio if there is any.
                 Log.i(TAG, "Audio No. "+ (position + 1) + " is clicked");
+
+                //Swap the play/pause icon.
+                mDataset.get(position).setPlay(!mDataset.get(position).isPlay());
+                view.findViewById(R.id.recording_play_pause_button)
+                        .setBackgroundResource(mDataset.get(position).isPlay() ? R.drawable.ic_play_button : R.drawable.ic_pause_button);
+
                 //Swap the play/pause icon.
                 if(!isPlaying) { // if there is no other audio playing
                     mDataset.get(position).setPlay(false); // set false in item
