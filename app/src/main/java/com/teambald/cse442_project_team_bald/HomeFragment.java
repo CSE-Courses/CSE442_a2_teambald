@@ -1,47 +1,16 @@
 package com.teambald.cse442_project_team_bald;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Color;
-import android.os.Bundle;
 import android.Manifest;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.SystemClock;
-import android.os.Vibrator;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-
 import android.widget.Chronometer;
-import android.widget.ImageButton;
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
-
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -51,6 +20,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -61,6 +31,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 
 public class HomeFragment extends Fragment {
@@ -81,15 +56,15 @@ public class HomeFragment extends Fragment {
 
     private ImageButton recordButton;
 
-    private SignInButton loginButton;
+    //private SignInButton loginButton;
 
     private TextView accountText;
 
     private HomeFragment homeFragObj;
 
-    private GoogleSignInClient mGoogleSignInClient;
+    //private GoogleSignInClient mGoogleSignInClient;
 
-    private ActivityResultLauncher<Intent> someActivityResultLauncher;
+    //private ActivityResultLauncher<Intent> someActivityResultLauncher;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -100,7 +75,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        /*
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
@@ -130,6 +105,8 @@ public class HomeFragment extends Fragment {
                         }
                     }
                 });
+                */
+
     }
   
     @Override
@@ -144,9 +121,9 @@ public class HomeFragment extends Fragment {
         view.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
         recordButton = view.findViewById(R.id.recorder_button);
         recordButton.setOnClickListener(new recordClickListener());
-        loginButton = view.findViewById(R.id.sign_in_button);
-        loginButton.setSize(SignInButton.SIZE_STANDARD);
-        loginButton.setOnClickListener(new loginClickListener());
+        //loginButton = view.findViewById(R.id.sign_in_button);
+        //loginButton.setSize(SignInButton.SIZE_STANDARD);
+        //loginButton.setOnClickListener(new loginClickListener());
         accountText = view.findViewById(R.id.login_account_text);
   
         checkPermissions();
@@ -172,6 +149,7 @@ public class HomeFragment extends Fragment {
             }
         }
     }
+    /*
     private class loginClickListener implements View.OnClickListener
     {
         @Override
@@ -204,7 +182,7 @@ public class HomeFragment extends Fragment {
         if(name == null)
             name = "Not Signed In";
         accountText.setText(name);
-    }
+    }*/
 
     private void startRecording() {
 
