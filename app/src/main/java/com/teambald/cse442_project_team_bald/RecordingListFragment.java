@@ -15,7 +15,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.teambald.cse442_project_team_bald.Objects.LocalTransfer;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 
+import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class RecordingListFragment extends Fragment {
     //TODO: @Chaoping: Create a list of recording object when you are done with it.
@@ -60,6 +65,28 @@ public class RecordingListFragment extends Fragment {
 
         RecyclerView.Adapter mAdapter = new RecordingListAdapter(recordingList);
         recyclerView.setAdapter(mAdapter);
+    }
+    //method use to Update the lists in external storage, need to be call on the background daily.
+    public void UpToDate() throws ParseException {
+        String recordPath = getActivity().getExternalFilesDir("/").getAbsolutePath();
+        File Data= new File(recordPath);
+        String[] pathnames=Data.list();
+        SimpleDateFormat formatter = new SimpleDateFormat("MM_dd", Locale.US);
+        Date now = new Date();
+        int limite_time=7; // set time to delete to 7;
+        for(String pathname:pathnames){
+            //find the dates and compare with current date
+            String date=pathname.substring("Recording_".length()+5,"Recording_".length()+10);
+            Date save_date= formatter.parse(date);
+            long diff_in_date=now.getTime()-save_date.getTime();
+            long diffDays = diff_in_date / (24 * 60 * 60 * 1000); // find the different in day
+            if(diffDays>limite_time){
+                // do delete if difference greater than limite_time
+                File file = new File(pathname);
+                boolean deleted = file.delete(); // execute deletes
+            }
+
+        }
     }
 }
 
