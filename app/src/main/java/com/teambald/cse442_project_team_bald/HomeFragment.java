@@ -158,8 +158,6 @@ public class HomeFragment extends Fragment {
     {
         @Override
         public void onClick(View view) {
-             @Override
-            public void onClick(View view) {
                 if (isRecording) {
                     //Stop Recording
                     recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
@@ -171,8 +169,6 @@ public class HomeFragment extends Fragment {
                         startRecording();
                         recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
                         isRecording = true;
-
-                }
             }
         }
     }
