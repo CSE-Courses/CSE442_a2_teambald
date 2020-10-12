@@ -1,23 +1,27 @@
 package com.teambald.cse442_project_team_bald.TabsController;
 
+import android.media.MediaPlayer;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-
+import java.io.File;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdapter.MyViewHolder> {
     private ArrayList<RecordingItem> mDataset;
     private static final String TAG = "RECORDING_FRAGMENT: ";
-
+    private MediaPlayer mediaPlayer = null;
     private boolean isPlaying;
     private View PlayingView;
     private int preint;
@@ -85,6 +89,7 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
                     view.findViewById(R.id.recording_play_pause_button)
                             .setBackgroundResource(R.drawable.ic_pause_button); // change the background icon
                     isPlaying = true; // set playing to true
+                    playAudio(mDataset.get(0).getAudio_file());
                     preint = position; // track the index
                     PlayingView = view; // track the view
                 }else{ // if there exists a playing audio
@@ -114,4 +119,30 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
     public int getItemCount() {
         return mDataset.size();
     }
+
+    private void playAudio(File fileToPlay) {
+
+        mediaPlayer = new MediaPlayer();
+        try {
+            mediaPlayer.setDataSource(fileToPlay.getAbsolutePath());
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //Play the audio
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                stopAudio();
+            }
+        });
+    }
+    private void stopAudio() {
+        //Stop The Audio
+        isPlaying = false;
+        mediaPlayer.stop();
+        PlayingView.findViewById(R.id.recording_play_pause_button).setBackgroundResource(R.drawable.ic_play_button);
+    }
+
 }

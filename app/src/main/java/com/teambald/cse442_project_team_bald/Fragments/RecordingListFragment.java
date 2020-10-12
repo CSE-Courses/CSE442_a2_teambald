@@ -1,6 +1,8 @@
 package com.teambald.cse442_project_team_bald.Fragments;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,12 +14,14 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.teambald.cse442_project_team_bald.Objects.LocalTransfer;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,8 +32,8 @@ public class RecordingListFragment extends Fragment {
     //TODO: @Chaoping: Create a list of recording object when you are done with it.
   
     private ArrayList<RecordingItem> recordingList = new ArrayList<>();
-
-
+    private MediaPlayer mediaPlayer = null;
+    private File[] allFiles;
     public RecordingListFragment() {
 
     }
@@ -51,7 +55,15 @@ public class RecordingListFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.recording_list_fragment, container, false);
     }
+
+
+
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        String path = getActivity().getExternalFilesDir("/").getAbsolutePath();
+        File directory = new File(path);
+        allFiles = directory.listFiles();
+
+
         super.onViewCreated(view, savedInstanceState);
         view.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
         RecyclerView recyclerView = view.findViewById(R.id.recording_list_recyclerview);
@@ -60,15 +72,21 @@ public class RecordingListFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        //TODO: @Chaoping: This is only for test purpose, replace them with real data later.
-        recordingList.add(new RecordingItem("9/21/2020 1:25PM", "5 mins","", true));
-        recordingList.add(new RecordingItem("9/21/2020 1:30PM", "5 mins", "",true));
-        recordingList.add(new RecordingItem("9/21/2020 1:35PM", "5 mins", "",true));
-        recordingList.add(new RecordingItem("9/21/2020 1:40PM", "5 mins", "",true));
+        //TODO: @Xuanhua: implement getRecordingList from Local Storage
+        File TestFile =  allFiles[1];
+        recordingList.add(new RecordingItem(TestFile.getName(), "5 mins",TestFile.getPath(), true,TestFile));
 
         RecyclerView.Adapter mAdapter = new RecordingListAdapter(recordingList);
         recyclerView.setAdapter(mAdapter);
     }
+
+    //TODO: @Xuanhua: to get all AudioFiles
+    public void getAudioFiles(){
+
+    }
+
+
+
     //method use to Update the lists in external storage, need to be call on the background daily.
     public void UpToDate() throws ParseException {
         String recordPath = getActivity().getExternalFilesDir("/").getAbsolutePath();
@@ -91,5 +109,8 @@ public class RecordingListFragment extends Fragment {
 
         }
     }
+
+
+
 }
 
