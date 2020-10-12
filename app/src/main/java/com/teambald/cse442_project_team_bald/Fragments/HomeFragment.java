@@ -1,6 +1,8 @@
 package com.teambald.cse442_project_team_bald.Fragments;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -15,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -42,7 +45,7 @@ import com.google.android.gms.tasks.Task;
 import com.teambald.cse442_project_team_bald.R;
 
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment{
 
     private ImageButton recorderButton;
     private boolean isRecording;
@@ -133,6 +136,7 @@ public class HomeFragment extends Fragment {
         recorderButton = view.findViewById(R.id.recorder_button);
         isRecording= false;
     }
+
     private class recordClickListener implements View.OnClickListener
     {
         @Override
@@ -142,15 +146,17 @@ public class HomeFragment extends Fragment {
                     recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
                     stopRecording();
                     isRecording = false;
+
                 } else {
                     //Check permission to record audio
-                        //Start Recording
-                        startRecording();
-                        recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
-                        isRecording = true;
+                    //Start Recording
+                    startRecording();
+                    recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
+                    isRecording = true;
             }
         }
     }
+
     private class loginClickListener implements View.OnClickListener
     {
         @Override
@@ -203,6 +209,32 @@ public class HomeFragment extends Fragment {
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mediaRecorder.setOutputFile(recordPath + "/" + recordFile);
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+        //Save recording periodically.
+        //Read saved recording length (default to 5 mins).
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        int max = sharedPref.getInt(getString(R.string.recording_length_key), 5) * 60 * 1000;
+        mediaRecorder.setMaxDuration(max);
+
+        //Will be executed when reach max duration.
+        mediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
+            @Override
+            public void onInfo(MediaRecorder mediaRecorder, int i, int i1) {
+                //When reach max duration, stop, save the file and start again.
+                if (i == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
+                    //Stop and save the audio.
+                    mediaRecorder.stop();
+                    mediaRecorder.release();
+
+                    //Show toast to notify user that the file has been saved.
+                    Toast toast = Toast.makeText(getContext(), "Recording has been saved.", Toast.LENGTH_LONG);
+                    toast.show();
+
+                    //Restart the recorder.
+                    startRecording();
+                }
+            }
+        });
 
         try {
             mediaRecorder.prepare();
