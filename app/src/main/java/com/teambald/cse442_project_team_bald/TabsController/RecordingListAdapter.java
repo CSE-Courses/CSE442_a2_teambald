@@ -144,5 +144,10 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
         mediaPlayer.stop();
         PlayingView.findViewById(R.id.recording_play_pause_button).setBackgroundResource(R.drawable.ic_play_button);
     }
+    public void deleteItem(int position) {
+        mDataset.get(position).getAudio_file().delete();
+        mDataset.remove(position);
+
+    }
 
 }

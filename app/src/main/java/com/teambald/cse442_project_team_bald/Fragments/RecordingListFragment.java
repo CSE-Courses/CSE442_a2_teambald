@@ -12,13 +12,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.teambald.cse442_project_team_bald.Objects.LocalTransfer;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
+import com.teambald.cse442_project_team_bald.TabsController.SwipToDelete;
 
 import java.io.File;
 import java.text.ParseException;
@@ -37,10 +38,6 @@ public class RecordingListFragment extends Fragment {
 
     public RecordingListFragment() {}
 
-    public void load(){
-        LocalTransfer transfer=new LocalTransfer();
-        // transfer.loadData(recordingList); // need path to implement the function
-    }
 
     public static RecordingListFragment newInstance() {
         return new RecordingListFragment();
@@ -72,6 +69,9 @@ public class RecordingListFragment extends Fragment {
 
         mAdapter = new RecordingListAdapter(recordingList);
         recyclerView.setAdapter(mAdapter);
+        ItemTouchHelper itemTouchHelper = new
+                ItemTouchHelper(new SwipToDelete( (RecordingListAdapter)mAdapter));
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     //method use to Update the lists in external storage, need to be call on the background daily.
