@@ -6,9 +6,9 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.teambald.cse442_project_team_bald.Fragments.CloudFragment;
+import com.teambald.cse442_project_team_bald.Fragments.HomeFragment;
 import com.teambald.cse442_project_team_bald.Fragments.RecordingListFragment;
 import com.teambald.cse442_project_team_bald.Fragments.SettingFragment;
-import com.teambald.cse442_project_team_bald.Fragments.HomeFragment;
 
 public class ViewPagerAdapter extends FragmentStateAdapter {
     private static final int TABS_SIZE = 4;
