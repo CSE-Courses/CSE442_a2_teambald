@@ -39,6 +39,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
+                    android:autoSizeTextType="uniform"
                     android:id="@+id/recording_date_tv"
                     android:text="Recording Text"
                     android:paddingLeft="12dp"
