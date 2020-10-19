@@ -22,13 +22,12 @@
 
             <ImageButton
                 android:id="@+id/recording_play_pause_button"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:background="@color/white"
+                android:layout_width="82dp"
+                android:layout_height="74dp"
                 android:layout_gravity="center"
                 android:layout_marginLeft="12dp"
                 android:layout_marginRight="12dp"
-                />
+                android:background="@color/white" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -37,15 +36,14 @@
                 >
 
                 <TextView
+                    android:id="@+id/recording_date_tv"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:autoSizeTextType="uniform"
-                    android:id="@+id/recording_date_tv"
-                    android:text="Recording Text"
                     android:paddingLeft="12dp"
                     android:paddingTop="8dp"
-                    android:textSize="28sp"
-                    />
+                    android:text="Recording Text"
+                    android:textSize="28sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -72,7 +70,9 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <Space
+    <Switch
+        android:id="@+id/locker"
         android:layout_width="match_parent"
-        android:layout_height="8dp"/>
+        android:layout_height="wrap_content"
+        android:text="Lock" />
 </LinearLayout>

@@ -6,7 +6,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import java.io.File;
 import androidx.recyclerview.widget.RecyclerView;
@@ -67,10 +69,23 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
         TextView date = holder.recordingItemView.findViewById(R.id.recording_date_tv);
         TextView duration = holder.recordingItemView.findViewById(R.id.recording_duration_tv);
         ImageButton button = holder.recordingItemView.findViewById(R.id.recording_play_pause_button);
+        Switch locker=holder.recordingItemView.findViewById(R.id.locker);
 
         date.setText(mDataset.get(position).getDate());
         duration.setText(mDataset.get(position).getDuration());
-
+        if(mDataset.get(position).isLocked()) {
+            locker.setChecked(true); // if is locked set to true
+        }
+        //Locker event
+        locker.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                   mDataset.get(position).Lock(); // lock
+                } else {
+                    mDataset.get(position).unLock(); // unlock
+                }
+            }
+        });
         button.setBackgroundResource(mDataset.get(position).isPlay() ? R.drawable.ic_play_button : R.drawable.ic_pause_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,9 +160,10 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
         PlayingView.findViewById(R.id.recording_play_pause_button).setBackgroundResource(R.drawable.ic_play_button);
     }
     public void deleteItem(int position) {
-        mDataset.get(position).getAudio_file().delete();
-        mDataset.remove(position);
-
+        if(!mDataset.get(position).isLocked()) { // if item is unlocked it will be removable.
+            mDataset.get(position).getAudio_file().delete();
+            mDataset.remove(position);
+        }
     }
 
 }
