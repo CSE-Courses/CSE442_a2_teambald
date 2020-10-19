@@ -1,5 +1,6 @@
 package com.teambald.cse442_project_team_bald.TabsController;
 
+import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.util.Log;
@@ -10,6 +11,8 @@ import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.io.File;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,7 +30,7 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
     private boolean isPlaying;
     private View PlayingView;
     private int preint;
-
+    private Context context;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -42,9 +45,9 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public RecordingListAdapter(ArrayList<RecordingItem> myDataset) {
+    public RecordingListAdapter(ArrayList<RecordingItem> myDataset, Context context) {
         mDataset = myDataset;
-
+        this.context=context;
         isPlaying=false;
         PlayingView=null;
         preint=-1;
@@ -163,6 +166,15 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
         if(!mDataset.get(position).isLocked()) { // if item is unlocked it will be removable.
             mDataset.get(position).getAudio_file().delete();
             mDataset.remove(position);
+            CharSequence text = "Recording deleted!";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(this.context, text, duration);
+            toast.show();
+        }else{
+            CharSequence text = "Please unlock the recording to delete!";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(this.context, text, duration);
+            toast.show();
         }
     }
 
