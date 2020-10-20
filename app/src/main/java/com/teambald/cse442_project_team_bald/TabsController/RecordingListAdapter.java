@@ -31,6 +31,7 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
     private View PlayingView;
     private int preint;
     private Context context;
+    private File FiletoPlay;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -50,6 +51,7 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
         this.context=context;
         isPlaying=false;
         PlayingView=null;
+        FiletoPlay = null;
         preint=-1;
     }
 
@@ -101,13 +103,15 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
                 view.findViewById(R.id.recording_play_pause_button)
                         .setBackgroundResource(mDataset.get(position).isPlay() ? R.drawable.ic_play_button : R.drawable.ic_pause_button);
 
+
                 //Swap the play/pause icon.
                 if(!isPlaying) { // if there is no other audio playing
                     mDataset.get(position).setPlay(false); // set false in item
                     view.findViewById(R.id.recording_play_pause_button)
                             .setBackgroundResource(R.drawable.ic_pause_button); // change the background icon
                     isPlaying = true; // set playing to true
-                    playAudio(mDataset.get(position).getAudio_file());
+                    FiletoPlay = mDataset.get(position).getAudio_file();
+                    playAudio(FiletoPlay);
                     preint = position; // track the index
                     PlayingView = view; // track the view
                 }else{ // if there exists a playing audio
@@ -118,15 +122,18 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
                         isPlaying=false; // set playing to false
                         preint=-1; // stop tracking index
                         PlayingView=null; // stop tracking view
-                        stopAudio();
+                        pauseAudio();
+                        
                     }else{ // if playing != current click
                         PlayingView.findViewById(R.id.recording_play_pause_button).setBackgroundResource(R.drawable.ic_play_button); // have the previous view change the icon to pause status
                         mDataset.get(preint).setPlay(true); // have the previous data set to true
                         mDataset.get(position).setPlay(false); // have the current data set to false
+                        pauseAudio();
                         view.findViewById(R.id.recording_play_pause_button).setBackgroundResource(R.drawable.ic_pause_button); // change the current background to play status
                         isPlaying=true;// set playing to true
                         preint=position; // track index
                         PlayingView=view; // track view
+                        playAudio(mDataset.get(position).getAudio_file());
                     }
                 }
             }
@@ -162,6 +169,13 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
         isPlaying = false;
         mediaPlayer.stop();
         PlayingView.findViewById(R.id.recording_play_pause_button).setBackgroundResource(R.drawable.ic_play_button);
+    }
+
+    private void pauseAudio(){
+    mediaPlayer.pause();
+    }
+    private void resumeAudio(){
+    mediaPlayer.start();
     }
     public void deleteItem(int position) {
         if(!mDataset.get(position).isLocked()) { // if item is unlocked it will be removable.
