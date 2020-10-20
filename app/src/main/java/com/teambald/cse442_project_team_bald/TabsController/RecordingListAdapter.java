@@ -89,7 +89,7 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
                     view.findViewById(R.id.recording_play_pause_button)
                             .setBackgroundResource(R.drawable.ic_pause_button); // change the background icon
                     isPlaying = true; // set playing to true
-                    playAudio(mDataset.get(0).getAudio_file());
+                    playAudio(mDataset.get(position).getAudio_file());
                     preint = position; // track the index
                     PlayingView = view; // track the view
                 }else{ // if there exists a playing audio
