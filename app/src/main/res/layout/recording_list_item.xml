@@ -7,67 +7,62 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="130dp"
         app:cardCornerRadius="8dp"
         android:elevation="8dp"
         android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground"
+        android:padding="8dp"
         >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            >
+            android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/recording_play_pause_button"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:background="@color/white"
                 android:layout_gravity="center"
                 android:layout_marginLeft="12dp"
                 android:layout_marginRight="12dp"
-                />
+                android:background="@color/white" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                >
+                android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/recording_date_tv"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:autoSizeTextType="uniform"
-                    android:id="@+id/recording_date_tv"
-                    android:text="Recording Text"
                     android:paddingLeft="12dp"
                     android:paddingTop="8dp"
-                    android:textSize="28sp"
-                    />
+                    android:text="Recording Text"
+                    android:textSize="28sp" />
 
                 <TextView
+                    android:id="@+id/recording_duration_tv"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:id="@+id/recording_duration_tv"
-                    android:text="Recording Duration"
                     android:paddingLeft="14dp"
                     android:paddingTop="4dp"
                     android:paddingBottom="4dp"
-                    android:textSize="20sp"
+                    android:text="Recording Duration"
+                    android:textSize="20sp" />
+
+                <Switch
+                    android:id="@+id/locker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="18dp"
+                    android:layout_gravity="end"
+                    android:text="Lock"
                     />
             </LinearLayout>
-
-            <!--                <ImageButton-->
-            <!--                    android:layout_width="wrap_content"-->
-            <!--                    android:layout_height="match_parent"-->
-            <!--                    android:id="@+id/recording_more_button"-->
-            <!--                    android:src="@drawable/ic_recording_more_icon_80"-->
-            <!--                    android:layout_weight="0"-->
-            <!--                    android:background="@color/white"-->
-            <!--                    android:layout_gravity="center"-->
-            <!--                    />-->
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
