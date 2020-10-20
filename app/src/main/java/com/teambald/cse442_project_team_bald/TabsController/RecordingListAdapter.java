@@ -118,6 +118,7 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
                         isPlaying=false; // set playing to false
                         preint=-1; // stop tracking index
                         PlayingView=null; // stop tracking view
+                        stopAudio();
                     }else{ // if playing != current click
                         PlayingView.findViewById(R.id.recording_play_pause_button).setBackgroundResource(R.drawable.ic_play_button); // have the previous view change the icon to pause status
                         mDataset.get(preint).setPlay(true); // have the previous data set to true
