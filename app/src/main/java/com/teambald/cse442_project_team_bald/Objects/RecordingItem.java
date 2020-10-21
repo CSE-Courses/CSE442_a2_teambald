@@ -7,18 +7,32 @@ public class RecordingItem {
     String date;
     String duration;
     File audio_file;
+    int StartTime;
     boolean play;
+    boolean locker;
 
     public RecordingItem(String date, String duration, boolean play) {
         this.date = date;
         this.duration = duration;
         this.play = play;
+        this.locker=true; // set to true
     }
     public RecordingItem(String date, String duration,String path, boolean play,File audio_file) {
         this.date = date;
         this.duration = duration;
         this.play = play;
         this.audio_file = audio_file;
+        this.locker=true; // set to true
+        StartTime = 0;
+    }
+    public boolean isLocked(){
+        return this.locker;
+    }
+    public void Lock(){
+        locker=true;
+    }
+    public void unLock(){
+        locker=false;
     }
 
     public String getDate() {
@@ -34,6 +48,10 @@ public class RecordingItem {
     public boolean isPlay() {
         return play;
     }
+
+    public void setStartTime(int length){StartTime= length;}
+
+    public int getStartTimeTime(){return StartTime;}
 
     public void setDate(String date) {
         this.date = date;

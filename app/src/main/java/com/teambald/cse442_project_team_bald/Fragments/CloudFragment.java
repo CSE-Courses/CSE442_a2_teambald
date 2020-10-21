@@ -79,7 +79,7 @@ public class CloudFragment extends Fragment {
         cloudList.add(new RecordingItem("Cloud 9/21/2020 1:35PM", "5 mins", true));
         cloudList.add(new RecordingItem("Cloud 9/21/2020 1:40PM", "5 mins", true));
 
-        RecyclerView.Adapter mAdapter = new RecordingListAdapter(cloudList);
+        RecyclerView.Adapter mAdapter = new RecordingListAdapter(cloudList,getContext());
         recyclerView.setAdapter(mAdapter);
     }
 }
