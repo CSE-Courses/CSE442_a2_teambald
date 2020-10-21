@@ -1,16 +1,5 @@
 package com.teambald.cse442_project_team_bald.Objects;
 
-import android.os.Environment;
-import android.util.Log;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Scanner;
-
 
 public class LocalTransfer {
     public LocalTransfer(){

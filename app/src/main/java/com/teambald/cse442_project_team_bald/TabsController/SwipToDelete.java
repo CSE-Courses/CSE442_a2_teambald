@@ -1,6 +1,5 @@
 package com.teambald.cse442_project_team_bald.TabsController;
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 

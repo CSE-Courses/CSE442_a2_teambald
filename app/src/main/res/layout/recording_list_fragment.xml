@@ -20,15 +20,15 @@
         tools:listitem="@layout/recording_list_item"
         />
 
-<!--    <TextView-->
-<!--        android:id="@+id/tv_counter"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:gravity="center"-->
-<!--        android:textColor="#000"-->
-<!--        android:textSize="20sp"-->
-<!--        android:textStyle="bold"-->
-<!--        tools:text="Recording List"-->
-<!--        />-->
+    <!--    <TextView-->
+    <!--        android:id="@+id/tv_counter"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:gravity="center"-->
+    <!--        android:textColor="#000"-->
+    <!--        android:textSize="20sp"-->
+    <!--        android:textStyle="bold"-->
+    <!--        tools:text="Recording List"-->
+    <!--        />-->
 
 </FrameLayout>

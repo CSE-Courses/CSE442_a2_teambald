@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".RecordingListFragment">
+    tools:context="com.teambald.cse442_project_team_bald.Fragments.RecordingListFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recording_list_recyclerview_cloud"
