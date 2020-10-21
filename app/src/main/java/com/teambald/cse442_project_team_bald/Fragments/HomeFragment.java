@@ -200,13 +200,13 @@ public class HomeFragment extends Fragment{
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss", Locale.US);
         Date now = new Date();
         //initialize filename variable with date and time at the end to ensure the new file wont overwrite previous file
-        recordFile = "Recording_"+formatter.format(now)+ ".3gp";
+        recordFile = "Recording_"+formatter.format(now)+ ".mp4";
 
 
         //Setup Media Recorder for recording
         mediaRecorder = new MediaRecorder();
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         mediaRecorder.setOutputFile(recordPath + "/" + recordFile);
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
