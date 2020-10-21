@@ -74,11 +74,6 @@ public class CloudFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        //TODO: @Chaoping: This is only for test purpose, replace them with real data later.
-        cloudList.add(new RecordingItem("Cloud 9/21/2020 1:25PM", "5 mins", true));
-        cloudList.add(new RecordingItem("Cloud 9/21/2020 1:30PM", "5 mins", true));
-        cloudList.add(new RecordingItem("Cloud 9/21/2020 1:35PM", "5 mins", true));
-        cloudList.add(new RecordingItem("Cloud 9/21/2020 1:40PM", "5 mins", true));
 
         RecyclerView.Adapter mAdapter = new RecordingListAdapter(cloudList,getContext());
         recyclerView.setAdapter(mAdapter);
