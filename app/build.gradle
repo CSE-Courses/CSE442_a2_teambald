@@ -43,6 +43,7 @@ dependencies {
     implementation 'com.google.apis:google-api-services-people:v1-rev99-1.22.0'
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation 'com.google.firebase:firebase-storage:19.2.0'
 
     // UiAutomatorTesting
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
