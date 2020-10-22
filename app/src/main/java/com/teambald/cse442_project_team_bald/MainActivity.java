@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             case 2:
                                 tab.setText("Cloud");
-                                tab.setIcon(R.drawable.ic_cloud_icon);
+                                tab.setIcon(R.drawable.white_cloud_icon);
                                 break;
                             case 3:
                                 tab.setText("Settings");

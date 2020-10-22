@@ -4,6 +4,7 @@ import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +36,7 @@ public class RecordingListFragment extends Fragment {
     private MediaPlayer mediaPlayer = null;
     private File[] allFiles;
     private RecyclerView.Adapter mAdapter;
+    private static final String TAG = "RecordingListF";
 
     public RecordingListFragment() {}
 
