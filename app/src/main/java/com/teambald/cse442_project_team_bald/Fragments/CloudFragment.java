@@ -238,6 +238,9 @@ public class CloudFragment extends Fragment {
         if(storageRef!=null) {
             Log.d(TAG,"OnResume: ");
             listFiles("baicheng");
+            if(mAdapter != null) {
+                mAdapter.notifyDataSetChanged();
+            }
         }
     }
 
@@ -247,6 +250,9 @@ public class CloudFragment extends Fragment {
         if(storageRef!=null){
             Log.d(TAG,"OnAttach: ");
             listFiles("baicheng");
+            if(mAdapter != null) {
+                mAdapter.notifyDataSetChanged();
+            }
         }
     }
     public void updateAllFiles()
@@ -264,6 +270,7 @@ public class CloudFragment extends Fragment {
             durationStr = parseSeconds(seconds);
             cloudList.add(new RecordingItem(f.getName(), durationStr , f.getPath(), true, f));
         }
+        Log.d(TAG,"There are "+cloudList.size()+" items in cloud list");
     }
     public String parseSeconds(int seconds) {
         int min = seconds / 60;
