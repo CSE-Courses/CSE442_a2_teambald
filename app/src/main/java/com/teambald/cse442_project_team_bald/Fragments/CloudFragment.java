@@ -1,23 +1,20 @@
-package com.teambald.cse442_project_team_bald;
+package com.teambald.cse442_project_team_bald.Fragments;
 
-import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
-import com.teambald.cse442_project_team_bald.TabsController.dummy.DummyContent;
+import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
 
 import java.util.ArrayList;
 
@@ -82,7 +79,7 @@ public class CloudFragment extends Fragment {
         cloudList.add(new RecordingItem("Cloud 9/21/2020 1:35PM", "5 mins", true));
         cloudList.add(new RecordingItem("Cloud 9/21/2020 1:40PM", "5 mins", true));
 
-        RecyclerView.Adapter mAdapter = new RecordingListAdapter(cloudList);
+        RecyclerView.Adapter mAdapter = new RecordingListAdapter(cloudList,getContext());
         recyclerView.setAdapter(mAdapter);
     }
 }

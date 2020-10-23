@@ -1,27 +1,10 @@
 package com.teambald.cse442_project_team_bald;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
-
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
-
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
-import com.teambald.cse442_project_team_bald.TabsController.ViewPagerAdapter;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -61,9 +44,10 @@ public class MainActivity extends AppCompatActivity {
                                 tab.setText("Cloud");
                                 tab.setIcon(R.drawable.ic_cloud_icon);
                                 break;
-                            default:
-                                tab.setText("Home");
-                                tab.setIcon(R.drawable.ic_home_icon);
+                            case 3:
+                                tab.setText("Settings");
+                                tab.setIcon(R.drawable.ic_settings_icon);
+                                break;
                         }
 
                     }
