@@ -156,7 +156,7 @@ public class HomeFragment extends Fragment {
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         int max = sharedPref.getInt(getString(R.string.recording_length_key), 5) * 60 * 1000;
         mediaRecorder.setMaxDuration(max);
-
+//        mediaRecorder.setMaxDuration(5000);
         //Will be executed when reach max duration.
         mediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
             @Override

@@ -57,8 +57,9 @@ public class FireBaseUtils {
         mountainsRef.getPath().equals(mountainImagesRef.getPath());    // false
         return true;
     }
-    public boolean downloadFile(String path,String filename)
-    {
+//    public boolean downloadFile(String path,String filename)
+//    {
+//
+//    }
 
-    }
 }
