@@ -1,6 +1,5 @@
 package com.teambald.cse442_project_team_bald;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,17 +8,14 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
@@ -34,7 +30,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
  * Activity to demonstrate basic retrieval of the Google user's ID, email address, and basic
  * profile, which also adds a request dialog to access the user's Google Drive.
  */
-public class SignInActivityWithDrive extends AppCompatActivity implements
+public class SignInActivity extends AppCompatActivity implements
         View.OnClickListener {
 
     private static final String TAG = "SignInActivity";
@@ -47,7 +43,7 @@ public class SignInActivityWithDrive extends AppCompatActivity implements
     private Button proceedButton;
 
     private TextView mStatusTextView;
-    private SignInActivityWithDrive siawd;
+    private SignInActivity siawd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

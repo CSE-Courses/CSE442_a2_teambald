@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,6 +31,7 @@ import com.google.firebase.storage.UploadTask;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
+import com.teambald.cse442_project_team_bald.TabsController.SwipToDelete;
 
 import java.io.File;
 import java.lang.reflect.Array;
@@ -132,25 +135,19 @@ public class CloudFragment extends Fragment {
         //ArrayList<String> filenames =
         //Log.d(TAG,filenames.toString());
         //Log.d(TAG,filenames.size()+"");
-        updateAllFiles();
+        listFiles("baicheng");
         mAdapter = new RecordingListAdapter(cloudList,getContext());
         recyclerView.setAdapter(mAdapter);
+        ItemTouchHelper itemTouchHelper = new
+                ItemTouchHelper(new SwipToDelete( (RecordingListAdapter)mAdapter));
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
-    public ArrayList<String> listFiles(String fireBaseFolder)
+    public void listFiles(String fireBaseFolder)
     {
         StorageReference listRef = storageRef.child(fireBaseFolder);
-        final ArrayList<String> filenames = new ArrayList<String>();
+        CloudSuccListener rstListener = new CloudSuccListener();
         listRef.listAll()
-                .addOnSuccessListener(new OnSuccessListener<ListResult>() {
-                    @Override
-                    public void onSuccess(ListResult listResult) {
-                        for (StorageReference item : listResult.getItems()) {
-                            // All the items under listRef.
-                            Log.d(TAG,item.getName());
-                            filenames.add(item.getName());
-                        }
-                    }
-                })
+                .addOnSuccessListener(rstListener)
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
@@ -158,7 +155,37 @@ public class CloudFragment extends Fragment {
                         Log.d(TAG,"File list error");
                     }
                 });
-        return filenames;
+    }
+    public void updateFiles(ArrayList<String> filenames)
+    {
+        cloudList.clear();
+        for (String filename : filenames)
+        {
+            cloudList.add(new RecordingItem(filename, "X s" , filename, true, new File(filename)));
+        }
+        if(mAdapter != null) {
+        mAdapter.notifyDataSetChanged();
+        }
+        Log.d(TAG,"There are "+cloudList.size()+" items in cloud list");
+    }
+    private class CloudSuccListener implements OnSuccessListener<ListResult>
+    {
+        public ArrayList<String> filenames;// = new ArrayList<>();
+
+        public ArrayList<String> getFilenames() {
+            return filenames;
+        }
+
+        @Override
+        public void onSuccess(ListResult listResult) {
+            filenames = new ArrayList<>();
+            for (StorageReference item : listResult.getItems()) {
+                // All the items under listRef.
+                Log.d(TAG,item.getName());
+                filenames.add(item.getName());
+            }
+            updateFiles(filenames);
+        }
     }
     public void uploadFile(String path,String filenamePref,String filenameSuf,String fireBaseFolder)
     {
@@ -238,9 +265,10 @@ public class CloudFragment extends Fragment {
         if(storageRef!=null) {
             Log.d(TAG,"OnResume: ");
             listFiles("baicheng");
-            if(mAdapter != null) {
-                mAdapter.notifyDataSetChanged();
-            }
+        }
+        if(mAdapter != null) {
+            mAdapter.notifyDataSetChanged();
+            Log.d(TAG,"Update the list");
         }
     }
 
@@ -255,9 +283,11 @@ public class CloudFragment extends Fragment {
             }
         }
     }
-    public void updateAllFiles()
+    /*
+    public void updateAllFiles(String bucketname)
     {
-        ArrayList<String> files = listFiles("baicheng");
+        ArrayList<String> files = listFiles(bucketname);
+        Log.d(TAG,"There are "+files.size()+" items in files list");
         cloudList.clear();
         for (String filename : files)
         {
@@ -271,7 +301,7 @@ public class CloudFragment extends Fragment {
             cloudList.add(new RecordingItem(f.getName(), durationStr , f.getPath(), true, f));
         }
         Log.d(TAG,"There are "+cloudList.size()+" items in cloud list");
-    }
+    }*/
     public String parseSeconds(int seconds) {
         int min = seconds / 60;
         seconds-=(min * 60);
