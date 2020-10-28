@@ -2,7 +2,6 @@ package com.teambald.cse442_project_team_bald.Fragments;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
@@ -17,10 +16,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -29,17 +24,17 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.Task;
+import com.teambald.cse442_project_team_bald.Encryption.AudioEncryptionUtils;
+import com.teambald.cse442_project_team_bald.Encryption.FileUtils;
 import com.teambald.cse442_project_team_bald.R;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
+import javax.crypto.SecretKey;
 
 
 public class HomeFragment extends Fragment {
@@ -52,6 +47,8 @@ public class HomeFragment extends Fragment {
     private String fileToPlay;
     private MediaRecorder mediaRecorder;
     private String recordFile;
+    //Path of new recording.
+    private String filePath;
 
     private Chronometer timer;
     
@@ -143,20 +140,23 @@ public class HomeFragment extends Fragment {
         //initialize filename variable with date and time at the end to ensure the new file wont overwrite previous file
         recordFile = "Recording_"+formatter.format(now)+ ".mp4";
 
+        //Path used for encryption.
+//        final String filePath = recordPath + "/" + recordFile;
+        filePath = recordPath + "/" + recordFile;
 
         //Setup Media Recorder for recording
         mediaRecorder = new MediaRecorder();
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mediaRecorder.setOutputFile(recordPath + "/" + recordFile);
+        mediaRecorder.setOutputFile(filePath);
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
         //Save recording periodically.
         //Read saved recording length (default to 5 mins).
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         int max = sharedPref.getInt(getString(R.string.recording_length_key), 5) * 60 * 1000;
-        mediaRecorder.setMaxDuration(max);
-//        mediaRecorder.setMaxDuration(5000);
+//        mediaRecorder.setMaxDuration(max);
+        mediaRecorder.setMaxDuration(5000);
         //Will be executed when reach max duration.
         mediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
             @Override
@@ -167,12 +167,18 @@ public class HomeFragment extends Fragment {
                     mediaRecorder.stop();
                     mediaRecorder.release();
 
-                    //Show toast to notify user that the file has been saved.
-                    Toast toast = Toast.makeText(getContext(), "Recording has been saved.", Toast.LENGTH_LONG);
-                    toast.show();
+                    //Encrypt audio file.
+                    if(encrypt(filePath)){
+                        //Show toast to notify user that the file has been saved.
+                        Toast toast = Toast.makeText(getContext(), "Recording has been saved.", Toast.LENGTH_SHORT);
+                        toast.show();
 
-                    //Restart the recorder.
-                    startRecording();
+                        //Restart the recorder.
+                        startRecording();
+                    }else{
+                        Toast toast = Toast.makeText(getContext(), "Recording encryption failed.", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
                 }
             }
         });
@@ -213,7 +219,56 @@ public class HomeFragment extends Fragment {
         mediaRecorder.release();
         mediaRecorder = null;
 
+        //Encrypt audio file.
+        if(encrypt(filePath)){
+            //Show toast to notify user that the file has been saved.
+            Toast toast = Toast.makeText(getContext(), "Recording has been saved.", Toast.LENGTH_SHORT);
+            toast.show();
+
+            Log.e("Encryption", "encrypt " + filePath + " succeed.");
+
+        }else{
+            Toast toast = Toast.makeText(getContext(), "Recording encryption failed.", Toast.LENGTH_SHORT);
+            toast.show();
+
+            Log.e("Encryption", "encrypt " + filePath + " failed.");
+        }
     }
 
+    /**
+     * Encrypt and save to disk
+     *
+     * @return
+     */
+    private boolean encrypt(String filePath) {
+        try {
+            byte[] fileData = FileUtils.readFile(filePath);
+            byte[] encodedBytes = AudioEncryptionUtils.encode(AudioEncryptionUtils.getInstance(getContext()).getSecretKey(), fileData);
+            FileUtils.saveFile(encodedBytes, filePath);
+            return true;
+        } catch (Exception e) {
+            Log.e("Encryption", e.toString());
+            Toast toast = Toast.makeText(getContext(), "Encryption failed.", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+        return false;
+    }
+
+    /**
+     * Decrypt and return the decoded bytes
+     *
+     * @return
+     */
+    private byte[] decrypt(String filePath) {
+        try {
+            byte[] fileData = FileUtils.readFile(filePath);
+            byte[] decryptedBytes = AudioEncryptionUtils.decode(AudioEncryptionUtils.getInstance(getContext()).getSecretKey(), fileData);
+            return decryptedBytes;
+        } catch (Exception e) {
+            Toast toast = Toast.makeText(getContext(), "Decryption failed.", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+        return null;
+    }
 
 }

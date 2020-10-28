@@ -16,10 +16,13 @@ import android.widget.Toast;
 import java.io.File;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.teambald.cse442_project_team_bald.Encryption.AudioEncryptionUtils;
+import com.teambald.cse442_project_team_bald.Encryption.FileUtils;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -147,10 +150,24 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
     }
 
     private void playAudio(final RecordingItem recordingItem) {
+        //File should be encrypted.
         File fileToPlay = recordingItem.getAudio_file();
+
+        //Decrypt audio file
+        byte[] decrypt = decrypt(fileToPlay);
+        FileDescriptor decrypted;
+        try{
+            decrypted = FileUtils.getTempFileDescriptor(context, decrypt);
+        }catch (IOException e){
+            Toast toast = Toast.makeText(context, "Playing audio has failed.", Toast.LENGTH_SHORT);
+            toast.show();
+            return;
+        }
+
         mediaPlayer = new MediaPlayer();
         try {
-            mediaPlayer.setDataSource(fileToPlay.getAbsolutePath());
+//            mediaPlayer.setDataSource(fileToPlay.getAbsolutePath());
+            mediaPlayer.setDataSource(decrypted);
             mediaPlayer.prepare();
             mediaPlayer.seekTo(recordingItem.getStartTimeTime());
             mediaPlayer.start();
@@ -199,4 +216,21 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
         }
     }
 
+    /**
+     * Decrypt and return the decoded bytes
+     *
+     * @return
+     */
+    private byte[] decrypt(File file) {
+        String filePath = file.getPath();
+        try {
+            byte[] fileData = FileUtils.readFile(filePath);
+            byte[] decryptedBytes = AudioEncryptionUtils.decode(AudioEncryptionUtils.getInstance(context).getSecretKey(), fileData);
+            return decryptedBytes;
+        } catch (Exception e) {
+            Toast toast = Toast.makeText(context, "Decryption failed.", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+        return null;
+    }
 }
