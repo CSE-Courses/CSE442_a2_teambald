@@ -100,6 +100,10 @@ public class SignInActivity extends AppCompatActivity implements
         if (currentUser != null ) {
             updateUI(currentUser);
         }
+        else
+        {
+            updateUI(null);
+        }
     }
     // [START auth_with_google]
     private void firebaseAuthWithGoogle(String idToken) {
@@ -189,12 +193,15 @@ public class SignInActivity extends AppCompatActivity implements
             mStatusTextView.setText(getString(R.string.signed_in_fmt, user.getEmail()));
 
             findViewById(R.id.sign_in_button).setVisibility(View.GONE);
-            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
+            findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
+            findViewById(R.id.disconnect_button).setVisibility(View.VISIBLE);
+            findViewById(R.id.proceedButton).setVisibility(View.VISIBLE);
         } else {
             mStatusTextView.setText(R.string.signed_out);
-
             findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
-            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.GONE);
+            findViewById(R.id.sign_out_button).setVisibility(View.GONE);
+            findViewById(R.id.disconnect_button).setVisibility(View.GONE);
+            findViewById(R.id.proceedButton).setVisibility(View.GONE);
         }
     }
 
