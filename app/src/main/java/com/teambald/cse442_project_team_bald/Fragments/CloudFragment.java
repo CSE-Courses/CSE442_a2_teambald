@@ -26,6 +26,7 @@ import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
@@ -155,6 +156,45 @@ public class CloudFragment extends Fragment {
                         Log.d(TAG,"File list error");
                     }
                 });
+        CloudMetaSuccListener metaRstListener = new CloudMetaSuccListener();
+        listRef.getMetadata().addOnSuccessListener(metaRstListener).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Uh-oh, an error occurred!
+                Log.d(TAG,"Meta data error");
+            }
+        });
+    }
+    public String getMetaData(String filename,String firebaseFolder)
+    {
+        return null;
+    }
+    public void setMetaData(final String filename, final String firebaseFolder, String propertyName, String propertyValue)
+    {
+        StorageReference forestRef = storageRef.child(firebaseFolder).child(filename);
+
+        // Create file metadata including the content type
+                StorageMetadata metadata = new StorageMetadata.Builder()
+                        .setContentType("audio/mp4")
+                        .setCustomMetadata(propertyName, propertyValue)
+                        .build();
+
+        // Update metadata properties
+                forestRef.updateMetadata(metadata)
+                        .addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                            @Override
+                            public void onSuccess(StorageMetadata storageMetadata) {
+                                // Updated metadata is in storageMetadata
+                                Log.d(TAG,"File metadata update successful");
+                                Log.d(TAG,"For file: "+firebaseFolder+"//"+filename);
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                // Uh-oh, an error occurred!
+                            }
+                        });
     }
     public void updateFiles(ArrayList<String> filenames)
     {
@@ -167,6 +207,25 @@ public class CloudFragment extends Fragment {
         mAdapter.notifyDataSetChanged();
         }
         Log.d(TAG,"There are "+cloudList.size()+" items in cloud list");
+    }
+    private class CloudMetaSuccListener implements OnSuccessListener<StorageMetadata>
+    {
+        public ArrayList<String> filenames;// = new ArrayList<>();
+
+        public ArrayList<String> getFilenames() {
+            return filenames;
+        }
+
+        @Override
+        public void onSuccess(StorageMetadata metaDataRst) {
+            /*filenames = new ArrayList<>();
+            for (StorageReference item : listResult.getItems()) {
+                // All the items under listRef.
+                Log.d(TAG,item.getName());
+                filenames.add(item.getName());
+            }
+            updateFiles(filenames);*/
+        }
     }
     private class CloudSuccListener implements OnSuccessListener<ListResult>
     {
