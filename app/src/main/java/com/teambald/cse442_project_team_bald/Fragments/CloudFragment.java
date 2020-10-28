@@ -201,7 +201,7 @@ public class CloudFragment extends Fragment {
         cloudList.clear();
         for (String filename : filenames)
         {
-            cloudList.add(new RecordingItem(filename, "X s" , filename, true, new File(filename)));
+            cloudList.add(new RecordingItem(filename, "Duration: ", filename, true, new File(filename)));
         }
         if(mAdapter != null) {
         mAdapter.notifyDataSetChanged();
@@ -211,7 +211,6 @@ public class CloudFragment extends Fragment {
     private class CloudMetaSuccListener implements OnSuccessListener<StorageMetadata>
     {
         public ArrayList<String> filenames;// = new ArrayList<>();
-
         public ArrayList<String> getFilenames() {
             return filenames;
         }
@@ -225,6 +224,7 @@ public class CloudFragment extends Fragment {
                 filenames.add(item.getName());
             }
             updateFiles(filenames);*/
+            String metaDatValue = metaDataRst.getCustomMetadata("RecordingLength");
         }
     }
     private class CloudSuccListener implements OnSuccessListener<ListResult>
