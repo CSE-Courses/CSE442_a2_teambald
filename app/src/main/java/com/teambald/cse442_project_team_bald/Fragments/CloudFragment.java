@@ -217,13 +217,6 @@ public class CloudFragment extends Fragment {
 
         @Override
         public void onSuccess(StorageMetadata metaDataRst) {
-            /*filenames = new ArrayList<>();
-            for (StorageReference item : listResult.getItems()) {
-                // All the items under listRef.
-                Log.d(TAG,item.getName());
-                filenames.add(item.getName());
-            }
-            updateFiles(filenames);*/
             String metaDatValue = metaDataRst.getCustomMetadata("RecordingLength");
         }
     }
@@ -246,11 +239,11 @@ public class CloudFragment extends Fragment {
             updateFiles(filenames);
         }
     }
-    public void uploadFile(String path,String filenamePref,String filenameSuf,String fireBaseFolder)
+    public void uploadFile(String path,String localFolder,String filenamePref,String filenameSuf,String fireBaseFolder)
     {
         if(null!=path && null!=filenamePref && null!=filenameSuf && null!=fireBaseFolder)
         {
-            final String fullPath = path + "/" + filenamePref + "." + filenameSuf;
+            final String fullPath = path + "/" +localFolder+ "/" + filenamePref + "." + filenameSuf;
             final String fullFBPath = fireBaseFolder + "/" + filenamePref + "." + filenameSuf;
 
             Uri file = Uri.fromFile(new File(fullPath));
@@ -283,12 +276,12 @@ public class CloudFragment extends Fragment {
             return;
         }
     }
-    public boolean downloadFile(String path,String filenamePref,String filenameSuf,String fireBaseFolder)
+    public boolean downloadFile(String path,String localFolder,String filenamePref,String filenameSuf,String fireBaseFolder)
     {
         try
         {
             StorageReference storageReference = storageRef.child(fireBaseFolder).child(filenamePref + "." + filenameSuf);
-            final String fullPath = path + "/" + filenamePref + "." + filenameSuf;
+            final String fullPath = path + "/" +localFolder+ "/" + filenamePref + "." + filenameSuf;
             File tempFile = new File(fullPath);
             storageReference.getFile(tempFile)
                 .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {

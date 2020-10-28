@@ -154,7 +154,9 @@ public class HomeFragment extends Fragment {
         //Save recording periodically.
         //Read saved recording length (default to 5 mins).
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        int max = sharedPref.getInt(getString(R.string.recording_length_key), 5) * 60 * 1000;
+        //int max = sharedPref.getInt(getString(R.string.recording_length_key), 5) * 60 * 1000;
+        //int max = sharedPref.getInt(getString(R.string.recording_length_key), 5) * 60 * 1000;
+        int max = 5000;
         mediaRecorder.setMaxDuration(max);
 
         //Will be executed when reach max duration.
