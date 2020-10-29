@@ -34,6 +34,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.R;
 
 import java.io.IOException;
@@ -63,6 +64,8 @@ public class HomeFragment extends Fragment {
     private TextView accountText;
 
     private HomeFragment homeFragObj;
+
+    private MainActivity activity;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -105,11 +108,22 @@ public class HomeFragment extends Fragment {
         updateUI(account);
         // [END on_start_sign_in]
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // [START on_start_sign_in]
+        // Check for existing Google Sign In account, if the user is already signed in
+        // the GoogleSignInAccount will be non-null.
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
+        updateUI(account);
+        // [END on_start_sign_in]
+    }
     private void updateUI(@Nullable GoogleSignInAccount account) {
         if (account != null) {
-            accountText.setText("Signed In as: "+account.getDisplayName());
+            accountText.setText("Signed In as: "+account.getEmail());
         } else {
-            accountText.setText("None");
+            accountText.setText("Signed In as: None");
         }
     }
 
@@ -154,7 +168,9 @@ public class HomeFragment extends Fragment {
         //Save recording periodically.
         //Read saved recording length (default to 5 mins).
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        int max = sharedPref.getInt(getString(R.string.recording_length_key), 5) * 60 * 1000;
+        //int max = sharedPref.getInt(getString(R.string.recording_length_key), 5) * 60 * 1000;
+        //int max = sharedPref.getInt(getString(R.string.recording_length_key), 5) * 60 * 1000;
+        int max = 5000;
         mediaRecorder.setMaxDuration(max);
 //        mediaRecorder.setMaxDuration(5000);
         //Will be executed when reach max duration.
@@ -216,4 +232,8 @@ public class HomeFragment extends Fragment {
     }
 
 
+    public void setActivity(MainActivity mainActivity)
+    {
+        activity = mainActivity;
+    }
 }

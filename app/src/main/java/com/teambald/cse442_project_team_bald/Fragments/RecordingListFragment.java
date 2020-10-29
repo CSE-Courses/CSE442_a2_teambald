@@ -4,6 +4,7 @@ import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
@@ -35,6 +37,9 @@ public class RecordingListFragment extends Fragment {
     private MediaPlayer mediaPlayer = null;
     private File[] allFiles;
     private RecyclerView.Adapter mAdapter;
+    private static final String TAG = "RecordingListF";
+
+    private MainActivity activity;
 
     public RecordingListFragment() {}
 
@@ -136,5 +141,9 @@ public class RecordingListFragment extends Fragment {
         return (min < 10 ? "0" + min : String.valueOf(min)) + ":" + (seconds < 10 ? "0" + seconds : String.valueOf(seconds));
     }
 
+    public void setActivity(MainActivity mainActivity)
+    {
+        activity = mainActivity;
+    }
 }
 
