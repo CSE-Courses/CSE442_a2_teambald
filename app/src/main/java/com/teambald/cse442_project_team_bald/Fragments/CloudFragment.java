@@ -1,6 +1,7 @@
 package com.teambald.cse442_project_team_bald.Fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,6 +21,8 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
@@ -29,6 +32,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
@@ -52,6 +56,7 @@ public class CloudFragment extends Fragment {
     private static StorageReference storageRef;
     private RecyclerView.Adapter mAdapter;
 
+    private MainActivity activity;
     /*
     private Button down;
     private Button up;
@@ -128,42 +133,78 @@ public class CloudFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         view.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
-        RecyclerView recyclerView = view.findViewById(R.id.recording_list_recyclerview_cloud);
-        recyclerView.setHasFixedSize(true);
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        boolean logedIn = sharedPref.getBoolean(SettingFragment.LogedInBl,false);
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext());
-        recyclerView.setLayoutManager(layoutManager);
-        //ArrayList<String> filenames =
-        //Log.d(TAG,filenames.toString());
-        //Log.d(TAG,filenames.size()+"");
-        listFiles("baicheng");
-        mAdapter = new RecordingListAdapter(cloudList,getContext());
-        recyclerView.setAdapter(mAdapter);
-        ItemTouchHelper itemTouchHelper = new
-                ItemTouchHelper(new SwipToDelete( (RecordingListAdapter)mAdapter));
-        itemTouchHelper.attachToRecyclerView(recyclerView);
+        if(logedIn) {
+            RecyclerView recyclerView = view.findViewById(R.id.recording_list_recyclerview_cloud);
+            recyclerView.setHasFixedSize(true);
+
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext());
+            recyclerView.setLayoutManager(layoutManager);
+            //ArrayList<String> filenames =
+            //Log.d(TAG,filenames.toString());
+            //Log.d(TAG,filenames.size()+"");
+            listFiles("baicheng");
+            mAdapter = new RecordingListAdapter(cloudList, getContext());
+            recyclerView.setAdapter(mAdapter);
+            ItemTouchHelper itemTouchHelper = new
+                    ItemTouchHelper(new SwipToDelete((RecordingListAdapter) mAdapter));
+            itemTouchHelper.attachToRecyclerView(recyclerView);
+        }
+        else
+        {
+            RecyclerView recyclerView = view.findViewById(R.id.recording_list_recyclerview_cloud);
+            recyclerView.setHasFixedSize(true);
+
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext());
+            recyclerView.setLayoutManager(layoutManager);
+            //ArrayList<String> filenames =
+            //Log.d(TAG,filenames.toString());
+            //Log.d(TAG,filenames.size()+"");
+            cloudList.clear();
+            cloudList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
+            mAdapter = new RecordingListAdapter(cloudList, getContext());
+            recyclerView.setAdapter(mAdapter);
+            ItemTouchHelper itemTouchHelper = new
+                    ItemTouchHelper(new SwipToDelete((RecordingListAdapter) mAdapter));
+            itemTouchHelper.attachToRecyclerView(recyclerView);
+        }
     }
     public void listFiles(String fireBaseFolder)
     {
-        StorageReference listRef = storageRef.child(fireBaseFolder);
-        CloudSuccListener rstListener = new CloudSuccListener();
-        listRef.listAll()
-                .addOnSuccessListener(rstListener)
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Uh-oh, an error occurred!
-                        Log.d(TAG,"File list error");
-                    }
-                });
-        CloudMetaSuccListener metaRstListener = new CloudMetaSuccListener();
-        listRef.getMetadata().addOnSuccessListener(metaRstListener).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Uh-oh, an error occurred!
-                Log.d(TAG,"Meta data error");
+        GoogleSignInAccount gsi = GoogleSignIn.getLastSignedInAccount(getActivity());
+        Log.d(TAG,gsi+"");
+        if( gsi != null) {
+            StorageReference listRef = storageRef.child(fireBaseFolder);
+            CloudSuccListener rstListener = new CloudSuccListener();
+            listRef.listAll()
+                    .addOnSuccessListener(rstListener)
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            // Uh-oh, an error occurred!
+                            Log.d(TAG,"File list error");
+                        }
+                    });
+            CloudMetaSuccListener metaRstListener = new CloudMetaSuccListener();
+            listRef.getMetadata().addOnSuccessListener(metaRstListener).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Uh-oh, an error occurred!
+                    Log.d(TAG,"Meta data error");
+                }
+            });
+        }
+        else
+        {
+            cloudList.clear();
+            cloudList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
+
+            if(mAdapter != null) {
+                mAdapter.notifyDataSetChanged();
             }
-        });
+        }
     }
     public String getMetaData(String filename,String firebaseFolder)
     {
@@ -204,7 +245,8 @@ public class CloudFragment extends Fragment {
             cloudList.add(new RecordingItem(filename, "Duration: ", filename, true, new File(filename)));
         }
         if(mAdapter != null) {
-        mAdapter.notifyDataSetChanged();
+            mAdapter.notifyDataSetChanged();
+            Log.d(TAG,"mAdapter notified");
         }
         Log.d(TAG,"There are "+cloudList.size()+" items in cloud list");
     }
@@ -256,7 +298,8 @@ public class CloudFragment extends Fragment {
                             Log.d(TAG, "File upload successful");
                             Log.d(TAG, "From:" + fullPath);
                             Log.d(TAG, "To:" + fullFBPath);
-                            Toast.makeText(getContext(),"File upload Successful", Toast.LENGTH_LONG);
+                            Toast tst = Toast.makeText(getContext(),"File upload Successful", Toast.LENGTH_SHORT);
+                            tst.show();
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -267,7 +310,8 @@ public class CloudFragment extends Fragment {
                             Log.d(TAG, "File upload unsuccessful");
                             Log.d(TAG, "From:" + fullPath);
                             Log.d(TAG, "To:" + fullFBPath);
-                            Toast.makeText(getContext(),"File upload Unsuccessful", Toast.LENGTH_LONG);
+                            Toast tst = Toast.makeText(getContext(),"File upload Unsuccessful", Toast.LENGTH_SHORT);
+                            tst.show();
                         }
                     });
         }
@@ -318,6 +362,11 @@ public class CloudFragment extends Fragment {
             Log.d(TAG,"OnResume: ");
             listFiles("baicheng");
         }
+        else
+        {
+            cloudList.clear();
+            cloudList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
+        }
         if(mAdapter != null) {
             mAdapter.notifyDataSetChanged();
             Log.d(TAG,"Update the list");
@@ -358,5 +407,11 @@ public class CloudFragment extends Fragment {
         int min = seconds / 60;
         seconds-=(min * 60);
         return (min < 10 ? "0" + min : String.valueOf(min)) + ":" + (seconds < 10 ? "0" + seconds : String.valueOf(seconds));
+    }
+
+
+    public void setActivity(MainActivity mainActivity)
+    {
+        activity = mainActivity;
     }
 }

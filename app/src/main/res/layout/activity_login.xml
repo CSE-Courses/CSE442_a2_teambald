@@ -7,7 +7,7 @@
     android:background="#FFFFFF"
     android:orientation="vertical"
     android:weightSum="4"
-    tools:context="com.teambald.cse442_project_team_bald.SignInActivity">
+    tools:context="com.teambald.cse442_project_team_bald.MainActivity">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
