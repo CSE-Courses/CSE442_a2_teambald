@@ -2,15 +2,12 @@ package com.teambald.cse442_project_team_bald.Fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,7 +25,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -36,10 +32,9 @@ import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
-import com.teambald.cse442_project_team_bald.TabsController.SwipToDelete;
+import com.teambald.cse442_project_team_bald.TabsController.SwipeActionHandler;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -151,7 +146,7 @@ public class CloudFragment extends Fragment {
             mAdapter = new RecordingListAdapter(cloudList, getContext());
             recyclerView.setAdapter(mAdapter);
             ItemTouchHelper itemTouchHelper = new
-                    ItemTouchHelper(new SwipToDelete((RecordingListAdapter) mAdapter));
+                    ItemTouchHelper(new SwipeActionHandler((RecordingListAdapter) mAdapter));
             itemTouchHelper.attachToRecyclerView(recyclerView);
         }
         else
@@ -168,9 +163,6 @@ public class CloudFragment extends Fragment {
             cloudList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
             mAdapter = new RecordingListAdapter(cloudList, getContext());
             recyclerView.setAdapter(mAdapter);
-            ItemTouchHelper itemTouchHelper = new
-                    ItemTouchHelper(new SwipToDelete((RecordingListAdapter) mAdapter));
-            itemTouchHelper.attachToRecyclerView(recyclerView);
         }
     }
     public void listFiles(String fireBaseFolder)
@@ -195,7 +187,6 @@ public class CloudFragment extends Fragment {
         {
             cloudList.clear();
             cloudList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
-
             if(mAdapter != null) {
                 mAdapter.notifyDataSetChanged();
             }
