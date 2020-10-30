@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdapter.MyViewHolder> {
+
+
     private ArrayList<RecordingItem> mDataset;
     private static final String TAG = "RECORDING_FRAGMENT: ";
     private MediaPlayer mediaPlayer = null;
@@ -198,5 +200,11 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
             toast.show();
         }
     }
+    public ArrayList<RecordingItem> getmDataset() {
+        return mDataset;
+    }
 
+    public void setmDataset(ArrayList<RecordingItem> mDataset) {
+        this.mDataset = mDataset;
+    }
 }
