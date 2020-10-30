@@ -54,6 +54,7 @@ public class CloudFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
 
     private MainActivity activity;
+    private String fireBaseFolder = null;
     /*
     private Button down;
     private Button up;
@@ -132,7 +133,7 @@ public class CloudFragment extends Fragment {
         view.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         boolean logedIn = sharedPref.getBoolean(SettingFragment.LogedInBl,false);
-
+        fireBaseFolder = sharedPref.getString(SettingFragment.LogInEmail,null);
         if(logedIn) {
             RecyclerView recyclerView = view.findViewById(R.id.recording_list_recyclerview_cloud);
             recyclerView.setHasFixedSize(true);
@@ -142,7 +143,7 @@ public class CloudFragment extends Fragment {
             //ArrayList<String> filenames =
             //Log.d(TAG,filenames.toString());
             //Log.d(TAG,filenames.size()+"");
-            listFiles("baicheng");
+            listFiles(fireBaseFolder);
             mAdapter = new RecordingListAdapter(cloudList, getContext());
             recyclerView.setAdapter(mAdapter);
             ItemTouchHelper itemTouchHelper = new
@@ -288,129 +289,15 @@ public class CloudFragment extends Fragment {
             Log.d(TAG,"MetaData for File: "+filename+" Downloaded successfully");
         }
     }
-    public void deleteFile(final String filenamePref, final String filenameSuf, final String fireBaseFolder)
-    {
-        if(null!=filenamePref && null!=filenameSuf && null!=fireBaseFolder)
-        {
-            StorageReference storageReference = storageRef.child(fireBaseFolder).child(filenamePref + "." + filenameSuf);
-            storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    // File deleted successfully
-                    Log.d(TAG,"File deleted from cloud successfully");
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Uh-oh, an error occurred!
-                    Log.d(TAG,"File not deleted from cloud!");
-                }
-            });
-        }
-    }
 
-    public void uploadFile(String path, String localFolder, final String filenamePref, final String filenameSuf, final String fireBaseFolder, String duration)
-    {
-        if(null!=path && null!=filenamePref && null!=filenameSuf && null!=fireBaseFolder)
-        {
-            final String fullPath = path + "/" +localFolder+ "/" + filenamePref + "." + filenameSuf;
-            final String fullFBPath = fireBaseFolder + "/" + filenamePref + "." + filenameSuf;
-
-            Uri file = Uri.fromFile(new File(fullPath));
-            StorageReference storageReference = storageRef.child(fireBaseFolder).child(filenamePref + "." + filenameSuf);
-            storageReference.putFile(file)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // Get a URL to the uploaded content
-                            Log.d(TAG, "File upload successful");
-                            Log.d(TAG, "From:" + fullPath);
-                            Log.d(TAG, "To:" + fullFBPath);
-                            Toast tst = Toast.makeText(getContext(),"File upload Successful", Toast.LENGTH_SHORT);
-                            tst.show();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Handle unsuccessful uploads
-                            // ...
-                            Log.d(TAG, "File upload unsuccessful");
-                            Log.d(TAG, "From:" + fullPath);
-                            Log.d(TAG, "To:" + fullFBPath);
-                            Toast tst = Toast.makeText(getContext(),"File upload Unsuccessful", Toast.LENGTH_SHORT);
-                            tst.show();
-                        }
-                    });
-            // Create file metadata including the content type
-            StorageMetadata metadata = new StorageMetadata.Builder()
-                    .setContentType("audio/mp4")
-                    .setCustomMetadata(durationMetaDataConst, duration)
-                    .build();
-            // Update metadata properties
-            storageReference.updateMetadata(metadata)
-                    .addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-                        @Override
-                        public void onSuccess(StorageMetadata storageMetadata) {
-                            // Updated metadata is in storageMetadata
-                            Log.d(TAG,"File metadata update successful");
-                            Log.d(TAG,"For file: "+fireBaseFolder+"//"+filenamePref + "." + filenameSuf);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Uh-oh, an error occurred!
-                            Log.d(TAG,"File metadata update unsuccessful");
-                        }
-                    });
-        }
-        else
-        {
-            return;
-        }
-    }
-    public boolean downloadFile(String path,String localFolder,String filenamePref,String filenameSuf,String fireBaseFolder)
-    {
-        try
-        {
-            StorageReference storageReference = storageRef.child(fireBaseFolder).child(filenamePref + "." + filenameSuf);
-            final String fullPath = path + "/" +localFolder+ "/" + filenamePref + "." + filenameSuf;
-            File tempFile = new File(fullPath);
-            storageReference.getFile(tempFile)
-                .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-
-                        Log.d(TAG,"File download Successful");
-                        Toast.makeText(getContext(),"File download Successful", Toast.LENGTH_LONG);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle failed download
-                        // ...
-                        Log.d(TAG,"Read file error on Failure");
-                        Toast.makeText(getContext(),"File download Unsuccessful", Toast.LENGTH_LONG);
-                    }
-            });
-        }
-        catch (Exception e)
-        {
-            Log.d(TAG,"Read file error");
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
 
     @Override
     public void onResume() {
         super.onResume();
         if(storageRef!=null) {
             Log.d(TAG,"OnResume: ");
-            listFiles("baicheng");
+            fireBaseFolder = getMainActivity().getmAuth().getCurrentUser().getEmail();
+            listFiles(fireBaseFolder);
         }
         else
         {
@@ -428,7 +315,8 @@ public class CloudFragment extends Fragment {
         super.onAttach(context);
         if(storageRef!=null){
             Log.d(TAG,"OnAttach: ");
-            listFiles("baicheng");
+            fireBaseFolder = getMainActivity().getmAuth().getCurrentUser().getEmail();
+            listFiles(fireBaseFolder);
             if(mAdapter != null) {
                 mAdapter.notifyDataSetChanged();
             }
@@ -464,4 +352,6 @@ public class CloudFragment extends Fragment {
     {
         activity = mainActivity;
     }
+    public MainActivity getMainActivity()
+    {return activity;}
 }

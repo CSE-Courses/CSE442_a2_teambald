@@ -2,11 +2,14 @@ package com.teambald.cse442_project_team_bald;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
@@ -19,6 +22,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 import com.google.android.material.tabs.TabLayout;
@@ -29,8 +34,15 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.teambald.cse442_project_team_bald.Fragments.SettingFragment;
 import com.teambald.cse442_project_team_bald.TabsController.ViewPagerAdapter;
+
+import java.io.File;
 
 /**
  * Activity to demonstrate basic retrieval of the Google user's ID, email address, and basic
@@ -44,7 +56,10 @@ public class MainActivity extends AppCompatActivity
 
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mAuth;
+    private static FirebaseStorage storage;
+    private static StorageReference storageRef;
 
+    private static final String durationMetaDataConst = "Duration";
 
     private Button proceedButton;
 
@@ -89,6 +104,8 @@ public class MainActivity extends AppCompatActivity
         // Customize sign-in button. The sign-in button can be displayed in
         // multiple sizes.
 
+        storage = FirebaseStorage.getInstance();
+        storageRef = storage.getReference();
         //SignInButton signInButton = findViewById(R.id.sign_in_button);
         //signInButton.setSize(SignInButton.SIZE_STANDARD);
         // [END customize_button]
@@ -124,8 +141,6 @@ public class MainActivity extends AppCompatActivity
 
                     }
                 }).attach();
-
-
     }
 
 
@@ -211,4 +226,135 @@ public class MainActivity extends AppCompatActivity
 
     public FirebaseAuth getmAuth()
     {return mAuth;}
+
+    public boolean downloadFile(String path,String localFolder,String filenamePref,String filenameSuf,String fireBaseFolder)
+    {
+        return downloadFile(path,localFolder,filenamePref+"."+filenameSuf,fireBaseFolder);
+    }
+    public boolean downloadFile(String path,String localFolder,String filename,String fireBaseFolder)
+    {
+        try
+        {
+            Log.d(TAG,"Downloading from");
+            Log.d(TAG,fireBaseFolder);
+            Log.d(TAG,filename);
+            StorageReference storageReference = storageRef.child(fireBaseFolder).child(filename);
+            final String fullPath = path + "/" +localFolder+ "/" + filename;
+            File tempFile = new File(fullPath);
+            storageReference.getFile(tempFile)
+                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+
+                            Log.d(TAG,"File download Successful");
+                            Toast tst = Toast.makeText(getApplicationContext(),"File download Successful", Toast.LENGTH_SHORT);
+                            tst.show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle failed download
+                            // ...
+                            Log.d(TAG,"Read file error on Failure");
+                            Toast tst = Toast.makeText(getApplicationContext(),"File download Unsuccessful", Toast.LENGTH_SHORT);
+                            tst.show();
+                        }
+                    });
+        }
+        catch (Exception e)
+        {
+            Log.d(TAG,"Read file error");
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+    public void uploadFile(String path, String localFolder, final String filenamePref, final String filenameSuf, final String fireBaseFolder, String duration)
+    {uploadFile(path,localFolder,filenamePref + "." + filenameSuf,fireBaseFolder,duration);}
+    public void uploadFile(String path, String localFolder, final String filename, final String fireBaseFolder, String duration)
+    {
+        if(null!=path && null!=filename && null!=fireBaseFolder)
+        {
+            final String fullPath = path + "/" +localFolder+ "/" + filename;
+            final String fullFBPath = fireBaseFolder + "/" + filename;
+
+            Uri file = Uri.fromFile(new File(fullPath));
+            StorageReference storageReference = storageRef.child(fireBaseFolder).child(filename);
+            storageReference.putFile(file)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // Get a URL to the uploaded content
+                            Log.d(TAG, "File upload successful");
+                            Log.d(TAG, "From:" + fullPath);
+                            Log.d(TAG, "To:" + fullFBPath);
+                            Toast tst = Toast.makeText(getApplicationContext(),"File upload Successful", Toast.LENGTH_SHORT);
+                            tst.show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle unsuccessful uploads
+                            // ...
+                            Log.d(TAG, "File upload unsuccessful");
+                            Log.d(TAG, "From:" + fullPath);
+                            Log.d(TAG, "To:" + fullFBPath);
+                            Toast tst = Toast.makeText(getApplicationContext(),"File upload Unsuccessful", Toast.LENGTH_SHORT);
+                            tst.show();
+                        }
+                    });
+            // Create file metadata including the content type
+            StorageMetadata metadata = new StorageMetadata.Builder()
+                    .setContentType("audio/mp4")
+                    .setCustomMetadata(durationMetaDataConst, duration)
+                    .build();
+            // Update metadata properties
+            storageReference.updateMetadata(metadata)
+                    .addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                        @Override
+                        public void onSuccess(StorageMetadata storageMetadata) {
+                            // Updated metadata is in storageMetadata
+                            Log.d(TAG,"File metadata update successful");
+                            Log.d(TAG,"For file: "+fireBaseFolder+"//"+filename);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Uh-oh, an error occurred!
+                            Log.d(TAG,"File metadata update unsuccessful");
+                        }
+                    });
+        }
+        else
+        {
+            return;
+        }
+    }
+    public void deleteFile(final String filenamePref, final String filenameSuf, final String fireBaseFolder)
+    {deleteFile(filenamePref + "." + filenameSuf,fireBaseFolder);}
+    public void deleteFile(final String filename, final String fireBaseFolder)
+    {
+        if(null!=filename && null!=fireBaseFolder)
+        {
+            StorageReference storageReference = storageRef.child(fireBaseFolder).child(filename);
+            storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    // File deleted successfully
+                    Log.d(TAG,"File deleted from cloud successfully");
+                    Log.d(TAG, "From:" + fireBaseFolder+"/"+filename);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Uh-oh, an error occurred!
+                    Log.d(TAG,"File not deleted from cloud!");
+                    Log.d(TAG, "From:" + fireBaseFolder+"/"+filename);
+                }
+            });
+        }
+    }
 }
