@@ -1,11 +1,18 @@
 package com.teambald.cse442_project_team_bald.TabsController;
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 import com.teambald.cse442_project_team_bald.Fragments.CloudFragment;
@@ -54,7 +61,6 @@ public class SwipeActionHandler extends ItemTouchHelper.SimpleCallback {
     public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
         return false;
     }
-
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
         int position = viewHolder.getAdapterPosition();
@@ -76,6 +82,9 @@ public class SwipeActionHandler extends ItemTouchHelper.SimpleCallback {
                     RecordingItem item = recordingList.get(position);
                     File file = item.getAudio_file();
                     Log.d(TAG,"Uploading file: "+file.getAbsolutePath());
+                    String path = recordingListFragment.getActivity().getExternalFilesDir("/").getAbsolutePath();
+                    String fireBaseFolder = recordingListFragment.getMainActivity().getmAuth().getCurrentUser().getEmail();
+                    recordingListFragment.getMainActivity().uploadFile(path,"",file.getName(),fireBaseFolder,item.getDuration());
                 }
                 //
                 break;
@@ -87,11 +96,23 @@ public class SwipeActionHandler extends ItemTouchHelper.SimpleCallback {
                     RecordingItem item = recordingList.get(position);
                     File file = item.getAudio_file();
                     Log.d(TAG,"Downloading file: "+file.getAbsolutePath());
+                    String path = cloudFragment.getActivity().getExternalFilesDir("/").getAbsolutePath();
+                    String fireBaseFolder = cloudFragment.getMainActivity().getmAuth().getCurrentUser().getEmail();
+                    cloudFragment.getMainActivity().downloadFile(path,"",file.getName(),fireBaseFolder);
                 }
                 else if (direction == ItemTouchHelper.RIGHT)
                 {
                     //Delete file
                     Log.d(TAG,"Deleting file");
+                    RecordingItem item = recordingList.get(position);
+                    File file = item.getAudio_file();
+                    Log.d(TAG,"Deleting cloud file: "+file.getAbsolutePath());
+
+                    String path = cloudFragment.getActivity().getExternalFilesDir("/").getAbsolutePath();
+                    String fireBaseFolder = cloudFragment.getMainActivity().getmAuth().getCurrentUser().getEmail();
+
+                    cloudFragment.getMainActivity().deleteFile(file.getName(),fireBaseFolder);
+
                     mAdapter.deleteItem(position);
                     mAdapter.notifyDataSetChanged();
                 }

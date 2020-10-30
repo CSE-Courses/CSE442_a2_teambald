@@ -144,5 +144,7 @@ public class RecordingListFragment extends Fragment {
     {
         activity = mainActivity;
     }
+    public MainActivity getMainActivity()
+    {return activity;}
 }
 
