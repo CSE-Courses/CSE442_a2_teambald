@@ -4,7 +4,6 @@ import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +20,7 @@ import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
-import com.teambald.cse442_project_team_bald.TabsController.SwipToDelete;
+import com.teambald.cse442_project_team_bald.TabsController.SwipeActionHandler;
 
 import java.io.File;
 import java.text.ParseException;
@@ -75,7 +74,7 @@ public class RecordingListFragment extends Fragment {
         mAdapter = new RecordingListAdapter(recordingList,getContext());
         recyclerView.setAdapter(mAdapter);
         ItemTouchHelper itemTouchHelper = new
-                ItemTouchHelper(new SwipToDelete( (RecordingListAdapter)mAdapter));
+                ItemTouchHelper(new SwipeActionHandler( (RecordingListAdapter)mAdapter));
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 

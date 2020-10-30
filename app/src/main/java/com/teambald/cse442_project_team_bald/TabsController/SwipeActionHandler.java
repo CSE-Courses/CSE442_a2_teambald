@@ -3,7 +3,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class SwipToDelete extends ItemTouchHelper.SimpleCallback {
+public class SwipeActionHandler extends ItemTouchHelper.SimpleCallback {
 
     /**
      * Creates an ItemTouchHelper that will work with the given Callback.
@@ -17,7 +17,7 @@ public class SwipToDelete extends ItemTouchHelper.SimpleCallback {
     private RecordingListAdapter mAdapter;
 
 
-    public SwipToDelete(RecordingListAdapter adapter) {
+    public SwipeActionHandler(RecordingListAdapter adapter) {
         super(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
         mAdapter = adapter;
     }
