@@ -146,7 +146,7 @@ public class CloudFragment extends Fragment {
             mAdapter = new RecordingListAdapter(cloudList, getContext());
             recyclerView.setAdapter(mAdapter);
             ItemTouchHelper itemTouchHelper = new
-                    ItemTouchHelper(new SwipeActionHandler((RecordingListAdapter) mAdapter));
+                    ItemTouchHelper(new SwipeActionHandler((RecordingListAdapter) mAdapter,1,this));
             itemTouchHelper.attachToRecyclerView(recyclerView);
         }
         else
@@ -181,7 +181,6 @@ public class CloudFragment extends Fragment {
                             Log.d(TAG,"File list error");
                         }
                     });
-
         }
         else
         {
@@ -200,6 +199,10 @@ public class CloudFragment extends Fragment {
             String filename = filenames.get(idx);
             cloudList.add(new RecordingItem(filename, "Duration: ", filename, true, new File(filename)));
         }
+        RecyclerView recyclerView = getView().findViewById(R.id.recording_list_recyclerview_cloud);
+        ItemTouchHelper itemTouchHelper = new
+                ItemTouchHelper(new SwipeActionHandler((RecordingListAdapter) mAdapter,1,this));
+        itemTouchHelper.attachToRecyclerView(recyclerView);
         if(mAdapter != null) {
             mAdapter.notifyDataSetChanged();
             Log.d(TAG,"mAdapter notified");

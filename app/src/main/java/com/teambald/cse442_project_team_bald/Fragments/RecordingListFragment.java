@@ -74,7 +74,7 @@ public class RecordingListFragment extends Fragment {
         mAdapter = new RecordingListAdapter(recordingList,getContext());
         recyclerView.setAdapter(mAdapter);
         ItemTouchHelper itemTouchHelper = new
-                ItemTouchHelper(new SwipeActionHandler( (RecordingListAdapter)mAdapter));
+                ItemTouchHelper(new SwipeActionHandler( (RecordingListAdapter)mAdapter,0,this));
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 

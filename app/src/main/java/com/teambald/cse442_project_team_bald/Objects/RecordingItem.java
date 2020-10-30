@@ -11,6 +11,15 @@ public class RecordingItem {
     boolean play;
     boolean locker;
 
+    public RecordingItem()
+    {
+        date = null;
+        duration = null;
+        audio_file = null;
+        StartTime = -1;
+        play = false;
+        locker = false;
+    }
     public RecordingItem(String date, String duration, boolean play) {
         this.date = date;
         this.duration = duration;
