@@ -20,10 +20,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.teambald.cse442_project_team_bald.Encryption.AudioEncryptionUtils;
 import com.teambald.cse442_project_team_bald.Encryption.FileUtils;
+import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
-import com.teambald.cse442_project_team_bald.TabsController.SwipToDelete;
+import com.teambald.cse442_project_team_bald.TabsController.SwipeActionHandler;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -35,11 +36,13 @@ import java.util.Date;
 import java.util.Locale;
 
 public class RecordingListFragment extends Fragment {
-    private static final String TAG = "RecordingListFragment: ";
     private ArrayList<RecordingItem> recordingList = new ArrayList<>();
     private MediaPlayer mediaPlayer = null;
     private File[] allFiles;
     private RecyclerView.Adapter mAdapter;
+    private static final String TAG = "RecordingListF";
+
+    private MainActivity activity;
 
     public RecordingListFragment() {}
 
@@ -75,7 +78,7 @@ public class RecordingListFragment extends Fragment {
         mAdapter = new RecordingListAdapter(recordingList,getContext());
         recyclerView.setAdapter(mAdapter);
         ItemTouchHelper itemTouchHelper = new
-                ItemTouchHelper(new SwipToDelete( (RecordingListAdapter)mAdapter));
+                ItemTouchHelper(new SwipeActionHandler( (RecordingListAdapter)mAdapter,0,this));
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
@@ -181,6 +184,13 @@ public class RecordingListFragment extends Fragment {
         seconds-=(min * 60);
         return (min < 10 ? "0" + min : String.valueOf(min)) + ":" + (seconds < 10 ? "0" + seconds : String.valueOf(seconds));
     }
+
+    public void setActivity(MainActivity mainActivity)
+    {
+        activity = mainActivity;
+    }
+    public MainActivity getMainActivity()
+    {return activity;}
 
     /**
      * Decrypt and return the decoded bytes

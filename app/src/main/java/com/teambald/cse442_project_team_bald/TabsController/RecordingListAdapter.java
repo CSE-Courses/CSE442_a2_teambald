@@ -151,7 +151,6 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
 
     private void playAudio(final RecordingItem recordingItem) {
         File fileToPlay = recordingItem.getAudio_file();
-
         mediaPlayer = new MediaPlayer();
         try {
             mediaPlayer.setDataSource(fileToPlay.getAbsolutePath());
@@ -202,6 +201,13 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
             Toast toast = Toast.makeText(this.context, text, duration);
             toast.show();
         }
+    }
+    public ArrayList<RecordingItem> getmDataset() {
+        return mDataset;
+    }
+
+    public void setmDataset(ArrayList<RecordingItem> mDataset) {
+        this.mDataset = mDataset;
     }
 
     /**

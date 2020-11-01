@@ -17,6 +17,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -25,8 +29,11 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.teambald.cse442_project_team_bald.Encryption.AudioEncryptionUtils;
-import com.teambald.cse442_project_team_bald.Encryption.FileUtils;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.R;
 import com.teambald.cse442_project_team_bald.Service.RecordingService;
@@ -56,7 +63,7 @@ public class HomeFragment extends Fragment {
     private SharedPreferences sharedPref;
 
     private Chronometer timer;
-    
+
     private static final String TAG = "HOME_FRAGMENT: ";
 
     private ImageButton recordButton;
@@ -64,6 +71,8 @@ public class HomeFragment extends Fragment {
     private TextView accountText;
 
     private HomeFragment homeFragObj;
+
+    private MainActivity activity;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -113,11 +122,22 @@ public class HomeFragment extends Fragment {
         updateUI(account);
         // [END on_start_sign_in]
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // [START on_start_sign_in]
+        // Check for existing Google Sign In account, if the user is already signed in
+        // the GoogleSignInAccount will be non-null.
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
+        updateUI(account);
+        // [END on_start_sign_in]
+    }
     private void updateUI(@Nullable GoogleSignInAccount account) {
         if (account != null) {
-            accountText.setText("Signed In as: "+account.getDisplayName());
+            accountText.setText("Signed In as: "+account.getEmail());
         } else {
-            accountText.setText("None");
+            accountText.setText("Signed In as: None");
         }
     }
 
@@ -183,64 +203,8 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    /**
-     * Encrypt and save to disk
-     *
-     * @return
-     */
-    private boolean encrypt(String filePath) {
-        try {
-            byte[] fileData = FileUtils.readFile(filePath);
-            byte[] encodedBytes = AudioEncryptionUtils.encode(AudioEncryptionUtils.getInstance(getContext()).getSecretKey(), fileData);
-            FileUtils.saveFile(encodedBytes, filePath);
-            return true;
-        } catch (Exception e) {
-            Log.e("Encryption", e.toString());
-            Toast toast = Toast.makeText(getContext(), "Encryption failed.", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-        return false;
-    }
-
-    /**
-     * Decrypt and return the decoded bytes
-     *
-     * @return
-     */
-    private byte[] decrypt(String filePath) {
-        try {
-            byte[] fileData = FileUtils.readFile(filePath);
-            byte[] decryptedBytes = AudioEncryptionUtils.decode(AudioEncryptionUtils.getInstance(getContext()).getSecretKey(), fileData);
-            return decryptedBytes;
-        } catch (Exception e) {
-            Toast toast = Toast.makeText(getContext(), "Decryption failed.", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-        return null;
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Log.d("mTAG", "APP stopped!");
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d("mTAG", "APP resumed!");
-        Log.d("mTAG", "Recording = " + isRecording);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.d("mTAG", "APP paused!");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d("mTAG", "APP destroyed!");
+    public void setActivity(MainActivity mainActivity)
+    {
+        activity = mainActivity;
     }
 }
