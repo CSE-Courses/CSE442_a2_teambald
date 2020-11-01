@@ -98,7 +98,6 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO: @Chaoping: Add listener that play/pause the audio. Make sure to pause other playing audio if there is any.
                 Log.i(TAG, "Audio No. "+ (position + 1) + " is clicked");
 
                 //Swap the play/pause icon.
