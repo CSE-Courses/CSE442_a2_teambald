@@ -67,8 +67,8 @@ public class RecordingService extends Service {
             stopSelf();
         }else {
             //Read saved recording length (default to 5 mins).
-//            recordingLength = intent.getIntExtra("RECORDING_LENGTH", 300000);
-            recordingLength = 5000;
+            recordingLength = intent.getIntExtra("RECORDING_LENGTH", 300000);
+//            recordingLength = 5000;          //DEBUG Use.
             //Start recording.
             startRecording();
 
