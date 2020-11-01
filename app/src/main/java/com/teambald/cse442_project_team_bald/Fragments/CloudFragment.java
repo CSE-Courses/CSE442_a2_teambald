@@ -296,8 +296,12 @@ public class CloudFragment extends Fragment {
         super.onResume();
         if(storageRef!=null) {
             Log.d(TAG,"OnResume: ");
-            fireBaseFolder = getMainActivity().getmAuth().getCurrentUser().getEmail();
-            listFiles(fireBaseFolder);
+            //Check if signed in to avoid NullPointerException.
+            if(getMainActivity().getmAuth().getCurrentUser() != null) {
+                fireBaseFolder = getMainActivity().getmAuth().getCurrentUser().getEmail();
+                listFiles(fireBaseFolder);
+            }
+
         }
         else
         {

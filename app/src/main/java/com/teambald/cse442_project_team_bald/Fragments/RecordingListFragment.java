@@ -4,9 +4,11 @@ import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +18,8 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.teambald.cse442_project_team_bald.Encryption.AudioEncryptionUtils;
+import com.teambald.cse442_project_team_bald.Encryption.FileUtils;
 import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
@@ -23,6 +27,8 @@ import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter
 import com.teambald.cse442_project_team_bald.TabsController.SwipeActionHandler;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,8 +36,6 @@ import java.util.Date;
 import java.util.Locale;
 
 public class RecordingListFragment extends Fragment {
-    //TODO: @Chaoping: Create a list of recording object when you are done with it.
-  
     private ArrayList<RecordingItem> recordingList = new ArrayList<>();
     private MediaPlayer mediaPlayer = null;
     private File[] allFiles;
@@ -118,18 +122,59 @@ public class RecordingListFragment extends Fragment {
         allFiles = directory.listFiles();
         recordingList.clear();
         for(File f : allFiles){
-            Uri uri = Uri.parse(f.getAbsolutePath());
-            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-            mmr.setDataSource(getContext(), uri);
-            String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-            int seconds = Integer.parseInt(durationStr) / 1000;
-            durationStr = parseSeconds(seconds);
-            recordingList.add(new RecordingItem(f.getName(), durationStr , f.getPath(), true, f));
+            Log.i("File Path", f.getAbsolutePath());
+            try {
+                Uri uri = Uri.parse(f.getAbsolutePath());
+                MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+                mmr.setDataSource(getContext(), uri);
+                String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                int seconds = Integer.parseInt(durationStr) / 1000;
+                durationStr = parseSeconds(seconds);
+                recordingList.add(new RecordingItem(f.getName(), durationStr, f.getPath(), true, f));
+            }catch (Exception e){
+                Log.e(TAG, ""+e);
+            }
         }
         if(mAdapter != null) {
             mAdapter.notifyDataSetChanged();
         }
     }
+
+    /*
+     * For Encrypted files only.
+     * Update the items in recordingList and notify the mAdapter to display to change.
+     * This will be called in onResume().
+     */
+//    public void readAllEncryptedFiles() {
+//        String path = getActivity().getExternalFilesDir("/").getAbsolutePath();
+//        File directory = new File(path);
+//        allFiles = directory.listFiles();
+//        recordingList.clear();
+//        for(File f : allFiles){
+//            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+//
+//            //Decrypt audio file
+//            byte[] decrypt = decrypt(f);
+//            FileDescriptor decrypted;
+//            try{
+//                decrypted = FileUtils.getTempFileDescriptor(getContext(), decrypt);
+//            }catch (IOException e){
+//                Toast toast = Toast.makeText(getContext(), "Decrypt audio has failed.", Toast.LENGTH_SHORT);
+//                toast.show();
+//                return;
+//            }
+//
+//            mmr.setDataSource(decrypted);
+//
+//            String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+//            int seconds = Integer.parseInt(durationStr) / 1000;
+//            durationStr = parseSeconds(seconds);
+//            recordingList.add(new RecordingItem(f.getName(), durationStr , f.getPath(), true, f));
+//        }
+//        if(mAdapter != null) {
+//            mAdapter.notifyDataSetChanged();
+//        }
+//    }
 
     /*
      * Take seconds and parse into the form of 00:00.
@@ -146,5 +191,23 @@ public class RecordingListFragment extends Fragment {
     }
     public MainActivity getMainActivity()
     {return activity;}
+
+    /**
+     * Decrypt and return the decoded bytes
+     *
+     * @return
+     */
+    private byte[] decrypt(File file) {
+        String filePath = file.getPath();
+        try {
+            byte[] fileData = FileUtils.readFile(filePath);
+            byte[] decryptedBytes = AudioEncryptionUtils.decode(AudioEncryptionUtils.getInstance(getContext()).getSecretKey(), fileData);
+            return decryptedBytes;
+        } catch (Exception e) {
+            Toast toast = Toast.makeText(getContext(), "Decryption failed.", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+        return null;
+    }
 }
 
