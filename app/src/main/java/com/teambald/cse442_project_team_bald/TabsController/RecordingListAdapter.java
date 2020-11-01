@@ -150,24 +150,11 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
     }
 
     private void playAudio(final RecordingItem recordingItem) {
-        //File should be encrypted.
         File fileToPlay = recordingItem.getAudio_file();
-
-        //Decrypt audio file
-        byte[] decrypt = decrypt(fileToPlay);
-        FileDescriptor decrypted;
-        try{
-            decrypted = FileUtils.getTempFileDescriptor(context, decrypt);
-        }catch (IOException e){
-            Toast toast = Toast.makeText(context, "Playing audio has failed.", Toast.LENGTH_SHORT);
-            toast.show();
-            return;
-        }
 
         mediaPlayer = new MediaPlayer();
         try {
-//            mediaPlayer.setDataSource(fileToPlay.getAbsolutePath());
-            mediaPlayer.setDataSource(decrypted);
+            mediaPlayer.setDataSource(fileToPlay.getAbsolutePath());
             mediaPlayer.prepare();
             mediaPlayer.seekTo(recordingItem.getStartTimeTime());
             mediaPlayer.start();
@@ -183,6 +170,7 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
             }
         });
     }
+
     private void stopAudio() {
         //Stop The Audio
         isPlaying = false;
