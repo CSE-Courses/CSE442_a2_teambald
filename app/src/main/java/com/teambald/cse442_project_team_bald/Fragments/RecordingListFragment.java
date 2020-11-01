@@ -118,6 +118,7 @@ public class RecordingListFragment extends Fragment {
      */
     public void readAllFiles() {
         String path = getActivity().getExternalFilesDir("/").getAbsolutePath();
+        path = path+File.separator+"LocalRecording";//Local
         File directory = new File(path);
         allFiles = directory.listFiles();
         recordingList.clear();

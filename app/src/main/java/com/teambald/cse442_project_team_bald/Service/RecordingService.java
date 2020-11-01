@@ -26,6 +26,8 @@ import com.teambald.cse442_project_team_bald.Fragments.HomeFragment;
 import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.R;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -39,6 +41,7 @@ public class RecordingService extends Service {
     private static final String TAG = "RecordingServiceTAG";
     private MediaRecorder mediaRecorder;
     private String recordFile;
+    public String recordPath;
 
     private HandlerThread mRecordingThread;
     private Handler mRecordingHandler;
@@ -47,6 +50,13 @@ public class RecordingService extends Service {
 
     @Override
     public void onCreate() {
+        //Update and Create Local Recording List and Cloud Recording List
+        String rawPath = getApplicationContext().getExternalFilesDir("/").getAbsolutePath();
+        recordPath = rawPath+File.separator+"LocalRecording";
+        File LocalRecordList = new File(recordPath);
+        File CloudRedordList = new File(rawPath+File.separator+"CloudRecording");
+        LocalRecordList.mkdir();
+        CloudRedordList.mkdir();
         Log.d(TAG, "Service is created");
         mRecordingThread = new HandlerThread("Recording thread", Thread.MAX_PRIORITY);
         mRecordingThread.start();
@@ -94,7 +104,7 @@ public class RecordingService extends Service {
 
     private void startRecording() {
         //Get app external directory path
-        String recordPath = getApplicationContext().getExternalFilesDir("/").getAbsolutePath();
+
 
         //Get current date and time
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss", Locale.US);
@@ -132,6 +142,7 @@ public class RecordingService extends Service {
                     //Restart the recorder.
                     startRecording();
                 }
+
             }
         });
 
@@ -143,7 +154,9 @@ public class RecordingService extends Service {
 
         //Start Recording
         mediaRecorder.start();
+
     }
+
 
     private void stopRecording() {
         Log.i(TAG, "Stop recording");
