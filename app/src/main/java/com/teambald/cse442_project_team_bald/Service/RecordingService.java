@@ -53,10 +53,8 @@ public class RecordingService extends Service {
         //Update and Create Local Recording List and Cloud Recording List
         String rawPath = getApplicationContext().getExternalFilesDir("/").getAbsolutePath();
         recordPath = rawPath+File.separator+"LocalRecording";
-        File LocalRecordList = new File(recordPath);
-        File CloudRedordList = new File(rawPath+File.separator+"CloudRecording");
-        LocalRecordList.mkdir();
-        CloudRedordList.mkdir();
+
+
         Log.d(TAG, "Service is created");
         mRecordingThread = new HandlerThread("Recording thread", Thread.MAX_PRIORITY);
         mRecordingThread.start();

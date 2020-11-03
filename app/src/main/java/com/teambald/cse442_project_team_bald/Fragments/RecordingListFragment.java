@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -41,19 +42,23 @@ public class RecordingListFragment extends Fragment {
     private File[] allFiles;
     private RecyclerView.Adapter mAdapter;
     private static final String TAG = "RecordingListF";
+    private String Directory_toRead;
+
 
     private MainActivity activity;
 
-    public RecordingListFragment() {}
+    public RecordingListFragment(String path) {
+        this.Directory_toRead = path;
+    }
 
 
     public static RecordingListFragment newInstance() {
-        return new RecordingListFragment();
+        return new RecordingListFragment("");
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        readAllFiles();
+
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -65,15 +70,21 @@ public class RecordingListFragment extends Fragment {
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+
+
         view.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
         RecyclerView recyclerView = view.findViewById(R.id.recording_list_recyclerview);
-        recyclerView.setHasFixedSize(true);
 
+        recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
+
+
+
         //Read local audio files. Will be updated in onResume().
-        readAllFiles();
+        readAllFiles(Directory_toRead);
 
         mAdapter = new RecordingListAdapter(recordingList,getContext());
         recyclerView.setAdapter(mAdapter);
@@ -109,22 +120,21 @@ public class RecordingListFragment extends Fragment {
     public void onResume() {
         super.onResume();
         //Update saved audio file to make sure the recordings are up-to-date.
-        readAllFiles();
+        readAllFiles(Directory_toRead);
     }
 
     /*
-     * Update the items in recordingList and notify the mAdapter to display to change.
      * This will be called in onResume().
      */
-    public void readAllFiles() {
-        String path = getActivity().getExternalFilesDir("/").getAbsolutePath();
-        path = path+File.separator+"LocalRecording";//Local
+    public void readAllFiles(String path) {
+//        String path = getActivity().getExternalFilesDir("/").getAbsolutePath();
+//        path = path+File.separator+"LocalRecording";//Local
         File directory = new File(path);
         allFiles = directory.listFiles();
         recordingList.clear();
         for(File f : allFiles){
-            Log.i("File Path", f.getAbsolutePath());
             try {
+                Log.i("File Path", f.getAbsolutePath());
                 Uri uri = Uri.parse(f.getAbsolutePath());
                 MediaMetadataRetriever mmr = new MediaMetadataRetriever();
                 mmr.setDataSource(getContext(), uri);
@@ -210,5 +220,10 @@ public class RecordingListFragment extends Fragment {
         }
         return null;
     }
+
+    private void setpath(String path){
+        this.Directory_toRead = path;
+    }
+
 }
 

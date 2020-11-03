@@ -38,6 +38,7 @@ import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.R;
 import com.teambald.cse442_project_team_bald.Service.RecordingService;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -98,6 +99,9 @@ public class HomeFragment extends Fragment {
         recordButton = view.findViewById(R.id.recorder_button);
         recordButton.setOnClickListener(new recordClickListener());
         accountText = view.findViewById(R.id.login_account_text);
+
+        //initilize the Recroding Directory
+        initilize_RecordDirctroy();
 
         sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
 
@@ -203,6 +207,15 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    public void initilize_RecordDirctroy(){
+        String rawPath = getContext().getExternalFilesDir("/").getAbsolutePath();
+        String recordPath = rawPath+File.separator+"LocalRecording";
+        File LocalRecordList = new File(recordPath);
+        File CloudRedordList = new File(rawPath+File.separator+"CloudRecording");
+
+        LocalRecordList.mkdir();
+        CloudRedordList.mkdir();
+    }
     public void setActivity(MainActivity mainActivity)
     {
         activity = mainActivity;
