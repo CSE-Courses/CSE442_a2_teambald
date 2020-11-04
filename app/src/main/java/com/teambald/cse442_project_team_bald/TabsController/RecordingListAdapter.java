@@ -16,10 +16,13 @@ import android.widget.Toast;
 import java.io.File;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.teambald.cse442_project_team_bald.Encryption.AudioEncryptionUtils;
+import com.teambald.cse442_project_team_bald.Encryption.FileUtils;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -95,7 +98,6 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO: @Chaoping: Add listener that play/pause the audio. Make sure to pause other playing audio if there is any.
                 Log.i(TAG, "Audio No. "+ (position + 1) + " is clicked");
 
                 //Swap the play/pause icon.
@@ -166,6 +168,7 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
             }
         });
     }
+
     private void stopAudio() {
         //Stop The Audio
         isPlaying = false;
@@ -198,5 +201,29 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
             toast.show();
         }
     }
+    public ArrayList<RecordingItem> getmDataset() {
+        return mDataset;
+    }
 
+    public void setmDataset(ArrayList<RecordingItem> mDataset) {
+        this.mDataset = mDataset;
+    }
+
+    /**
+     * Decrypt and return the decoded bytes
+     *
+     * @return
+     */
+    private byte[] decrypt(File file) {
+        String filePath = file.getPath();
+        try {
+            byte[] fileData = FileUtils.readFile(filePath);
+            byte[] decryptedBytes = AudioEncryptionUtils.decode(AudioEncryptionUtils.getInstance(context).getSecretKey(), fileData);
+            return decryptedBytes;
+        } catch (Exception e) {
+            Toast toast = Toast.makeText(context, "Decryption failed.", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+        return null;
+    }
 }

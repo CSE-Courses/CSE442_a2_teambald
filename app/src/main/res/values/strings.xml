@@ -4,8 +4,8 @@
     <string name="recorder_description">Recorder Icon</string>
     <string name="recording_length_text">Recording length</string>
     <string name="recording_length_key">RECORDING LENGTH KEY</string>
+    <string name="is_recording_key">IS RECORDING KEY</string>
 
-    <string name="title_text">Google Sign-In\nQuickstart</string>
 
     <!-- Sign-in status messages -->
     <string name="signed_in_fmt">Signed in as: %s</string>
