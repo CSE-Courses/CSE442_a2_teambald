@@ -9,12 +9,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,6 +41,7 @@ import java.util.Locale;
 public class RecordingListFragment extends Fragment {
     private ArrayList<RecordingItem> recordingList = new ArrayList<>();
     private MediaPlayer mediaPlayer = null;
+    private ImageButton BackButton;
     private File[] allFiles;
     private RecyclerView.Adapter mAdapter;
     private static final String TAG = "RecordingListF";
@@ -91,6 +94,19 @@ public class RecordingListFragment extends Fragment {
         ItemTouchHelper itemTouchHelper = new
                 ItemTouchHelper(new SwipeActionHandler( (RecordingListAdapter)mAdapter,0,this));
         itemTouchHelper.attachToRecyclerView(recyclerView);
+
+        //setup the Back Button
+        this.BackButton = view.findViewById(R.id.Back_Button);
+        this.BackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Fragment recordingListFG = new RecordSelectFragment();
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.replace(((ViewGroup)getView().getParent()).getId() , recordingListFG );
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
     }
 
     //method use to Update the lists in external storage, need to be call on the background daily.
