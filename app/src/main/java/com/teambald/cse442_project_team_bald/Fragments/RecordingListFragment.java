@@ -165,6 +165,9 @@ public class RecordingListFragment extends Fragment {
                         break;
                     }
                 }
+                if(f.getName().indexOf("Record")==0){
+                    name=f.getName();
+                }
                 recordingList.add(new RecordingItem(name, durationStr, f.getPath(), true, f));
             }catch (Exception e){
                 Log.e(TAG, ""+e);
