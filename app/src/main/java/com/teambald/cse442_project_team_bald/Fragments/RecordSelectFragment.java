@@ -28,6 +28,7 @@ public class RecordSelectFragment extends Fragment {
     private static final String TAG = "RecordingListF";
     private Button HomeButton;
     private Button CloudButton;
+    private Button BackButton;
     private String LocalRecord_Directory;
     private String CloudRecord_Directory;
     private MainActivity activity;
@@ -74,6 +75,8 @@ public class RecordSelectFragment extends Fragment {
                 transaction.commit();
             }
         });
+
+
     }
 
     public void setActivity(MainActivity mainActivity)

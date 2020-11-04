@@ -318,7 +318,7 @@ public class CloudFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if(storageRef!=null){
+        if(storageRef!=null && getMainActivity().getmAuth().getCurrentUser() != null){
             Log.d(TAG,"OnAttach: ");
             fireBaseFolder = getMainActivity().getmAuth().getCurrentUser().getEmail();
             listFiles(fireBaseFolder);
