@@ -14,6 +14,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.teambald.cse442_project_team_bald.Encryption.AudioEncryptionUtils;
@@ -34,6 +37,7 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
     private View PlayingView;
     private int preint;
     private Context context;
+    private Fragment fragment;
 
 
 
@@ -50,12 +54,13 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public RecordingListAdapter(ArrayList<RecordingItem> myDataset, Context context) {
+    public RecordingListAdapter(ArrayList<RecordingItem> myDataset, Context context,Fragment fragment) {
         mDataset = myDataset;
         this.context=context;
         isPlaying=false;
         PlayingView=null;
         preint=-1;
+        this.fragment=fragment;
     }
 
     // Create new views (invoked by the layout manager)
@@ -81,19 +86,39 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
 
         date.setText(mDataset.get(position).getDate());
         duration.setText(mDataset.get(position).getDuration());
-        if(mDataset.get(position).isLocked()) {
-            locker.setChecked(true); // if is locked set to true
-        }
         //Locker event
         locker.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                   mDataset.get(position).Lock(); // lock
+                if (isChecked) {// lock
+                    String path= mDataset.get(position).getAudio_file().getPath();
+                    if(path.charAt(path.length()-5) !='L') {
+                        String name = path.substring(0, path.length() - 4);
+                        mDataset.get(position).getAudio_file().renameTo(new File(name + "_L.mp4"));
+                        FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
+                        ft.detach(fragment);
+                        ft.attach(fragment);
+                        ft.commit();
+
+                    }
                 } else {
                     mDataset.get(position).unLock(); // unlock
+                    String path= mDataset.get(position).getAudio_file().getPath();
+                    String name= path.substring(0,path.length()-6);
+                    if(path.charAt(path.length()-5)== 'L') {
+                        mDataset.get(position).getAudio_file().renameTo(new File(name + ".mp4"));
+                        FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
+                        ft.detach(fragment);
+                        ft.attach(fragment);
+                        ft.commit();
+                    }
                 }
             }
         });
+        if(!mDataset.get(position).isLocked()) {
+            locker.setChecked(false); // if is locked set to true
+        }else{
+            locker.setChecked(true);
+        }
         button.setBackgroundResource(mDataset.get(position).isPlay() ? R.drawable.ic_play_button : R.drawable.ic_pause_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override

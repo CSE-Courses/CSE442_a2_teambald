@@ -24,19 +24,23 @@ public class RecordingItem {
         this.date = date;
         this.duration = duration;
         this.play = play;
-        this.locker=true; // set to true
+        this.locker=false; // set to true
     }
     public RecordingItem(String date, String duration,String path, boolean play,File audio_file) {
         this.date = date;
         this.duration = duration;
         this.play = play;
         this.audio_file = audio_file;
-        this.locker=true; // set to true
+        this.locker=false; // set to true
+        if(audio_file.getName().charAt(audio_file.getName().length()-5) == 'L') {
+            this.locker = true; // set to false
+        }
         StartTime = 0;
     }
     public boolean isLocked(){
         return this.locker;
     }
+
     public void Lock(){
         locker=true;
     }
