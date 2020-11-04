@@ -103,7 +103,8 @@ public class RecordingService extends Service {
 
     private void startRecording() {
         //Read set recording length, default is 5 mins.
-        recordingLength = prefs.getInt(getString(R.string.recording_length_key), 300000);
+        recordingLength = prefs.getInt(getString(R.string.recording_length_key), 5);
+        Log.i(TAG, "Recording will be saved every " + recordingLength + "mins");
         //Get current date and time
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss", Locale.US);
         Date now = new Date();
@@ -121,7 +122,7 @@ public class RecordingService extends Service {
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
         //Save recording periodically.
-        mediaRecorder.setMaxDuration(recordingLength);
+        mediaRecorder.setMaxDuration(recordingLength * 60 * 1000);
         //Will be executed when reach max duration.
         mediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
             @Override
@@ -160,6 +161,9 @@ public class RecordingService extends Service {
         Log.i(TAG, "Stop recording");
         //Change text on page to file saved
         //Stop media recorder and set it to null for further use to record new audio
+        if(mediaRecorder == null){
+            return;
+        }
         mediaRecorder.stop();
         mediaRecorder.reset();
         mediaRecorder.release();

@@ -3,6 +3,7 @@ package com.teambald.cse442_project_team_bald.Fragments;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,7 +53,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         super.onCreate(savedInstanceState);
 
         //Initialize SharedPref and read set recording length from SharedPreference (default: 5).
-        sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
         editor = sharedPref.edit();
         pval = sharedPref.getInt(getString(R.string.recording_length_key), 5);
         Log.i("Recording_Length", String.valueOf(pval));
@@ -159,7 +160,10 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStart() {
         super.onStart();
-        FirebaseUser currentUser = activity.getmAuth().getCurrentUser();
+        FirebaseUser currentUser = null;
+        if(activity.getmAuth() != null){
+            currentUser = activity.getmAuth().getCurrentUser();
+        }
         // Check if the user is already signed in and all required scopes are granted
         if (currentUser != null ) {
             updateSignInUI(currentUser);

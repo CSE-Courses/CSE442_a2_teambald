@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -103,7 +104,7 @@ public class HomeFragment extends Fragment {
         //initilize the Recroding Directory
         initilize_RecordDirctroy();
 
-        sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
         //Read isRecording value.
         isRecording = sharedPref.getBoolean(getString(R.string.is_recording_key), false);
 
