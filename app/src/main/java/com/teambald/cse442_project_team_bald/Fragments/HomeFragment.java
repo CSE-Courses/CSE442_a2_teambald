@@ -104,6 +104,8 @@ public class HomeFragment extends Fragment {
         initilize_RecordDirctroy();
 
         sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        //Read isRecording value.
+        isRecording = sharedPref.getBoolean(getString(R.string.is_recording_key), false);
 
         checkPermissions();
         view.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
@@ -113,7 +115,6 @@ public class HomeFragment extends Fragment {
         }else{
             recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
         }
-        isRecording= false;
     }
     @Override
     public void onStart() {
@@ -149,8 +150,6 @@ public class HomeFragment extends Fragment {
     {
         @Override
         public void onClick(View view) {
-            //Read isRecording value.
-            isRecording = sharedPref.getBoolean(getString(R.string.is_recording_key), false);
 
             if (isRecording) {
                 //Stop Recording
@@ -179,10 +178,8 @@ public class HomeFragment extends Fragment {
             toast.show();
             return;
         }
-        int recordingLength = sharedPref.getInt(getString(R.string.recording_length_key), 5) * 60 * 1000;
         Intent serviceIntent = new Intent(getContext(), RecordingService.class);
         serviceIntent.putExtra("Recording_Service_Signal", "start");
-        serviceIntent.putExtra("RECORDING_LENGTH", recordingLength);
         ContextCompat.startForegroundService(getContext(), serviceIntent);
         Log.d("mTAG", "Service start!");
     }
