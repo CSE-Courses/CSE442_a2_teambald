@@ -1,13 +1,18 @@
 package com.teambald.cse442_project_team_bald.TabsController;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -21,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.teambald.cse442_project_team_bald.Encryption.AudioEncryptionUtils;
 import com.teambald.cse442_project_team_bald.Encryption.FileUtils;
+import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 
@@ -79,13 +85,35 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
     public void onBindViewHolder(MyViewHolder holder, final int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        TextView date = holder.recordingItemView.findViewById(R.id.recording_date_tv);
+        final TextView date = holder.recordingItemView.findViewById(R.id.recording_date_tv);
         TextView duration = holder.recordingItemView.findViewById(R.id.recording_duration_tv);
         ImageButton button = holder.recordingItemView.findViewById(R.id.recording_play_pause_button);
         Switch locker=holder.recordingItemView.findViewById(R.id.locker);
+        Button rename=holder.recordingItemView.findViewById(R.id.rename_button);
+        final TextView text=holder.recordingItemView.findViewById(R.id.renaming_Text);
 
         date.setText(mDataset.get(position).getDate());
         duration.setText(mDataset.get(position).getDuration());
+        //Renaming event
+        rename.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(text.getText()!=""){
+                    date.setText(text.getText());
+                    String name= mDataset.get(position).getAudio_file().getName();
+                    String path=mDataset.get(position).getAudio_file().getPath();
+                    String subName= name.substring(name.indexOf("Recording"));
+                    String SubPath=path.substring(0,path.indexOf(name));
+                    mDataset.get(position).getAudio_file().renameTo(new File(SubPath+text.getText()+"_"+subName ));
+                    text.setText("");
+                    notifyDataSetChanged();
+                    FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
+                    ft.detach(fragment);
+                    ft.attach(fragment);
+                    ft.commit();
+                }
+            }
+        });
         //Locker event
         locker.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

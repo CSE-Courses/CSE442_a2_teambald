@@ -141,7 +141,15 @@ public class RecordingListFragment extends Fragment {
                 String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
                 int seconds = Integer.parseInt(durationStr) / 1000;
                 durationStr = parseSeconds(seconds);
-                recordingList.add(new RecordingItem(f.getName(), durationStr, f.getPath(), true, f));
+                String name="";
+                for(int i=0;i<f.getName().length();i++){
+                    if(f.getName().charAt(i)!='_'){
+                        name+=f.getName().charAt(i);
+                    }else{
+                        break;
+                    }
+                }
+                recordingList.add(new RecordingItem(name, durationStr, f.getPath(), true, f));
             }catch (Exception e){
                 Log.e(TAG, ""+e);
             }
