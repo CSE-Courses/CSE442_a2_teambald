@@ -206,9 +206,11 @@ public class HomeFragment extends Fragment {
         String rawPath = getContext().getExternalFilesDir("/").getAbsolutePath();
         String recordPath = rawPath+File.separator+"LocalRecording";
         File LocalRecordList = new File(recordPath);
-        File CloudRedordList = new File(rawPath+File.separator+"CloudRecording");
+        File CloudRecordList = new File(rawPath+File.separator+"CloudRecording");
+        File tmpRecordList = new File(rawPath+File.separator+"tmp");
 
         LocalRecordList.mkdir();
-        CloudRedordList.mkdir();
+        CloudRecordList.mkdir();
+        tmpRecordList.mkdir();
     }
 }

@@ -40,6 +40,8 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.teambald.cse442_project_team_bald.Fragments.SettingFragment;
+import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
+import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
 import com.teambald.cse442_project_team_bald.TabsController.ViewPagerAdapter;
 
 import java.io.File;
@@ -249,6 +251,47 @@ public class MainActivity extends AppCompatActivity
 
                             Log.d(TAG,"File download Successful");
                             Toast tst = Toast.makeText(getApplicationContext(),"File download Successful", Toast.LENGTH_SHORT);
+                            tst.show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle failed download
+                            // ...
+                            Log.d(TAG,"Read file error on Failure");
+                            Toast tst = Toast.makeText(getApplicationContext(),"File download Unsuccessful", Toast.LENGTH_SHORT);
+                            tst.show();
+                        }
+                    });
+        }
+        catch (Exception e)
+        {
+            Log.d(TAG,"Read file error");
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+    public boolean downloadFileToPlay(String path, String localFolder, String filename, String fireBaseFolder, final RecordingListAdapter rla, final RecordingItem recordingItem)
+    {
+        try
+        {
+            Log.d(TAG,"Downloading from");
+            Log.d(TAG,fireBaseFolder);
+            Log.d(TAG,filename);
+            StorageReference storageReference = storageRef.child(fireBaseFolder).child(filename);
+            final String fullPath = path + "/" +localFolder+ "/" + filename;
+            final File tempFile = new File(fullPath);
+            storageReference.getFile(tempFile)
+                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+
+                            Log.d(TAG,"File Download Successful");
+                            Log.d(TAG,"Start playing now");
+                            Toast tst = Toast.makeText(getApplicationContext(),"Start playing now", Toast.LENGTH_SHORT);
+                            rla.playAudio(tempFile,recordingItem);
                             tst.show();
                         }
                     })

@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.teambald.cse442_project_team_bald.Encryption.AudioEncryptionUtils;
 import com.teambald.cse442_project_team_bald.Encryption.FileUtils;
+import com.teambald.cse442_project_team_bald.Fragments.RecordingListFragment;
+import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 
@@ -30,13 +32,14 @@ public class LocalListAdapter extends RecordingListAdapter{
     private static final String TAG = "RECORDED_FRAGMENT: ";
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public LocalListAdapter(ArrayList<RecordingItem> myDataset, Context context, Fragment fragment) {
+    public LocalListAdapter(ArrayList<RecordingItem> myDataset, Context ct, RecordingListFragment frag, MainActivity ma) {
         mDataset = myDataset;
-        this.context=context;
+        context=ct;
         isPlaying=false;
         PlayingView=null;
         preint=-1;
-        this.fragment=fragment;
+        fragment=frag;
+        activity = ma;
         Log.d(TAG,"Init Local List Adap");
     }
 

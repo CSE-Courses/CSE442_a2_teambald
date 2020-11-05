@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.teambald.cse442_project_team_bald.Encryption.AudioEncryptionUtils;
 import com.teambald.cse442_project_team_bald.Encryption.FileUtils;
+import com.teambald.cse442_project_team_bald.Fragments.CloudFragment;
+import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 
@@ -30,13 +32,15 @@ public class CloudListAdapter extends RecordingListAdapter{
     private static final String TAG = "CLOUD_FRAGMENT: ";
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public CloudListAdapter(ArrayList<RecordingItem> myDataset, Context context, Fragment fragment) {
+    public CloudListAdapter(ArrayList<RecordingItem> myDataset, Context ct, CloudFragment frag, MainActivity ma) {
         mDataset = myDataset;
-        this.context=context;
+        context=ct;
         isPlaying=false;
         PlayingView=null;
         preint=-1;
-        this.fragment=fragment;
+        cloudFragment=frag;
+        activity = ma;
+        Log.d(TAG,"Init Cloud List Adap");
     }
 
 
@@ -123,7 +127,7 @@ public class CloudListAdapter extends RecordingListAdapter{
             @Override
             public void onClick(View view) {
                 Log.i(TAG, "Audio No. "+ (position + 1) + " is clicked");
-
+                //Download first;
                 //Swap the play/pause icon.
                 mDataset.get(position).setPlay(!mDataset.get(position).isPlay());
                 view.findViewById(R.id.recording_play_pause_button)
@@ -135,7 +139,7 @@ public class CloudListAdapter extends RecordingListAdapter{
                     view.findViewById(R.id.recording_play_pause_button)
                             .setBackgroundResource(R.drawable.ic_pause_button); // change the background icon
                     isPlaying = true; // set playing to true
-                    playAudio(mDataset.get(position));
+                    downloadAndPlayAudio(mDataset.get(position));
                     preint = position; // track the index
                     PlayingView = view; // track the view
 
@@ -159,7 +163,7 @@ public class CloudListAdapter extends RecordingListAdapter{
                         isPlaying=true;// set playing to true
                         preint=position; // track index
                         PlayingView=view; // track view
-                        playAudio(mDataset.get(position));
+                        downloadAndPlayAudio(mDataset.get(position));
                     }
                 }
             }

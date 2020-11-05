@@ -134,7 +134,7 @@ public class CloudFragment extends Fragment {
             //Log.d(TAG,filenames.toString());
             //Log.d(TAG,filenames.size()+"");
             listFiles(fireBaseFolder);
-            mAdapter = new CloudListAdapter(cloudList, getContext(),this);
+            mAdapter = new CloudListAdapter(cloudList, getContext(),this,activity);
             recyclerView.setAdapter(mAdapter);
             ItemTouchHelper itemTouchHelper = new
                     ItemTouchHelper(new SwipeActionHandler((CloudListAdapter) mAdapter,this,"CloudRecording",1));
@@ -152,7 +152,7 @@ public class CloudFragment extends Fragment {
             //Log.d(TAG,filenames.size()+"");
             cloudList.clear();
             cloudList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
-            mAdapter = new CloudListAdapter(cloudList, getContext(),this);
+            mAdapter = new CloudListAdapter(cloudList, getContext(),this,activity);
             recyclerView.setAdapter(mAdapter);
         }
     }

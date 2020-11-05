@@ -86,7 +86,7 @@ public class RecordingListFragment extends Fragment {
         //Read local audio files. Will be updated in onResume().
         readAllFiles(Directory_toRead);
 
-        mAdapter = new LocalListAdapter(recordingList,getContext(),this);
+        mAdapter = new LocalListAdapter(recordingList,getContext(),this,activity);
         recyclerView.setAdapter(mAdapter);
         ItemTouchHelper itemTouchHelper = new
                 ItemTouchHelper(new SwipeActionHandler( (LocalListAdapter)mAdapter,this,Directory_toRead,0));

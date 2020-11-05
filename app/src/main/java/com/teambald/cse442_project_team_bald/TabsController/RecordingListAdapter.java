@@ -26,6 +26,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.teambald.cse442_project_team_bald.Encryption.AudioEncryptionUtils;
 import com.teambald.cse442_project_team_bald.Encryption.FileUtils;
+import com.teambald.cse442_project_team_bald.Fragments.CloudFragment;
+import com.teambald.cse442_project_team_bald.Fragments.RecordingListFragment;
 import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
@@ -43,8 +45,9 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
     public View PlayingView;
     public int preint;
     public Context context;
-    public Fragment fragment;
-
+    public CloudFragment cloudFragment;
+    public RecordingListFragment fragment;
+    public MainActivity activity;
 
     public RecordingListAdapter()
     {}
@@ -61,15 +64,6 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
         }
     }
 
-    // Provide a suitable constructor (depends on the kind of dataset)
-    public RecordingListAdapter(ArrayList<RecordingItem> myDataset, Context context,Fragment fragment) {
-        mDataset = myDataset;
-        this.context=context;
-        isPlaying=false;
-        PlayingView=null;
-        preint=-1;
-        this.fragment=fragment;
-    }
 
     // Create new views (invoked by the layout manager)
     @Override
@@ -201,7 +195,10 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
     @Override
     public int getItemCount() {
         if(mDataset==null)
-        {return 0;}
+        {
+            Log.d(TAG,"mDataSet null");
+            return 0;
+        }
         return mDataset.size();
     }
 
@@ -224,6 +221,36 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
                 stopAudio();
             }
         });
+    }
+    public void playAudio(final File fileToPlay,final RecordingItem recordingItem)
+    {
+        mediaPlayer = new MediaPlayer();
+        try {
+            mediaPlayer.setDataSource(fileToPlay.getAbsolutePath());
+            mediaPlayer.prepare();
+            mediaPlayer.seekTo(recordingItem.getStartTimeTime());
+            mediaPlayer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //Play the audio
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                recordingItem.setStartTime(0);
+                stopAudio();
+            }
+        });
+    }
+    public void downloadAndPlayAudio(final RecordingItem recordingItem)
+    {
+        String filename = recordingItem.getDate();
+        String rawPath = activity.getExternalFilesDir("/").getAbsolutePath();
+        String fullPath = rawPath+File.separator+"tmp"+File.separator+filename;
+        File audioFile = new File(fullPath);
+        Log.d(TAG,"Downloading file first for cloud play.");
+        activity.downloadFileToPlay(rawPath,"tmp",filename,activity.getmAuth().getCurrentUser().getEmail(),this,recordingItem);
+        Log.d(TAG,"Downloaded file for cloud play");
     }
 
     public void stopAudio() {
