@@ -82,7 +82,7 @@ public class SwipeActionHandler extends ItemTouchHelper.SimpleCallback {
                     RecordingItem item = recordingList.get(position);
                     File file = item.getAudio_file();
                     Log.d(TAG,"Uploading file: "+file.getAbsolutePath());
-                    String path = recordingListFragment.getActivity().getExternalFilesDir("/").getAbsolutePath();
+                    String path = recordingListFragment.getActivity().getExternalFilesDir("/").getAbsolutePath()+File.separator+"LocalRecording"+File.separator;
                     String fireBaseFolder = recordingListFragment.getMainActivity().getmAuth().getCurrentUser().getEmail();
                     recordingListFragment.getMainActivity().uploadFile(path,"",file.getName(),fireBaseFolder,item.getDuration());
                 }
@@ -96,7 +96,7 @@ public class SwipeActionHandler extends ItemTouchHelper.SimpleCallback {
                     RecordingItem item = recordingList.get(position);
                     File file = item.getAudio_file();
                     Log.d(TAG,"Downloading file: "+file.getAbsolutePath());
-                    String path = cloudFragment.getActivity().getExternalFilesDir("/").getAbsolutePath();
+                    String path = cloudFragment.getActivity().getExternalFilesDir("/").getAbsolutePath()+File.separator+"CloudRecording"+File.separator;
                     String fireBaseFolder = cloudFragment.getMainActivity().getmAuth().getCurrentUser().getEmail();
                     cloudFragment.getMainActivity().downloadFile(path,"",file.getName(),fireBaseFolder);
                 }
@@ -108,7 +108,6 @@ public class SwipeActionHandler extends ItemTouchHelper.SimpleCallback {
                     File file = item.getAudio_file();
                     Log.d(TAG,"Deleting cloud file: "+file.getAbsolutePath());
 
-                    String path = cloudFragment.getActivity().getExternalFilesDir("/").getAbsolutePath();
                     String fireBaseFolder = cloudFragment.getMainActivity().getmAuth().getCurrentUser().getEmail();
 
                     cloudFragment.getMainActivity().deleteFile(file.getName(),fireBaseFolder);

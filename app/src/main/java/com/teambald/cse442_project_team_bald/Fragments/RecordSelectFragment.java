@@ -57,22 +57,24 @@ public class RecordSelectFragment extends Fragment {
         HomeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Fragment recordingListFG = new RecordingListFragment(LocalRecord_Directory);
+                RecordingListFragment recordingListFG = new RecordingListFragment(LocalRecord_Directory);
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
                 transaction.add(((ViewGroup)getView().getParent()).getId() , recordingListFG );
                 transaction.addToBackStack(null);
                 transaction.commit();
+                recordingListFG.setActivity(activity);
             }
         });
         this.CloudButton = view.findViewById(R.id.Cloud);
         CloudButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Fragment recordingListFG = new RecordingListFragment(CloudRecord_Directory);
+                RecordingListFragment recordingListFG = new RecordingListFragment(CloudRecord_Directory);
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
                 transaction.add(((ViewGroup)getView().getParent()).getId() , recordingListFG );
                 transaction.addToBackStack(null);
                 transaction.commit();
+                recordingListFG.setActivity(activity);
             }
         });
 
