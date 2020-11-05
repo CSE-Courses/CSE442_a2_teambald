@@ -1,5 +1,7 @@
 package com.teambald.cse442_project_team_bald.TabsController;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -14,6 +16,7 @@ import com.teambald.cse442_project_team_bald.MainActivity;
 
 public class ViewPagerAdapter extends FragmentStateAdapter {
     private static final int TABS_SIZE = 4;
+    private static final String TAG = "VPAdapter";
 
     private MainActivity mainActivity;
 
@@ -27,22 +30,20 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         switch(position){
             case 0:
-                HomeFragment homeFragment = HomeFragment.newInstance();
-                homeFragment.setActivity(mainActivity);
+                HomeFragment homeFragment = new HomeFragment(mainActivity);
                 return homeFragment;
             case 1:
-                RecordSelectFragment recordingListFragment = RecordSelectFragment.newInstance();
-                recordingListFragment.setActivity(mainActivity);
+                RecordSelectFragment recordingListFragment = new RecordSelectFragment(mainActivity);
                 return  recordingListFragment;
             case 2:
-                CloudFragment cloudFragment =  CloudFragment.newInstance();
-                cloudFragment.setActivity(mainActivity);
+                CloudFragment cloudFragment =  new CloudFragment(mainActivity);
                 return cloudFragment;
             case 3:
-                SettingFragment settingFragment = SettingFragment.newInstance();
-                settingFragment.setActivity(mainActivity);
+                SettingFragment settingFragment = new SettingFragment(mainActivity);
                 return settingFragment;
-            default: return HomeFragment.newInstance();
+            default:
+                Log.d(TAG,"Invalid position in fragment creation");
+                return null;
         }
     }
 

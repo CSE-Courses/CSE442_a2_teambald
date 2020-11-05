@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -34,27 +35,29 @@ public class SwipeActionHandler extends ItemTouchHelper.SimpleCallback {
      */
     private RecordingListAdapter mAdapter;
 
-    //fragmentId = 0 -> recording frag
-    //fragmentId = 1 -> cloud frag
+    private String readPath;
     private int fragmentId = -1;
+    //0->LocalFrag 1->CloudFrag
 
     private static final String TAG = "SwipeActionHandler";
 
     private CloudFragment cloudFragment;
     private RecordingListFragment recordingListFragment;
 
-    public SwipeActionHandler(RecordingListAdapter adapter,int fragment,CloudFragment frag) {
+    public SwipeActionHandler(RecordingListAdapter adapter,CloudFragment frag, String path,int fragId) {
         super(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
         mAdapter = adapter;
-        fragmentId = fragment;
         cloudFragment = frag;
+        readPath = path;
+        fragmentId = fragId;
     }
 
-    public SwipeActionHandler(RecordingListAdapter adapter,int fragment,RecordingListFragment frag) {
+    public SwipeActionHandler(RecordingListAdapter adapter,RecordingListFragment frag, String path,int fragId) {
         super(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
         mAdapter = adapter;
-        fragmentId = fragment;
         recordingListFragment = frag;
+        readPath = path;
+        fragmentId = fragId;
     }
 
     @Override
@@ -82,8 +85,16 @@ public class SwipeActionHandler extends ItemTouchHelper.SimpleCallback {
                     RecordingItem item = recordingList.get(position);
                     File file = item.getAudio_file();
                     Log.d(TAG,"Uploading file: "+file.getAbsolutePath());
-                    String path = recordingListFragment.getActivity().getExternalFilesDir("/").getAbsolutePath()+File.separator+"LocalRecording"+File.separator;
-                    String fireBaseFolder = recordingListFragment.getMainActivity().getmAuth().getCurrentUser().getEmail();
+                    String path = readPath+File.separator;
+
+                    FirebaseUser fbuser = recordingListFragment.getMainActivity().getmAuth().getCurrentUser();
+                    if(fbuser == null)
+                    {
+                        Toast.makeText(recordingListFragment.getContext(),"Please Log in",Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    String fireBaseFolder = fbuser.getEmail();
+
                     recordingListFragment.getMainActivity().uploadFile(path,"",file.getName(),fireBaseFolder,item.getDuration());
                 }
                 //
@@ -96,8 +107,14 @@ public class SwipeActionHandler extends ItemTouchHelper.SimpleCallback {
                     RecordingItem item = recordingList.get(position);
                     File file = item.getAudio_file();
                     Log.d(TAG,"Downloading file: "+file.getAbsolutePath());
-                    String path = cloudFragment.getActivity().getExternalFilesDir("/").getAbsolutePath()+File.separator+"CloudRecording"+File.separator;
-                    String fireBaseFolder = cloudFragment.getMainActivity().getmAuth().getCurrentUser().getEmail();
+                    String path = cloudFragment.getActivity().getExternalFilesDir("/").getAbsolutePath()+File.separator+readPath+File.separator;
+                    FirebaseUser fbuser = cloudFragment.getMainActivity().getmAuth().getCurrentUser();
+                    if(fbuser == null)
+                    {
+                        Toast.makeText(cloudFragment.getContext(),"Please Log in",Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    String fireBaseFolder = fbuser.getEmail();
                     cloudFragment.getMainActivity().downloadFile(path,"",file.getName(),fireBaseFolder);
                 }
                 else if (direction == ItemTouchHelper.RIGHT)
@@ -108,8 +125,13 @@ public class SwipeActionHandler extends ItemTouchHelper.SimpleCallback {
                     File file = item.getAudio_file();
                     Log.d(TAG,"Deleting cloud file: "+file.getAbsolutePath());
 
-                    String fireBaseFolder = cloudFragment.getMainActivity().getmAuth().getCurrentUser().getEmail();
-
+                    FirebaseUser fbuser = cloudFragment.getMainActivity().getmAuth().getCurrentUser();
+                    if(fbuser == null)
+                    {
+                        Toast.makeText(cloudFragment.getContext(),"Please Log in",Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    String fireBaseFolder = fbuser.getEmail();
                     cloudFragment.getMainActivity().deleteFile(file.getName(),fireBaseFolder);
 
                     mAdapter.deleteItem(position);

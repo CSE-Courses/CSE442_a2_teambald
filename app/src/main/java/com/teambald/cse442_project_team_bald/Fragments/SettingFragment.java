@@ -39,11 +39,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     public static final String LogInName = "LogInName";
     public static final String LogedInBl = "LogedInBoolean";
 
-    public SettingFragment() { }
+    public SettingFragment(MainActivity mainActivity) { activity = mainActivity;}
 
-    public static SettingFragment newInstance() {
-        return new SettingFragment();
-    }
     private static SignInButton signInButton;
     private static Button signOutButton;
     private static TextView statusText;
@@ -127,10 +124,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     {
         activity.signOut();
     }
-    public void setActivity(MainActivity mainActivity)
-    {
-        activity = mainActivity;
-    }
+
     public static void updateSignInUI(FirebaseUser account)
     {
         if(null != account)

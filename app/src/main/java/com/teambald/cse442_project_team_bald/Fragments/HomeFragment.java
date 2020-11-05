@@ -76,11 +76,8 @@ public class HomeFragment extends Fragment {
 
     private MainActivity activity;
 
-    public HomeFragment() {
-        // Required empty public constructor
-    }
-    public static HomeFragment newInstance() {
-        return new HomeFragment();
+    public HomeFragment(MainActivity mainActivity) {
+        activity = mainActivity;
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -213,9 +210,5 @@ public class HomeFragment extends Fragment {
 
         LocalRecordList.mkdir();
         CloudRedordList.mkdir();
-    }
-    public void setActivity(MainActivity mainActivity)
-    {
-        activity = mainActivity;
     }
 }

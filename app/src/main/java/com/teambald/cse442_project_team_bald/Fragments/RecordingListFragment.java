@@ -26,7 +26,7 @@ import com.teambald.cse442_project_team_bald.Encryption.FileUtils;
 import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
-import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
+import com.teambald.cse442_project_team_bald.TabsController.LocalListAdapter;
 import com.teambald.cse442_project_team_bald.TabsController.SwipeActionHandler;
 
 import java.io.File;
@@ -50,14 +50,11 @@ public class RecordingListFragment extends Fragment {
 
     private MainActivity activity;
 
-    public RecordingListFragment(String path) {
+    public RecordingListFragment(MainActivity mainActivity,String path) {
         this.Directory_toRead = path;
+        activity = mainActivity;
     }
 
-
-    public static RecordingListFragment newInstance() {
-        return new RecordingListFragment("");
-    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,10 +86,10 @@ public class RecordingListFragment extends Fragment {
         //Read local audio files. Will be updated in onResume().
         readAllFiles(Directory_toRead);
 
-        mAdapter = new RecordingListAdapter(recordingList,getContext(),this);
+        mAdapter = new LocalListAdapter(recordingList,getContext(),this);
         recyclerView.setAdapter(mAdapter);
         ItemTouchHelper itemTouchHelper = new
-                ItemTouchHelper(new SwipeActionHandler( (RecordingListAdapter)mAdapter,0,this));
+                ItemTouchHelper(new SwipeActionHandler( (LocalListAdapter)mAdapter,this,Directory_toRead,0));
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
         //setup the Back Button
@@ -100,7 +97,7 @@ public class RecordingListFragment extends Fragment {
         this.BackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Fragment recordingListFG = new RecordSelectFragment();
+                Fragment recordingListFG = new RecordSelectFragment(activity);
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
                 transaction.replace(((ViewGroup)getView().getParent()).getId() , recordingListFG );
                 transaction.addToBackStack(null);
@@ -223,10 +220,6 @@ public class RecordingListFragment extends Fragment {
         return (min < 10 ? "0" + min : String.valueOf(min)) + ":" + (seconds < 10 ? "0" + seconds : String.valueOf(seconds));
     }
 
-    public void setActivity(MainActivity mainActivity)
-    {
-        activity = mainActivity;
-    }
     public MainActivity getMainActivity()
     {return activity;}
 

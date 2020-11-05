@@ -33,7 +33,11 @@ public class RecordSelectFragment extends Fragment {
     private String CloudRecord_Directory;
     private MainActivity activity;
 
-    public static RecordSelectFragment newInstance() { return new RecordSelectFragment(); }
+
+    public RecordSelectFragment(MainActivity mainActivity)
+    {
+        activity = mainActivity;
+    }
 
     @Nullable
     @Override
@@ -57,37 +61,25 @@ public class RecordSelectFragment extends Fragment {
         HomeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                RecordingListFragment recordingListFG = new RecordingListFragment(LocalRecord_Directory);
+                RecordingListFragment recordingListFG = new RecordingListFragment(activity,LocalRecord_Directory);
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
                 transaction.add(((ViewGroup)getView().getParent()).getId() , recordingListFG );
                 transaction.addToBackStack(null);
                 transaction.commit();
-                recordingListFG.setActivity(activity);
             }
         });
         this.CloudButton = view.findViewById(R.id.Cloud);
         CloudButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                RecordingListFragment recordingListFG = new RecordingListFragment(CloudRecord_Directory);
+                RecordingListFragment recordingListFG = new RecordingListFragment(activity,CloudRecord_Directory);
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
                 transaction.add(((ViewGroup)getView().getParent()).getId() , recordingListFG );
                 transaction.addToBackStack(null);
                 transaction.commit();
-                recordingListFG.setActivity(activity);
             }
         });
 
 
     }
-
-    public void setActivity(MainActivity mainActivity)
-    {
-        this.activity = mainActivity;
-    }
-    public MainActivity getMainActivity()
-    {return activity;}
-
-
-
 }

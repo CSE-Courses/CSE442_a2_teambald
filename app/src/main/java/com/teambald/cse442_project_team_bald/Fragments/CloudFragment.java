@@ -32,7 +32,7 @@ import com.google.firebase.storage.UploadTask;
 import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
-import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
+import com.teambald.cse442_project_team_bald.TabsController.CloudListAdapter;
 import com.teambald.cse442_project_team_bald.TabsController.SwipeActionHandler;
 
 import java.io.File;
@@ -68,21 +68,10 @@ public class CloudFragment extends Fragment {
 
     private static final String TAG = "CloudFrag";
 
-    public CloudFragment() {
+    public CloudFragment(MainActivity mainActivity) {
+        activity = mainActivity;
     }
 
-    public static CloudFragment newInstance() {
-        return new CloudFragment();
-    }
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static CloudFragment newInstance(int columnCount) {
-        CloudFragment fragment = new CloudFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -145,10 +134,10 @@ public class CloudFragment extends Fragment {
             //Log.d(TAG,filenames.toString());
             //Log.d(TAG,filenames.size()+"");
             listFiles(fireBaseFolder);
-            mAdapter = new RecordingListAdapter(cloudList, getContext(),this);
+            mAdapter = new CloudListAdapter(cloudList, getContext(),this);
             recyclerView.setAdapter(mAdapter);
             ItemTouchHelper itemTouchHelper = new
-                    ItemTouchHelper(new SwipeActionHandler((RecordingListAdapter) mAdapter,1,this));
+                    ItemTouchHelper(new SwipeActionHandler((CloudListAdapter) mAdapter,this,"CloudRecording",1));
             itemTouchHelper.attachToRecyclerView(recyclerView);
         }
         else
@@ -163,7 +152,7 @@ public class CloudFragment extends Fragment {
             //Log.d(TAG,filenames.size()+"");
             cloudList.clear();
             cloudList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
-            mAdapter = new RecordingListAdapter(cloudList, getContext(),this);
+            mAdapter = new CloudListAdapter(cloudList, getContext(),this);
             recyclerView.setAdapter(mAdapter);
         }
     }
@@ -203,7 +192,7 @@ public class CloudFragment extends Fragment {
         }
         RecyclerView recyclerView = getView().findViewById(R.id.recording_list_recyclerview_cloud);
         ItemTouchHelper itemTouchHelper = new
-                ItemTouchHelper(new SwipeActionHandler((RecordingListAdapter) mAdapter,1,this));
+                ItemTouchHelper(new SwipeActionHandler((CloudListAdapter) mAdapter,this,"CloudRecording",1));
         itemTouchHelper.attachToRecyclerView(recyclerView);
         if(mAdapter != null) {
             mAdapter.notifyDataSetChanged();
@@ -350,12 +339,6 @@ public class CloudFragment extends Fragment {
         int min = seconds / 60;
         seconds-=(min * 60);
         return (min < 10 ? "0" + min : String.valueOf(min)) + ":" + (seconds < 10 ? "0" + seconds : String.valueOf(seconds));
-    }
-
-
-    public void setActivity(MainActivity mainActivity)
-    {
-        activity = mainActivity;
     }
     public MainActivity getMainActivity()
     {return activity;}

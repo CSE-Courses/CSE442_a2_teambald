@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity
         // [END build_client]
         FirebaseApp.initializeApp(getBaseContext());
         mAuth = FirebaseAuth.getInstance();
+        Log.d(TAG,"mAuth null is:"+ (null==mAuth));
         // [START customize_button]
         // Customize sign-in button. The sign-in button can be displayed in
         // multiple sizes.
