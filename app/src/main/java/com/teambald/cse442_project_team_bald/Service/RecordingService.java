@@ -245,7 +245,7 @@ public class RecordingService extends Service {
 //        final String fullPath = path + "/" + filename;
 //        final String fullFBPath = fireBaseFolder + "/" + filename;
 
-        Log.i(TAG, "Trying uploadRecording, duration = " + duration);
+        Log.i(TAG, "Trying auto upload Recording, duration = " + duration);
 
         File f = new File(fileUri);
         Uri file = Uri.fromFile(f);
@@ -256,7 +256,7 @@ public class RecordingService extends Service {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         // Get a URL to the uploaded content
-                        Log.d(TAG, "File upload successful");
+                        Log.d(TAG, "File auto-upload successful");
                         StorageMetadata metadata = new StorageMetadata.Builder()
                                 .setContentType("audio/mp4")
                                 .setCustomMetadata(durationMetaDataConst, duration)
@@ -267,14 +267,14 @@ public class RecordingService extends Service {
                                     @Override
                                     public void onSuccess(StorageMetadata storageMetadata) {
                                         // Updated metadata is in storageMetadata
-                                        Log.d(TAG,"File metadata update successful");
+                                        Log.d(TAG,"File metadata auto-update successful");
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception exception) {
                                         // Uh-oh, an error occurred!
-                                        Log.d(TAG,"File metadata update unsuccessful");
+                                        Log.d(TAG,"File metadata auto-update unsuccessful");
                                     }
                                 });
                     }
@@ -284,7 +284,7 @@ public class RecordingService extends Service {
                     public void onFailure(@NonNull Exception exception) {
                         // Handle unsuccessful uploads
                         // ...
-                        Log.d(TAG, "File upload unsuccessful");
+                        Log.d(TAG, "File auto-upload unsuccessful");
                     }
                 });
         // Create file metadata including the content type
