@@ -288,8 +288,14 @@ public class CloudFragment extends Fragment {
             Log.d(TAG,"OnResume: ");
             //Check if signed in to avoid NullPointerException.
             if(getMainActivity().getmAuth().getCurrentUser() != null) {
-                fireBaseFolder = getMainActivity().getmAuth().getCurrentUser().getEmail();
+                fireBaseFolder = activity.getmAuth().getCurrentUser().getEmail();
+                Log.d(TAG,"signed in as:" + fireBaseFolder);
                 listFiles(fireBaseFolder);
+            }
+            else
+            {
+                cloudList.clear();
+                cloudList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
             }
 
         }
@@ -307,9 +313,9 @@ public class CloudFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if(storageRef!=null && getMainActivity().getmAuth().getCurrentUser() != null){
+        if(storageRef!=null && activity.getmAuth().getCurrentUser() != null){
             Log.d(TAG,"OnAttach: ");
-            fireBaseFolder = getMainActivity().getmAuth().getCurrentUser().getEmail();
+            fireBaseFolder = activity.getmAuth().getCurrentUser().getEmail();
             listFiles(fireBaseFolder);
             if(mAdapter != null) {
                 mAdapter.notifyDataSetChanged();
