@@ -89,7 +89,7 @@ public class RecordingListFragment extends Fragment {
         mAdapter = new LocalListAdapter(recordingList,getContext(),this,activity);
         recyclerView.setAdapter(mAdapter);
         ItemTouchHelper itemTouchHelper = new
-                ItemTouchHelper(new SwipeActionHandler( (LocalListAdapter)mAdapter,this,Directory_toRead,0));
+                ItemTouchHelper(new SwipeActionHandler( (LocalListAdapter)mAdapter,this,Directory_toRead,0, getContext()));
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
         //setup the Back Button
@@ -222,24 +222,6 @@ public class RecordingListFragment extends Fragment {
 
     public MainActivity getMainActivity()
     {return activity;}
-
-    /**
-     * Decrypt and return the decoded bytes
-     *
-     * @return
-     */
-    private byte[] decrypt(File file) {
-        String filePath = file.getPath();
-        try {
-            byte[] fileData = FileUtils.readFile(filePath);
-            byte[] decryptedBytes = AudioEncryptionUtils.decode(AudioEncryptionUtils.getInstance(getContext()).getSecretKey(), fileData);
-            return decryptedBytes;
-        } catch (Exception e) {
-            Toast toast = Toast.makeText(getContext(), "Decryption failed.", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-        return null;
-    }
 
     private void setpath(String path){
         this.Directory_toRead = path;

@@ -377,6 +377,57 @@ public class MainActivity extends AppCompatActivity
             return;
         }
     }
+    public void uploadRecording(String fileUri, final String fireBaseFolder, String duration){
+//        final String fullPath = path + "/" + filename;
+//        final String fullFBPath = fireBaseFolder + "/" + filename;
+
+        Log.i(TAG, "Trying uploadRecording, duration = " + duration);
+
+        File f = new File(fileUri);
+        Uri file = Uri.fromFile(f);
+
+        StorageReference storageReference = storageRef.child(fireBaseFolder).child(f.getName());
+        storageReference.putFile(file)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // Get a URL to the uploaded content
+                        Log.d(TAG, "File upload successful");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        // ...
+                        Log.d(TAG, "File upload unsuccessful");
+                    }
+                });
+        // Create file metadata including the content type
+        StorageMetadata metadata = new StorageMetadata.Builder()
+                .setContentType("audio/mp4")
+                .setCustomMetadata(durationMetaDataConst, duration)
+                .build();
+        // Update metadata properties
+        storageReference.updateMetadata(metadata)
+                .addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                    @Override
+                    public void onSuccess(StorageMetadata storageMetadata) {
+                        // Updated metadata is in storageMetadata
+                        Log.d(TAG,"File metadata update successful");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Uh-oh, an error occurred!
+                        Log.d(TAG,"File metadata update unsuccessful");
+                    }
+                });
+        //Remove temp file.
+        f.delete();
+    }
+
     public void deleteFile(final String filenamePref, final String filenameSuf, final String fireBaseFolder)
     {deleteFile(filenamePref + "." + filenameSuf,fireBaseFolder);}
     public void deleteFile(final String filename, final String fireBaseFolder)
