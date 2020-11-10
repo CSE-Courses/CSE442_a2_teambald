@@ -32,6 +32,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.teambald.cse442_project_team_bald.Encryption.EnDecryptAudio;
 import com.teambald.cse442_project_team_bald.Fragments.HomeFragment;
 import com.teambald.cse442_project_team_bald.Fragments.RecordingListFragment;
 import com.teambald.cse442_project_team_bald.Fragments.SettingFragment;
@@ -91,7 +92,7 @@ public class RecordingService extends Service {
             stopRecording();
         }else {
             //Start recording.
-            startRecording();
+            startRecording(this);
 
             createNotificationChannel();
             Log.i(TAG, "Received start id " + startId + ": " + intent);
@@ -113,7 +114,7 @@ public class RecordingService extends Service {
         return START_STICKY;
     }
 
-    private void startRecording() {
+    private void startRecording(final Context context) {
         //Read set recording length, default is 5 mins.
         recordingLength = prefs.getInt(getString(R.string.recording_length_key), 5);
         Log.i(TAG, "Recording will be saved every " + recordingLength + "mins");
@@ -123,7 +124,7 @@ public class RecordingService extends Service {
         //initialize filename variable with date and time at the end to ensure the new file wont overwrite previous file
         recordFile = "Recording_"+formatter.format(now)+ ".mp4";
 
-        //Path used for encryption.
+        //Path where the file will be stored.
         final String filePath = recordPath + "/" + recordFile;
 
         //Setup Media Recorder for recording
@@ -150,11 +151,17 @@ public class RecordingService extends Service {
                     final String fireBaseFolder = prefs.getString(SettingFragment.LogInEmail,null);
                     if(fireBaseFolder != null) {
                         final String duration = recordingLength < 10 ? ("0" + recordingLength + ":00") : (recordingLength + ":00");
-                        uploadRecording(recordPath, recordFile, fireBaseFolder, duration);
+                        //Encrypt audio.
+                        byte[] encoded = EnDecryptAudio.encrypt(recordPath + "/" + recordFile, context);
+                        final String tempFilePath = getApplicationContext().getExternalFilesDir("/").getAbsolutePath()
+                                + File.separator + "tmp" + File.separator + recordFile;
+                        //Write bytes to a file.
+                        EnDecryptAudio.writeByteToFile(encoded, tempFilePath);
+                        uploadRecording(tempFilePath, fireBaseFolder, duration);
                     }
 
                     //Restart the recorder.
-                    startRecording();
+                    startRecording(context);
                 }
 
             }
@@ -188,7 +195,13 @@ public class RecordingService extends Service {
         final String fireBaseFolder = prefs.getString(SettingFragment.LogInEmail,null);
         Log.i(TAG, "firebaseFolder = " + fireBaseFolder);
         if(fireBaseFolder != null) {
-            uploadRecording(recordPath, recordFile, fireBaseFolder, readRecentRecordingLength());
+            //Encrypt audio.
+            byte[] encoded = EnDecryptAudio.encrypt(recordPath + "/" + recordFile, this);
+            final String tempFilePath = getApplicationContext().getExternalFilesDir("/").getAbsolutePath()
+                    + File.separator + "tmp" + File.separator + recordFile;
+            //Write bytes to a file.
+            EnDecryptAudio.writeByteToFile(encoded, tempFilePath);
+            uploadRecording(tempFilePath, fireBaseFolder, readRecentRecordingLength());
         }
 
         //Show toast to notify user that the file has been saved.
@@ -228,24 +241,22 @@ public class RecordingService extends Service {
         }
     }
 
-    void uploadRecording(String path, final String filename, final String fireBaseFolder, String duration){
-        final String fullPath = path + "/" + filename;
-        final String fullFBPath = fireBaseFolder + "/" + filename;
+    void uploadRecording(String fileUri, final String fireBaseFolder, String duration){
+//        final String fullPath = path + "/" + filename;
+//        final String fullFBPath = fireBaseFolder + "/" + filename;
 
-        Log.i(TAG, "Trying uploadRecording");
+        Log.i(TAG, "Trying uploadRecording, duration = " + duration);
 
-        Uri file = Uri.fromFile(new File(fullPath));
-        StorageReference storageReference = mStorageRef.child(fireBaseFolder).child(filename);
+        File f = new File(fileUri);
+        Uri file = Uri.fromFile(f);
+
+        StorageReference storageReference = mStorageRef.child(fireBaseFolder).child(recordFile);
         storageReference.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         // Get a URL to the uploaded content
                         Log.d(TAG, "File upload successful");
-                        Log.d(TAG, "From:" + fullPath);
-                        Log.d(TAG, "To:" + fullFBPath);
-//                        Toast tst = Toast.makeText(getApplicationContext(),"File upload Successful", Toast.LENGTH_SHORT);
-//                        tst.show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -254,10 +265,6 @@ public class RecordingService extends Service {
                         // Handle unsuccessful uploads
                         // ...
                         Log.d(TAG, "File upload unsuccessful");
-                        Log.d(TAG, "From:" + fullPath);
-                        Log.d(TAG, "To:" + fullFBPath);
-//                        Toast tst = Toast.makeText(getApplicationContext(),"File upload Unsuccessful", Toast.LENGTH_SHORT);
-//                        tst.show();
                     }
                 });
         // Create file metadata including the content type
@@ -272,7 +279,6 @@ public class RecordingService extends Service {
                     public void onSuccess(StorageMetadata storageMetadata) {
                         // Updated metadata is in storageMetadata
                         Log.d(TAG,"File metadata update successful");
-                        Log.d(TAG,"For file: "+fireBaseFolder+"//"+filename);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -282,6 +288,8 @@ public class RecordingService extends Service {
                         Log.d(TAG,"File metadata update unsuccessful");
                     }
                 });
+        //Remove temp file.
+        f.delete();
     }
 
     private String readRecentRecordingLength(){

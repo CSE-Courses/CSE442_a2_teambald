@@ -1,4 +1,5 @@
 package com.teambald.cse442_project_team_bald.TabsController;
+import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 import android.view.View;
@@ -14,6 +15,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.teambald.cse442_project_team_bald.Encryption.EnDecryptAudio;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 import com.teambald.cse442_project_team_bald.Fragments.CloudFragment;
@@ -41,23 +43,27 @@ public class SwipeActionHandler extends ItemTouchHelper.SimpleCallback {
 
     private static final String TAG = "SwipeActionHandler";
 
+    private Context context;
+
     private CloudFragment cloudFragment;
     private RecordingListFragment recordingListFragment;
 
-    public SwipeActionHandler(RecordingListAdapter adapter,CloudFragment frag, String path,int fragId) {
+    public SwipeActionHandler(RecordingListAdapter adapter,CloudFragment frag, String path,int fragId, Context context) {
         super(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
         mAdapter = adapter;
         cloudFragment = frag;
         readPath = path;
         fragmentId = fragId;
+        this.context = context;
     }
 
-    public SwipeActionHandler(RecordingListAdapter adapter,RecordingListFragment frag, String path,int fragId) {
+    public SwipeActionHandler(RecordingListAdapter adapter,RecordingListFragment frag, String path,int fragId, Context context) {
         super(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
         mAdapter = adapter;
         recordingListFragment = frag;
         readPath = path;
         fragmentId = fragId;
+        this.context = context;
     }
 
     @Override
@@ -94,8 +100,12 @@ public class SwipeActionHandler extends ItemTouchHelper.SimpleCallback {
                         return;
                     }
                     String fireBaseFolder = fbuser.getEmail();
-
-                    recordingListFragment.getMainActivity().uploadFile(path,"",file.getName(),fireBaseFolder,item.getDuration());
+                    byte[] encoded = EnDecryptAudio.encrypt(file.getPath(), context);
+                    final String tempFilePath = context.getExternalFilesDir("/").getAbsolutePath()
+                            + File.separator + "tmp" + File.separator + file.getName();
+                    //Write bytes to a file.
+                    EnDecryptAudio.writeByteToFile(encoded, tempFilePath);
+                    recordingListFragment.getMainActivity().uploadRecording(tempFilePath,fireBaseFolder,item.getDuration());
                 }
                 //
                 break;

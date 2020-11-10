@@ -39,6 +39,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.teambald.cse442_project_team_bald.Encryption.EnDecryptAudio;
 import com.teambald.cse442_project_team_bald.Fragments.SettingFragment;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
@@ -243,11 +244,14 @@ public class MainActivity extends AppCompatActivity
             Log.d(TAG,filename);
             StorageReference storageReference = storageRef.child(fireBaseFolder).child(filename);
             final String fullPath = path + "/" +localFolder+ "/" + filename;
-            File tempFile = new File(fullPath);
+            final File tempFile = new File(fullPath);
             storageReference.getFile(tempFile)
                     .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            //Decrypt and overwrite the file.
+                            byte[] decrpted = EnDecryptAudio.decrypt(tempFile, getApplicationContext());
+                            EnDecryptAudio.writeByteToFile(decrpted, tempFile.getPath());
 
                             Log.d(TAG,"File download Successful");
                             Toast tst = Toast.makeText(getApplicationContext(),"File download Successful", Toast.LENGTH_SHORT);
@@ -290,6 +294,11 @@ public class MainActivity extends AppCompatActivity
 
                             Log.d(TAG,"File Download Successful");
                             Log.d(TAG,"Start playing now");
+
+                            //Decrypt and overwrite the file.
+                            byte[] decrpted = EnDecryptAudio.decrypt(tempFile, getApplicationContext());
+                            EnDecryptAudio.writeByteToFile(decrpted, tempFile.getPath());
+
                             Toast tst = Toast.makeText(getApplicationContext(),"Start playing now", Toast.LENGTH_SHORT);
                             rla.playAudio(tempFile,recordingItem);
                             tst.show();
@@ -314,69 +323,58 @@ public class MainActivity extends AppCompatActivity
         }
         return true;
     }
-    public void uploadFile(String path, String localFolder, final String filenamePref, final String filenameSuf, final String fireBaseFolder, String duration)
-    {uploadFile(path,localFolder,filenamePref + "." + filenameSuf,fireBaseFolder,duration);}
-    public void uploadFile(String path, String localFolder, final String filename, final String fireBaseFolder, String duration)
-    {
-        if(null!=path && null!=filename && null!=fireBaseFolder)
-        {
-            final String fullPath = path + "/" +localFolder+ "/" + filename;
-            final String fullFBPath = fireBaseFolder + "/" + filename;
 
-            Uri file = Uri.fromFile(new File(fullPath));
-            StorageReference storageReference = storageRef.child(fireBaseFolder).child(filename);
-            storageReference.putFile(file)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // Get a URL to the uploaded content
-                            Log.d(TAG, "File upload successful");
-                            Log.d(TAG, "From:" + fullPath);
-                            Log.d(TAG, "To:" + fullFBPath);
-                            Toast tst = Toast.makeText(getApplicationContext(),"File upload Successful", Toast.LENGTH_SHORT);
-                            tst.show();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Handle unsuccessful uploads
-                            // ...
-                            Log.d(TAG, "File upload unsuccessful");
-                            Log.d(TAG, "From:" + fullPath);
-                            Log.d(TAG, "To:" + fullFBPath);
-                            Toast tst = Toast.makeText(getApplicationContext(),"File upload Unsuccessful", Toast.LENGTH_SHORT);
-                            tst.show();
-                        }
-                    });
-            // Create file metadata including the content type
-            StorageMetadata metadata = new StorageMetadata.Builder()
-                    .setContentType("audio/mp4")
-                    .setCustomMetadata(durationMetaDataConst, duration)
-                    .build();
-            // Update metadata properties
-            storageReference.updateMetadata(metadata)
-                    .addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-                        @Override
-                        public void onSuccess(StorageMetadata storageMetadata) {
-                            // Updated metadata is in storageMetadata
-                            Log.d(TAG,"File metadata update successful");
-                            Log.d(TAG,"For file: "+fireBaseFolder+"//"+filename);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Uh-oh, an error occurred!
-                            Log.d(TAG,"File metadata update unsuccessful");
-                        }
-                    });
-        }
-        else
-        {
-            return;
-        }
+    public void uploadRecording(String fileUri, final String fireBaseFolder, String duration){
+//        final String fullPath = path + "/" + filename;
+//        final String fullFBPath = fireBaseFolder + "/" + filename;
+
+        Log.i(TAG, "Trying uploadRecording, duration = " + duration);
+
+        File f = new File(fileUri);
+        Uri file = Uri.fromFile(f);
+
+        StorageReference storageReference = storageRef.child(fireBaseFolder).child(f.getName());
+        storageReference.putFile(file)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // Get a URL to the uploaded content
+                        Log.d(TAG, "File upload successful");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        // ...
+                        Log.d(TAG, "File upload unsuccessful");
+                    }
+                });
+        // Create file metadata including the content type
+        StorageMetadata metadata = new StorageMetadata.Builder()
+                .setContentType("audio/mp4")
+                .setCustomMetadata(durationMetaDataConst, duration)
+                .build();
+        // Update metadata properties
+        storageReference.updateMetadata(metadata)
+                .addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                    @Override
+                    public void onSuccess(StorageMetadata storageMetadata) {
+                        // Updated metadata is in storageMetadata
+                        Log.d(TAG,"File metadata update successful");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Uh-oh, an error occurred!
+                        Log.d(TAG,"File metadata update unsuccessful");
+                    }
+                });
+        //Remove temp file.
+        f.delete();
     }
+
     public void deleteFile(final String filenamePref, final String filenameSuf, final String fireBaseFolder)
     {deleteFile(filenamePref + "." + filenameSuf,fireBaseFolder);}
     public void deleteFile(final String filename, final String fireBaseFolder)
