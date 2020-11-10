@@ -324,22 +324,49 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public void uploadRecording(String fileUri, final String fireBaseFolder, String duration){
+    public void uploadRecording(final String fileUri, final String fireBaseFolder, final String duration){
 //        final String fullPath = path + "/" + filename;
 //        final String fullFBPath = fireBaseFolder + "/" + filename;
 
         Log.i(TAG, "Trying uploadRecording, duration = " + duration);
 
         File f = new File(fileUri);
-        Uri file = Uri.fromFile(f);
+        final Uri file = Uri.fromFile(f);
 
-        StorageReference storageReference = storageRef.child(fireBaseFolder).child(f.getName());
+        final StorageReference storageReference = storageRef.child(fireBaseFolder).child(f.getName());
         storageReference.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         // Get a URL to the uploaded content
                         Log.d(TAG, "File upload successful");
+                        Toast tst = Toast.makeText(getApplicationContext(),"File upload Successful", Toast.LENGTH_SHORT);
+                        tst.show();
+                        Log.d(TAG,"Uploading metadata for: "+fileUri +" Metadata: "+duration);
+                        // Create file metadata including the content type
+                        StorageMetadata metadata = new StorageMetadata.Builder()
+                                .setContentType("audio/mp4")
+                                .setCustomMetadata(durationMetaDataConst, duration)
+                                .build();
+                        // Update metadata properties
+                        storageReference.updateMetadata(metadata)
+                                .addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                                    @Override
+                                    public void onSuccess(StorageMetadata storageMetadata) {
+                                        // Updated metadata is in storageMetadata
+                                        Log.d(TAG,"File metadata update successful");
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception exception) {
+                                        // Uh-oh, an error occurred!
+                                        Log.d(TAG,"File metadata update unsuccessful");
+                                        Log.d(TAG,"Errors:");
+                                        exception.printStackTrace();
+                                        Log.d(TAG,exception.getLocalizedMessage());
+                                    }
+                                });
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -348,27 +375,8 @@ public class MainActivity extends AppCompatActivity
                         // Handle unsuccessful uploads
                         // ...
                         Log.d(TAG, "File upload unsuccessful");
-                    }
-                });
-        // Create file metadata including the content type
-        StorageMetadata metadata = new StorageMetadata.Builder()
-                .setContentType("audio/mp4")
-                .setCustomMetadata(durationMetaDataConst, duration)
-                .build();
-        // Update metadata properties
-        storageReference.updateMetadata(metadata)
-                .addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-                    @Override
-                    public void onSuccess(StorageMetadata storageMetadata) {
-                        // Updated metadata is in storageMetadata
-                        Log.d(TAG,"File metadata update successful");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Uh-oh, an error occurred!
-                        Log.d(TAG,"File metadata update unsuccessful");
+                        Toast tst = Toast.makeText(getApplicationContext(),"File upload Unsuccessful", Toast.LENGTH_SHORT);
+                        tst.show();
                     }
                 });
         //Remove temp file.

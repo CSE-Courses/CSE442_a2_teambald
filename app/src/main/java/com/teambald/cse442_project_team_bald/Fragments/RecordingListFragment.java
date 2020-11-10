@@ -70,18 +70,12 @@ public class RecordingListFragment extends Fragment {
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-
-
         view.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
         RecyclerView recyclerView = view.findViewById(R.id.recording_list_recyclerview);
 
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(layoutManager);
-
-
-
 
         //Read local audio files. Will be updated in onResume().
         readAllFiles(Directory_toRead);
@@ -145,33 +139,45 @@ public class RecordingListFragment extends Fragment {
         File directory = new File(path);
         allFiles = directory.listFiles();
         recordingList.clear();
-        for(File f : allFiles){
-            try {
-                Log.i("File Path", f.getAbsolutePath());
-                Uri uri = Uri.parse(f.getAbsolutePath());
-                MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-                mmr.setDataSource(getContext(), uri);
-                String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                int seconds = Integer.parseInt(durationStr) / 1000;
-                durationStr = parseSeconds(seconds);
-                String name="";
-                for(int i=0;i<f.getName().length();i++){
-                    if(f.getName().charAt(i)!='_'){
-                        name+=f.getName().charAt(i);
-                    }else{
-                        break;
+        if(allFiles == null)
+        {
+            Log.d(TAG, "all files array null");
+        }
+        else {
+            Log.d(TAG, "reading " + allFiles.length + " items");
+            for (File f : allFiles) {
+                try {
+                    Log.i("File Path", f.getAbsolutePath());
+                    Uri uri = Uri.parse(f.getAbsolutePath());
+                    MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+                    mmr.setDataSource(getContext(), uri);
+                    String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                    int seconds = Integer.parseInt(durationStr) / 1000;
+                    durationStr = parseSeconds(seconds);
+                    String name = "";
+                    for (int i = 0; i < f.getName().length(); i++) {
+                        if (f.getName().charAt(i) != '_') {
+                            name += f.getName().charAt(i);
+                        } else {
+                            break;
+                        }
                     }
+                    if (f.getName().indexOf("Record") == 0) {
+                        name = f.getName();
+                    }
+                    recordingList.add(new RecordingItem(name, durationStr, f.getPath(), true, f));
+                } catch (Exception e) {
+                    Log.e(TAG, "" + e);
                 }
-                if(f.getName().indexOf("Record")==0){
-                    name=f.getName();
-                }
-                recordingList.add(new RecordingItem(name, durationStr, f.getPath(), true, f));
-            }catch (Exception e){
-                Log.e(TAG, ""+e);
             }
         }
         if(mAdapter != null) {
             mAdapter.notifyDataSetChanged();
+            Log.d(TAG,"mAdapter notified, size of list "+ recordingList.size());
+        }
+        else
+        {
+            Log.d(TAG,"mAdapter null");
         }
     }
 

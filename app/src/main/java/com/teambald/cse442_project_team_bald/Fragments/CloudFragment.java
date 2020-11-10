@@ -232,7 +232,7 @@ public class CloudFragment extends Fragment {
         for(int idx = 0;idx<filenames.size();idx++)
         {
             final String filename = filenames.get(idx);
-            CloudMetaSuccListener metaRstListener = new CloudMetaSuccListener(filename);
+            CloudMetaSuccListener metaRstListener = new CloudMetaSuccListener(filename,idx);
             succListeners.add(metaRstListener);
             StorageReference listRef = storageRef.child(fireBaseFolder).child(filename);
             listRef.getMetadata()
@@ -241,34 +241,29 @@ public class CloudFragment extends Fragment {
                         @Override
                         public void onFailure(@NonNull Exception exception) {
                             // Uh-oh, an error occurred!
-                            Log.d(TAG,"MetaData for File: "+filename+" Downloaded successfully");
+                            Log.d(TAG,"MetaData for File: "+filename+" Download Unsuccessful");
                         }
                     });
         }
-        for(int idx = 0;idx<succListeners.size();idx++)
-        {
-            CloudMetaSuccListener listener = succListeners.get(idx);
-            durations.add(listener.getMetaDataValue());
-        }
-
-        for(int idx = 0;idx<durations.size();idx++) {
-            String duration = durations.get(idx);
-            cloudList.get(idx).setDuration(duration);
-        }
-
         if(mAdapter != null) {
             mAdapter.notifyDataSetChanged();
-            Log.d(TAG,"Update the list");
+            Log.d(TAG,"Update the list for durations");
+        }
+        else
+        {
+            Log.d(TAG,"mAdapter null");
         }
     }
     private class CloudMetaSuccListener implements OnSuccessListener<StorageMetadata>
     {
         private String filename;
         private String metaDataValue;// = null;
-        public CloudMetaSuccListener(String fn)
+        private int listIdx;
+        public CloudMetaSuccListener(String fn,int idx)
         {
             metaDataValue = null;
             filename = fn;
+            listIdx = idx;
         }
         public String getMetaDataValue() {
             return metaDataValue;
@@ -277,6 +272,11 @@ public class CloudFragment extends Fragment {
         public void onSuccess(StorageMetadata metaDataRst) {
             metaDataValue = metaDataRst.getCustomMetadata(durationMetaDataConst);
             Log.d(TAG,"MetaData for File: "+filename+" Downloaded successfully");
+            cloudList.get(listIdx).setDuration(metaDataValue);
+            if(mAdapter != null) {
+                mAdapter.notifyDataSetChanged();
+                Log.d(TAG,"Update the list for metadata idx: "+listIdx+" Metadata: "+metaDataValue);
+            }
         }
     }
 
