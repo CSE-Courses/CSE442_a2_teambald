@@ -39,6 +39,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.teambald.cse442_project_team_bald.Encryption.EnDecryptAudio;
 import com.teambald.cse442_project_team_bald.Fragments.SettingFragment;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
@@ -243,11 +244,14 @@ public class MainActivity extends AppCompatActivity
             Log.d(TAG,filename);
             StorageReference storageReference = storageRef.child(fireBaseFolder).child(filename);
             final String fullPath = path + "/" +localFolder+ "/" + filename;
-            File tempFile = new File(fullPath);
+            final File tempFile = new File(fullPath);
             storageReference.getFile(tempFile)
                     .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            //Decrypt and overwrite the file.
+                            byte[] decrpted = EnDecryptAudio.decrypt(tempFile, getApplicationContext());
+                            EnDecryptAudio.writeByteToFile(decrpted, tempFile.getPath());
 
                             Log.d(TAG,"File download Successful");
                             Toast tst = Toast.makeText(getApplicationContext(),"File download Successful", Toast.LENGTH_SHORT);
@@ -290,6 +294,11 @@ public class MainActivity extends AppCompatActivity
 
                             Log.d(TAG,"File Download Successful");
                             Log.d(TAG,"Start playing now");
+
+                            //Decrypt and overwrite the file.
+                            byte[] decrpted = EnDecryptAudio.decrypt(tempFile, getApplicationContext());
+                            EnDecryptAudio.writeByteToFile(decrpted, tempFile.getPath());
+
                             Toast tst = Toast.makeText(getApplicationContext(),"Start playing now", Toast.LENGTH_SHORT);
                             rla.playAudio(tempFile,recordingItem);
                             tst.show();
