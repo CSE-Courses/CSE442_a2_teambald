@@ -147,8 +147,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
             statusText.setText("Signed In as: None");
             Log.d(TAG,"Log in unsuccessful as");
         }
-
-
+        editor.commit();
     }
 
     @Override
