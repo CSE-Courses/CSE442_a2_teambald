@@ -45,14 +45,16 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     private static Button signOutButton;
     private static TextView statusText;
 
+    private final int[] times = new int[]{-1,1,5,10,15,20,25,30};
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Initialize SharedPref and read set recording length from SharedPreference (default: 5).
+        //Initialize SharedPref and read set recording length from SharedPreference (default: 2).
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
         editor = sharedPref.edit();
-        pval = sharedPref.getInt(getString(R.string.recording_length_key), 5);
+        pval = sharedPref.getInt(getString(R.string.recording_length_key), 2);
         Log.i("Recording_Length", String.valueOf(pval));
     }
 
@@ -74,14 +76,15 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         sBar.setProgress(pval);
 
         recording_length = view.findViewById(R.id.recording_length_tv);
-        recording_length.setText(pval + (pval == 1 ? " min": " mins"));
+        updatePVALText();
+
 
         sBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 //Save changed value.
                 pval = progress;
-                recording_length.setText(pval + (pval == 1 ? " min": " mins"));
+                updatePVALText();
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -114,6 +117,29 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                 break;
             default:
                 Log.d(TAG,"Unknown button clicked");
+        }
+    }
+    public void updatePVALText()
+    {
+        switch(pval)
+        {
+            case 0:
+                recording_length.setText("Off");
+                break;
+            case 1:
+                recording_length.setText("1 min");
+                break;
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+                recording_length.setText(times[pval]+" mins");
+                break;
+            default:
+                Log.d(TAG,"Invalid index for pval");
+                break;
         }
     }
     public void signIn()

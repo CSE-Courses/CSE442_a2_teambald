@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity
 
     private Button proceedButton;
 
-    private TextView mStatusTextView;
     private MainActivity siawd;
 
 
@@ -83,7 +82,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar tb = findViewById(R.id.my_toolbar);
         setSupportActionBar(tb);
         // Views
-        mStatusTextView = findViewById(R.id.status);
 
         siawd = this;
 

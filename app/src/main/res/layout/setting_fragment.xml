@@ -25,8 +25,9 @@
                 android:layout_marginTop="24dp"
                 android:text="Signed In As: "
                 android:textAlignment="center"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:layout_editor_absoluteX="0dp" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.gms.common.SignInButton
                 android:id="@+id/sign_in_button"
@@ -35,7 +36,6 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:visibility="visible"
-                app:layout_constraintBottom_toTopOf="@+id/status"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -50,7 +50,6 @@
                 android:layout_weight="1"
                 android:text="@string/sign_out"
                 android:theme="@style/ThemeOverlay.MyDarkButton"
-                app:layout_constraintBottom_toTopOf="@+id/disconnect_button"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -86,8 +85,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:indeterminate="false"
-                android:max="30"
-                android:min="1"
+                android:max="7"
+                android:min="0"
                 android:progress="0" />
 
             <TextView
