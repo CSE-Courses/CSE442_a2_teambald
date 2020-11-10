@@ -323,69 +323,7 @@ public class MainActivity extends AppCompatActivity
         }
         return true;
     }
-    public void uploadFile(String path, String localFolder, final String filenamePref, final String filenameSuf, final String fireBaseFolder, String duration)
-    {uploadFile(path,localFolder,filenamePref + "." + filenameSuf,fireBaseFolder,duration);}
-    public void uploadFile(String path, String localFolder, final String filename, final String fireBaseFolder, String duration)
-    {
-        if(null!=path && null!=filename && null!=fireBaseFolder)
-        {
-            final String fullPath = path + "/" +localFolder+ "/" + filename;
-            final String fullFBPath = fireBaseFolder + "/" + filename;
 
-            Uri file = Uri.fromFile(new File(fullPath));
-            StorageReference storageReference = storageRef.child(fireBaseFolder).child(filename);
-            storageReference.putFile(file)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // Get a URL to the uploaded content
-                            Log.d(TAG, "File upload successful");
-                            Log.d(TAG, "From:" + fullPath);
-                            Log.d(TAG, "To:" + fullFBPath);
-                            Toast tst = Toast.makeText(getApplicationContext(),"File upload Successful", Toast.LENGTH_SHORT);
-                            tst.show();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Handle unsuccessful uploads
-                            // ...
-                            Log.d(TAG, "File upload unsuccessful");
-                            Log.d(TAG, "From:" + fullPath);
-                            Log.d(TAG, "To:" + fullFBPath);
-                            Toast tst = Toast.makeText(getApplicationContext(),"File upload Unsuccessful", Toast.LENGTH_SHORT);
-                            tst.show();
-                        }
-                    });
-            // Create file metadata including the content type
-            StorageMetadata metadata = new StorageMetadata.Builder()
-                    .setContentType("audio/mp4")
-                    .setCustomMetadata(durationMetaDataConst, duration)
-                    .build();
-            // Update metadata properties
-            storageReference.updateMetadata(metadata)
-                    .addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-                        @Override
-                        public void onSuccess(StorageMetadata storageMetadata) {
-                            // Updated metadata is in storageMetadata
-                            Log.d(TAG,"File metadata update successful");
-                            Log.d(TAG,"For file: "+fireBaseFolder+"//"+filename);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Uh-oh, an error occurred!
-                            Log.d(TAG,"File metadata update unsuccessful");
-                        }
-                    });
-        }
-        else
-        {
-            return;
-        }
-    }
     public void uploadRecording(String fileUri, final String fireBaseFolder, String duration){
 //        final String fullPath = path + "/" + filename;
 //        final String fullFBPath = fireBaseFolder + "/" + filename;
