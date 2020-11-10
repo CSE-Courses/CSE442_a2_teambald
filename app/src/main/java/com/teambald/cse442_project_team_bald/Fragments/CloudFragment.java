@@ -137,7 +137,7 @@ public class CloudFragment extends Fragment {
             mAdapter = new CloudListAdapter(cloudList, getContext(),this,activity);
             recyclerView.setAdapter(mAdapter);
             ItemTouchHelper itemTouchHelper = new
-                    ItemTouchHelper(new SwipeActionHandler((CloudListAdapter) mAdapter,this,"CloudRecording",1));
+                    ItemTouchHelper(new SwipeActionHandler((CloudListAdapter) mAdapter,this,"CloudRecording",1, getContext()));
             itemTouchHelper.attachToRecyclerView(recyclerView);
         }
         else
@@ -192,7 +192,7 @@ public class CloudFragment extends Fragment {
         }
         RecyclerView recyclerView = getView().findViewById(R.id.recording_list_recyclerview_cloud);
         ItemTouchHelper itemTouchHelper = new
-                ItemTouchHelper(new SwipeActionHandler((CloudListAdapter) mAdapter,this,"CloudRecording",1));
+                ItemTouchHelper(new SwipeActionHandler((CloudListAdapter) mAdapter,this,"CloudRecording",1, getContext()));
         itemTouchHelper.attachToRecyclerView(recyclerView);
         if(mAdapter != null) {
             mAdapter.notifyDataSetChanged();
