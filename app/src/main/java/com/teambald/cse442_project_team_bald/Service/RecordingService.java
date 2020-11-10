@@ -10,7 +10,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -19,11 +21,20 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.teambald.cse442_project_team_bald.Fragments.HomeFragment;
+import com.teambald.cse442_project_team_bald.Fragments.RecordingListFragment;
+import com.teambald.cse442_project_team_bald.Fragments.SettingFragment;
 import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.R;
 
@@ -50,6 +61,9 @@ public class RecordingService extends Service {
     private int recordingLength;
     private SharedPreferences prefs;
 
+    private StorageReference mStorageRef;
+    private static final String durationMetaDataConst = "Duration";
+
     @Override
     public void onCreate() {
         //Update and Create Local Recording List and Cloud Recording List
@@ -63,6 +77,8 @@ public class RecordingService extends Service {
         mRecordingHandler = new Handler(mRecordingThread.getLooper());
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        mStorageRef = FirebaseStorage.getInstance().getReference();
     }
 
     @Override
@@ -73,10 +89,6 @@ public class RecordingService extends Service {
             Log.i(TAG, "Received Stop Foreground Intent");
             //Stop recording.
             stopRecording();
-            //Interrupt thread.
-            mRecordingThread.quitSafely();
-            stopForeground(true);
-            stopSelf();
         }else {
             //Start recording.
             startRecording();
@@ -134,9 +146,12 @@ public class RecordingService extends Service {
                     mediaRecorder.reset();
                     mediaRecorder.release();
 
-                    //Show toast to notify user that the file has been saved.
-//                    Toast toast = Toast.makeText(getApplicationContext(), "Recording has been saved.", Toast.LENGTH_SHORT);
-//                    toast.show();
+                    //Auto upload to Firebase Storage for signed-in user.
+                    final String fireBaseFolder = prefs.getString(SettingFragment.LogInEmail,null);
+                    if(fireBaseFolder != null) {
+                        final String duration = recordingLength < 10 ? ("0" + recordingLength + ":00") : (recordingLength + ":00");
+                        uploadRecording(recordPath, recordFile, fireBaseFolder, duration);
+                    }
 
                     //Restart the recorder.
                     startRecording();
@@ -169,9 +184,21 @@ public class RecordingService extends Service {
         mediaRecorder.release();
         mediaRecorder = null;
 
+        //Auto upload to Firebase Storage for signed-in user.
+        final String fireBaseFolder = prefs.getString(SettingFragment.LogInEmail,null);
+        Log.i(TAG, "firebaseFolder = " + fireBaseFolder);
+        if(fireBaseFolder != null) {
+            uploadRecording(recordPath, recordFile, fireBaseFolder, readRecentRecordingLength());
+        }
+
         //Show toast to notify user that the file has been saved.
         Toast toast = Toast.makeText(getApplicationContext(), "Recording has been saved.", Toast.LENGTH_SHORT);
         toast.show();
+
+        //Interrupt thread.
+        mRecordingThread.quitSafely();
+        stopForeground(true);
+        stopSelf();
     }
 
     @Override
@@ -199,5 +226,72 @@ public class RecordingService extends Service {
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(serviceChannel);
         }
+    }
+
+    void uploadRecording(String path, final String filename, final String fireBaseFolder, String duration){
+        final String fullPath = path + "/" + filename;
+        final String fullFBPath = fireBaseFolder + "/" + filename;
+
+        Log.i(TAG, "Trying uploadRecording");
+
+        Uri file = Uri.fromFile(new File(fullPath));
+        StorageReference storageReference = mStorageRef.child(fireBaseFolder).child(filename);
+        storageReference.putFile(file)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // Get a URL to the uploaded content
+                        Log.d(TAG, "File upload successful");
+                        Log.d(TAG, "From:" + fullPath);
+                        Log.d(TAG, "To:" + fullFBPath);
+//                        Toast tst = Toast.makeText(getApplicationContext(),"File upload Successful", Toast.LENGTH_SHORT);
+//                        tst.show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        // ...
+                        Log.d(TAG, "File upload unsuccessful");
+                        Log.d(TAG, "From:" + fullPath);
+                        Log.d(TAG, "To:" + fullFBPath);
+//                        Toast tst = Toast.makeText(getApplicationContext(),"File upload Unsuccessful", Toast.LENGTH_SHORT);
+//                        tst.show();
+                    }
+                });
+        // Create file metadata including the content type
+        StorageMetadata metadata = new StorageMetadata.Builder()
+                .setContentType("audio/mp4")
+                .setCustomMetadata(durationMetaDataConst, duration)
+                .build();
+        // Update metadata properties
+        storageReference.updateMetadata(metadata)
+                .addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                    @Override
+                    public void onSuccess(StorageMetadata storageMetadata) {
+                        // Updated metadata is in storageMetadata
+                        Log.d(TAG,"File metadata update successful");
+                        Log.d(TAG,"For file: "+fireBaseFolder+"//"+filename);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Uh-oh, an error occurred!
+                        Log.d(TAG,"File metadata update unsuccessful");
+                    }
+                });
+    }
+
+    private String readRecentRecordingLength(){
+        Uri uri = Uri.parse(recordPath + "/" + recordFile);
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        mmr.setDataSource(this, uri);
+        String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        int seconds = Integer.parseInt(durationStr) / 1000;
+        int min = seconds / 60;
+        seconds-=(min * 60);
+        return (min < 10 ? "0" + min : String.valueOf(min)) + ":" + (seconds < 10 ? "0" + seconds : String.valueOf(seconds));
     }
 }
