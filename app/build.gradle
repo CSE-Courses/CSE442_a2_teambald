@@ -56,5 +56,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:9.6.1'
     implementation platform('com.google.firebase:firebase-bom:25.12.0')
     implementation 'com.google.android.gms:play-services-auth:18.1.0'
+
+
+    //Biometrics
+    implementation 'androidx.biometric:biometric:1.0.1'
 }
 apply plugin: 'com.google.gms.google-services'

@@ -7,6 +7,9 @@
 
     <string name="sign_out">Sign Out</string>
 
+
+    <string name="biometric_authentication">BIOMETRIC AUTHENTICATION KEY</string>
+
     <!-- Server Client ID.  This should be a valid Web OAuth 2.0 Client ID obtained
          from https://console.developers.google.com/ -->
     <string name="server_client_id">606946566326-ald71c4sljtisqj9v6jgkvr0pna4idui.apps.googleusercontent.com</string>
