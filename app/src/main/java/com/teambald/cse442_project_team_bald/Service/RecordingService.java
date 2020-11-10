@@ -241,7 +241,7 @@ public class RecordingService extends Service {
         }
     }
 
-    void uploadRecording(String fileUri, final String fireBaseFolder, String duration){
+    void uploadRecording(String fileUri, final String fireBaseFolder, final String duration){
 //        final String fullPath = path + "/" + filename;
 //        final String fullFBPath = fireBaseFolder + "/" + filename;
 
@@ -250,13 +250,33 @@ public class RecordingService extends Service {
         File f = new File(fileUri);
         Uri file = Uri.fromFile(f);
 
-        StorageReference storageReference = mStorageRef.child(fireBaseFolder).child(recordFile);
+        final StorageReference storageReference = mStorageRef.child(fireBaseFolder).child(recordFile);
         storageReference.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         // Get a URL to the uploaded content
                         Log.d(TAG, "File upload successful");
+                        StorageMetadata metadata = new StorageMetadata.Builder()
+                                .setContentType("audio/mp4")
+                                .setCustomMetadata(durationMetaDataConst, duration)
+                                .build();
+                        // Update metadata properties
+                        storageReference.updateMetadata(metadata)
+                                .addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                                    @Override
+                                    public void onSuccess(StorageMetadata storageMetadata) {
+                                        // Updated metadata is in storageMetadata
+                                        Log.d(TAG,"File metadata update successful");
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception exception) {
+                                        // Uh-oh, an error occurred!
+                                        Log.d(TAG,"File metadata update unsuccessful");
+                                    }
+                                });
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -268,26 +288,7 @@ public class RecordingService extends Service {
                     }
                 });
         // Create file metadata including the content type
-        StorageMetadata metadata = new StorageMetadata.Builder()
-                .setContentType("audio/mp4")
-                .setCustomMetadata(durationMetaDataConst, duration)
-                .build();
-        // Update metadata properties
-        storageReference.updateMetadata(metadata)
-                .addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-                    @Override
-                    public void onSuccess(StorageMetadata storageMetadata) {
-                        // Updated metadata is in storageMetadata
-                        Log.d(TAG,"File metadata update successful");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Uh-oh, an error occurred!
-                        Log.d(TAG,"File metadata update unsuccessful");
-                    }
-                });
+
         //Remove temp file.
         f.delete();
     }
