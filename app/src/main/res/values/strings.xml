@@ -1,10 +1,14 @@
 <resources>
     <string name="app_name">Smart Recorder</string>
-    <string name="recording_length_text">Auto-Recording length</string>
+    <string name="recording_length_text">Recording length</string>
     <string name="recording_length_key">RECORDING LENGTH KEY</string>
+    <string name="auto_record">AUTO RECORDING KEY</string>
     <string name="is_recording_key">IS RECORDING KEY</string>
 
     <string name="sign_out">Sign Out</string>
+
+
+    <string name="biometric_authentication">BIOMETRIC AUTHENTICATION KEY</string>
 
     <!-- Server Client ID.  This should be a valid Web OAuth 2.0 Client ID obtained
          from https://console.developers.google.com/ -->

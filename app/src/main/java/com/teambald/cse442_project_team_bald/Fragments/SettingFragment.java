@@ -9,7 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,16 +47,18 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     private static Button signOutButton;
     private static TextView statusText;
 
-    private final int[] times = new int[]{-1,1,5,10,15,20,25,30};
+    public static final int[] times = new int[]{1,5,10,15,20,25,30};
+
+    private boolean autoRecord = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //Initialize SharedPref and read set recording length from SharedPreference (default: 2).
+        //Initialize SharedPref and read set recording length from SharedPreference (default: 1).
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
         editor = sharedPref.edit();
-        pval = sharedPref.getInt(getString(R.string.recording_length_key), 2);
+        pval = sharedPref.getInt(getString(R.string.recording_length_key), 1);
+        autoRecord = sharedPref.getBoolean(getString(R.string.auto_record),false);
         Log.i("Recording_Length", String.valueOf(pval));
     }
 
@@ -78,7 +82,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         recording_length = view.findViewById(R.id.recording_length_tv);
         updatePVALText();
 
-
         sBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -94,11 +97,30 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 editor.putInt(getString(R.string.recording_length_key), pval);
                 editor.commit();
-                int s = sharedPref.getInt(getString(R.string.recording_length_key), 5);
+                int s = sharedPref.getInt(getString(R.string.recording_length_key), 1);
                 Log.i("Recording_Length", String.valueOf(s));
             }
         });
 
+        Switch autoSwitch = view.findViewById(R.id.autoRecSwitch);
+        autoSwitch.setChecked(autoRecord);
+        autoSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                autoRecord = isChecked;
+                editor.putBoolean(getString(R.string.auto_record),autoRecord);
+                Log.d(TAG,"Saving auto recording preference: "+isChecked);
+                editor.commit();
+                if(autoRecord)
+                {
+                    Toast.makeText(getContext(),"Auto record ON",Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(getContext(),"Auto record OFF",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
         signInButton = view.findViewById(R.id.sign_in_button);
         signOutButton = view.findViewById(R.id.sign_out_button);
@@ -124,17 +146,14 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         switch(pval)
         {
             case 0:
-                recording_length.setText("Off");
-                break;
-            case 1:
                 recording_length.setText("1 min");
                 break;
+            case 1:
             case 2:
             case 3:
             case 4:
             case 5:
             case 6:
-            case 7:
                 recording_length.setText(times[pval]+" mins");
                 break;
             default:

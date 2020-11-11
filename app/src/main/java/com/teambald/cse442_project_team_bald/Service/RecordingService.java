@@ -116,8 +116,27 @@ public class RecordingService extends Service {
 
     private void startRecording(final Context context) {
         //Read set recording length, default is 5 mins.
-        recordingLength = prefs.getInt(getString(R.string.recording_length_key), 5);
-        Log.i(TAG, "Recording will be saved every " + recordingLength + "mins");
+        recordingLength = prefs.getInt(getString(R.string.recording_length_key), 1);
+        String recordingLengthString = "None";
+        final int recordingTime = SettingFragment.times[recordingLength];
+        switch(recordingLength)
+        {
+            case 0:
+                recordingLengthString = "1 min";
+                break;
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+                recordingLengthString = recordingTime+" mins";
+                break;
+            default:
+                Log.d(TAG,"Invalid index for pval");
+                break;
+        }
+        Log.i(TAG, "Recording will be saved every " + recordingLengthString);
         //Get current date and time
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss", Locale.US);
         Date now = new Date();
@@ -125,7 +144,7 @@ public class RecordingService extends Service {
         recordFile = "Recording_"+formatter.format(now)+ ".mp4";
 
         //Path where the file will be stored.
-        final String filePath = recordPath + "/" + recordFile;
+        final String filePath = recordPath + File.separator + recordFile;
 
         //Setup Media Recorder for recording
         mediaRecorder = new MediaRecorder();
@@ -135,7 +154,7 @@ public class RecordingService extends Service {
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
         //Save recording periodically.
-        mediaRecorder.setMaxDuration(recordingLength * 60 * 1000);
+        mediaRecorder.setMaxDuration(recordingTime * 60 * 1000);
         //Will be executed when reach max duration.
         mediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
             @Override
@@ -150,9 +169,9 @@ public class RecordingService extends Service {
                     //Auto upload to Firebase Storage for signed-in user.
                     final String fireBaseFolder = prefs.getString(SettingFragment.LogInEmail,null);
                     if(fireBaseFolder != null) {
-                        final String duration = recordingLength < 10 ? ("0" + recordingLength + ":00") : (recordingLength + ":00");
+                        final String duration = recordingLength < 10 ? ("0" + recordingTime + ":00") : (recordingTime + ":00");
                         //Encrypt audio.
-                        byte[] encoded = EnDecryptAudio.encrypt(recordPath + "/" + recordFile, context);
+                        byte[] encoded = EnDecryptAudio.encrypt(recordPath + File.separator + recordFile, context);
                         final String tempFilePath = getApplicationContext().getExternalFilesDir("/").getAbsolutePath()
                                 + File.separator + "tmp" + File.separator + recordFile;
                         //Write bytes to a file.
@@ -161,7 +180,12 @@ public class RecordingService extends Service {
                     }
 
                     //Restart the recorder.
-                    startRecording(context);
+                    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    boolean toRestart = sharedPref.getBoolean(getString(R.string.auto_record),false);
+                    if(toRestart)
+                    {
+                        startRecording(context);
+                    }
                 }
 
             }
