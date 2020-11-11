@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,12 +35,19 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseUser;
+import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.R;
+import com.teambald.cse442_project_team_bald.Service.RecordingService;
 
+import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
+import javax.crypto.SecretKey;
 
 
 public class HomeFragment extends Fragment {
@@ -52,10 +60,13 @@ public class HomeFragment extends Fragment {
     private String fileToPlay;
     private MediaRecorder mediaRecorder;
     private String recordFile;
+    //Path of new recording.
+    private String filePath;
+    //SharedPreference
+    private SharedPreferences sharedPref;
 
     private Chronometer timer;
-    
-    
+
     private static final String TAG = "HOME_FRAGMENT: ";
 
     private ImageButton recordButton;
@@ -64,11 +75,10 @@ public class HomeFragment extends Fragment {
 
     private HomeFragment homeFragObj;
 
-    public HomeFragment() {
-        // Required empty public constructor
-    }
-    public static HomeFragment newInstance() {
-        return new HomeFragment();
+    private MainActivity activity;
+
+    public HomeFragment(MainActivity mainActivity) {
+        activity = mainActivity;
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,11 +98,22 @@ public class HomeFragment extends Fragment {
         recordButton = view.findViewById(R.id.recorder_button);
         recordButton.setOnClickListener(new recordClickListener());
         accountText = view.findViewById(R.id.login_account_text);
-  
+
+        //initilize the Recroding Directory
+        initilize_RecordDirctroy();
+
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        //Read isRecording value.
+        isRecording = sharedPref.getBoolean(getString(R.string.is_recording_key), false);
+
         checkPermissions();
         view.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
         recorderButton = view.findViewById(R.id.recorder_button);
-        isRecording= false;
+        if(!isRecording){
+            recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
+        }else{
+            recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
+        }
     }
     @Override
     public void onStart() {
@@ -101,15 +122,35 @@ public class HomeFragment extends Fragment {
         // [START on_start_sign_in]
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
-        updateUI(account);
+        if(activity.getmAuth()!=null)
+            updateUI(activity.getmAuth().getCurrentUser());
         // [END on_start_sign_in]
     }
-    private void updateUI(@Nullable GoogleSignInAccount account) {
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // [START on_start_sign_in]
+        // Check for existing Google Sign In account, if the user is already signed in
+        // the GoogleSignInAccount will be non-null.
+        if(activity.getmAuth()!=null)
+            updateUI(activity.getmAuth().getCurrentUser());
+        // [END on_start_sign_in]
+
+        //Read isRecording value.
+        isRecording = sharedPref.getBoolean(getString(R.string.is_recording_key), false);
+
+        if(!isRecording){
+            recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
+        }else{
+            recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
+        }
+    }
+    private void updateUI(FirebaseUser account) {
         if (account != null) {
-            accountText.setText("Signed In as: "+account.getDisplayName());
+            accountText.setText("Signed In as: "+account.getEmail());
         } else {
-            accountText.setText("None");
+            accountText.setText("Signed In as: None");
         }
     }
 
@@ -117,74 +158,46 @@ public class HomeFragment extends Fragment {
     {
         @Override
         public void onClick(View view) {
-                if (isRecording) {
-                    //Stop Recording
-                    recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
-                    stopRecording();
-                    isRecording = false;
 
-                } else {
-                    //Check permission to record audio
-                    //Start Recording
-                    startRecording();
-                    recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
-                    isRecording = true;
+            if (isRecording) {
+                //Stop Recording
+                recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
+                //stopRecording();
+                stopService();
+                isRecording = false;
+
+            } else {
+                //Start service that record audio consistently;
+                startService();
+                recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
+                isRecording = true;
             }
+            //Save isRecording value.
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putBoolean(getString(R.string.is_recording_key), isRecording);
+            editor.commit();
         }
     }
-    private void startRecording() {
 
-        //Get app external directory path
-        String recordPath = getActivity().getExternalFilesDir("/").getAbsolutePath();
-
-        //Get current date and time
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss", Locale.US);
-        Date now = new Date();
-        //initialize filename variable with date and time at the end to ensure the new file wont overwrite previous file
-        recordFile = "Recording_"+formatter.format(now)+ ".mp4";
-
-
-        //Setup Media Recorder for recording
-        mediaRecorder = new MediaRecorder();
-        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mediaRecorder.setOutputFile(recordPath + "/" + recordFile);
-        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-
-        //Save recording periodically.
-        //Read saved recording length (default to 5 mins).
-        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        int max = sharedPref.getInt(getString(R.string.recording_length_key), 5) * 60 * 1000;
-        mediaRecorder.setMaxDuration(max);
-//        mediaRecorder.setMaxDuration(5000);
-        //Will be executed when reach max duration.
-        mediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
-            @Override
-            public void onInfo(MediaRecorder mediaRecorder, int i, int i1) {
-                //When reach max duration, stop, save the file and start again.
-                if (i == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
-                    //Stop and save the audio.
-                    mediaRecorder.stop();
-                    mediaRecorder.release();
-
-                    //Show toast to notify user that the file has been saved.
-                    Toast toast = Toast.makeText(getContext(), "Recording has been saved.", Toast.LENGTH_LONG);
-                    toast.show();
-
-                    //Restart the recorder.
-                    startRecording();
-                }
-            }
-        });
-
-        try {
-            mediaRecorder.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
+    //Start service that can record audio even if the app is not visible to user.
+    public void startService() {
+        if(!checkPermissions()){
+            Toast toast = Toast.makeText(getContext(), "Please check the permission before recording.", Toast.LENGTH_SHORT);
+            toast.show();
+            return;
         }
+        Intent serviceIntent = new Intent(getContext(), RecordingService.class);
+        serviceIntent.putExtra("Recording_Service_Signal", "start");
+        ContextCompat.startForegroundService(getContext(), serviceIntent);
+        Log.d("mTAG", "Service start!");
+    }
 
-        //Start Recording
-        mediaRecorder.start();
+    //Stop service
+    public void stopService() {
+        Intent serviceIntent = new Intent(getContext(), RecordingService.class);
+        serviceIntent.putExtra("Recording_Service_Signal", "stop");
+        ContextCompat.startForegroundService(getContext(), serviceIntent);
+        Log.d("mTAG", "Service Stop!");
     }
 
     private boolean checkPermissions() {
@@ -198,22 +211,16 @@ public class HomeFragment extends Fragment {
             return false;
         }
     }
-    public void onStop() {
-        super.onStop();
-        if(isRecording){
-            stopRecording();
-        }
+
+    public void initilize_RecordDirctroy(){
+        String rawPath = getContext().getExternalFilesDir("/").getAbsolutePath();
+        String recordPath = rawPath+File.separator+"LocalRecording";
+        File LocalRecordList = new File(recordPath);
+        File CloudRecordList = new File(rawPath+File.separator+"CloudRecording");
+        File tmpRecordList = new File(rawPath+File.separator+"tmp");
+
+        LocalRecordList.mkdir();
+        CloudRecordList.mkdir();
+        tmpRecordList.mkdir();
     }
-
-    private void stopRecording() {
-
-        //Change text on page to file saved
-        //Stop media recorder and set it to null for further use to record new audio
-        mediaRecorder.stop();
-        mediaRecorder.release();
-        mediaRecorder = null;
-
-    }
-
-
 }

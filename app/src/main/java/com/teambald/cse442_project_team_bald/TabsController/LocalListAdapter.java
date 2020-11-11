@@ -1,24 +1,17 @@
 package com.teambald.cse442_project_team_bald.TabsController;
 
 import android.content.Context;
-import android.content.Intent;
 import android.media.MediaPlayer;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
-
 import android.widget.Toast;
-
-import java.io.File;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -26,44 +19,29 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.teambald.cse442_project_team_bald.Encryption.AudioEncryptionUtils;
 import com.teambald.cse442_project_team_bald.Encryption.FileUtils;
-import com.teambald.cse442_project_team_bald.Fragments.CloudFragment;
 import com.teambald.cse442_project_team_bald.Fragments.RecordingListFragment;
 import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdapter.MyViewHolder> {
-    public ArrayList<RecordingItem> mDataset;
-    public static final String TAG = "RecordingListAda: ";
-    public MediaPlayer mediaPlayer = null;
-    public boolean isPlaying;
-    public View PlayingView;
-    public int preint;
-    public Context context;
-    public CloudFragment cloudFragment;
-    public RecordingListFragment fragment;
-    public MainActivity activity;
+public class LocalListAdapter extends RecordingListAdapter{
+    private static final String TAG = "RECORDED_FRAGMENT: ";
 
-    public RecordingListAdapter()
-    {}
-
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
-        public View recordingItemView;
-        public MyViewHolder(View v) {
-            super(v);
-            recordingItemView = v;
-        }
+    // Provide a suitable constructor (depends on the kind of dataset)
+    public LocalListAdapter(ArrayList<RecordingItem> myDataset, Context ct, RecordingListFragment frag, MainActivity ma) {
+        mDataset = myDataset;
+        context=ct;
+        isPlaying=false;
+        PlayingView=null;
+        preint=-1;
+        fragment=frag;
+        activity = ma;
+        Log.d(TAG,"Init Local List Adap");
     }
-
 
     // Create new views (invoked by the layout manager)
     @Override
@@ -156,13 +134,13 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
 
                 //Swap the play/pause icon.
                 if(!isPlaying) { // if there is no other audio playing
-                       mDataset.get(position).setPlay(false); // set false in item
-                       view.findViewById(R.id.recording_play_pause_button)
-                               .setBackgroundResource(R.drawable.ic_pause_button); // change the background icon
-                       isPlaying = true; // set playing to true
-                       playAudio(mDataset.get(position));
-                       preint = position; // track the index
-                       PlayingView = view; // track the view
+                    mDataset.get(position).setPlay(false); // set false in item
+                    view.findViewById(R.id.recording_play_pause_button)
+                            .setBackgroundResource(R.drawable.ic_pause_button); // change the background icon
+                    isPlaying = true; // set playing to true
+                    playAudio(mDataset.get(position));
+                    preint = position; // track the index
+                    PlayingView = view; // track the view
 
 
                 }else{ // if there exists a playing audio
@@ -194,120 +172,7 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        if(mDataset==null)
-        {
-            Log.d(TAG,"mDataSet null");
-            return 0;
-        }
         return mDataset.size();
     }
 
-    public void playAudio(final RecordingItem recordingItem) {
-        File fileToPlay = recordingItem.getAudio_file();
-        mediaPlayer = new MediaPlayer();
-        try {
-            mediaPlayer.setDataSource(fileToPlay.getAbsolutePath());
-            mediaPlayer.prepare();
-            mediaPlayer.seekTo(recordingItem.getStartTimeTime());
-            mediaPlayer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //Play the audio
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                recordingItem.setStartTime(0);
-                stopAudio();
-            }
-        });
-    }
-    public void playAudio(final File fileToPlay,final RecordingItem recordingItem)
-    {
-        mediaPlayer = new MediaPlayer();
-        try {
-            mediaPlayer.setDataSource(fileToPlay.getAbsolutePath());
-            mediaPlayer.prepare();
-            mediaPlayer.seekTo(recordingItem.getStartTimeTime());
-            mediaPlayer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //Play the audio
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                recordingItem.setStartTime(0);
-                stopAudio();
-            }
-        });
-    }
-    public void downloadAndPlayAudio(final RecordingItem recordingItem)
-    {
-        String filename = recordingItem.getDate();
-        String rawPath = activity.getExternalFilesDir("/").getAbsolutePath();
-        String fullPath = rawPath+File.separator+"tmp"+File.separator+filename;
-        File audioFile = new File(fullPath);
-        Log.d(TAG,"Downloading file first for cloud play.");
-        activity.downloadFileToPlay(rawPath,"tmp",filename,activity.getmAuth().getCurrentUser().getEmail(),this,recordingItem);
-        Log.d(TAG,"Downloaded file for cloud play");
-    }
-
-    public void stopAudio() {
-        //Stop The Audio
-        isPlaying = false;
-        mediaPlayer.stop();
-        try {
-            PlayingView.findViewById(R.id.recording_play_pause_button).setBackgroundResource(R.drawable.ic_play_button);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public void pauseAudio(RecordingItem recordingItem){
-        mediaPlayer.pause();
-        recordingItem.setStartTime(mediaPlayer.getCurrentPosition());
-    }
-
-    public void deleteItem(int position) {
-        if(!mDataset.get(position).isLocked()) { // if item is unlocked it will be removable.
-            mDataset.get(position).getAudio_file().delete();
-            mDataset.remove(position);
-            CharSequence text = "Recording deleted!";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(this.context, text, duration);
-            toast.show();
-        }else{
-            CharSequence text = "Please unlock the recording to delete!";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(this.context, text, duration);
-            toast.show();
-        }
-    }
-    public ArrayList<RecordingItem> getmDataset() {
-        return mDataset;
-    }
-
-    public void setmDataset(ArrayList<RecordingItem> mDataset) {
-        this.mDataset = mDataset;
-    }
-
-    /**
-     * Decrypt and return the decoded bytes
-     *
-     * @return
-     */
-    public byte[] decrypt(File file) {
-        String filePath = file.getPath();
-        try {
-            byte[] fileData = FileUtils.readFile(filePath);
-            byte[] decryptedBytes = AudioEncryptionUtils.decode(AudioEncryptionUtils.getInstance(context).getSecretKey(), fileData);
-            return decryptedBytes;
-        } catch (Exception e) {
-            Toast toast = Toast.makeText(context, "Decryption failed.", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-        return null;
-    }
 }
