@@ -37,12 +37,16 @@ import com.teambald.cse442_project_team_bald.Fragments.HomeFragment;
 import com.teambald.cse442_project_team_bald.Fragments.RecordingListFragment;
 import com.teambald.cse442_project_team_bald.Fragments.SettingFragment;
 import com.teambald.cse442_project_team_bald.MainActivity;
+import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
@@ -179,6 +183,23 @@ public class RecordingService extends Service {
                     mediaRecorder.stop();
                     mediaRecorder.reset();
                     mediaRecorder.release();
+                    //check storage size after saving the file
+                    ArrayList<File> filelist= new ArrayList<>();
+                    File directory = new File(recordPath);
+                    File[] allFiles = directory.listFiles();
+                    Arrays.sort(allFiles, new Comparator<File>() {
+                        public int compare(File f1, File f2) {
+                            return Long.compare(f1.lastModified(), f2.lastModified());
+                        }
+                    });
+                    for (File f : allFiles) {
+                        if(!f.getName().contains("_L")){
+                            filelist.add(f);
+                        }
+                    }
+                    if(filelist.size()>5){
+                        filelist.get(0).delete();
+                    }
 
                     //Auto upload to Firebase Storage for signed-in user.
                     final String fireBaseFolder = prefs.getString(SettingFragment.LogInEmail,null);

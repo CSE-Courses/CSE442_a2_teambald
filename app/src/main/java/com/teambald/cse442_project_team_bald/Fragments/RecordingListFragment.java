@@ -175,7 +175,7 @@ public class RecordingListFragment extends Fragment {
                     if (f.getName().indexOf("Record") == 0) {
                         name = f.getName();
                     }
-                    if(f.getName().contains("_L")){
+                    if(!f.getName().contains("_L")){
                         unlocked.add(new RecordingItem(name, durationStr, f.getPath(), true, f));
                     }
                     recordingList.add(new RecordingItem(name, durationStr, f.getPath(), true, f));
