@@ -177,18 +177,24 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     {
         if(null != account)
         {
+            editor.putBoolean(LogedInBl,true);
+            editor.putString(LogInName,account.getDisplayName());
+            editor.putString(LogInEmail,account.getEmail());
             signInButton.setVisibility(View.INVISIBLE);
             signOutButton.setVisibility(View.VISIBLE);
             statusText.setText("Signed In as: "+account.getEmail());
             Log.d(TAG,"Log in successful as:" + account.getEmail());
         }
-        else
-        {
+        else{
+            editor.putBoolean(LogedInBl,false);
+            editor.putString(LogInName,"null");
+            editor.putString(LogInEmail,"null");
             signInButton.setVisibility(View.VISIBLE);
             signOutButton.setVisibility(View.INVISIBLE);
             statusText.setText("Signed In as: None");
             Log.d(TAG,"Log in unsuccessful as");
         }
+        editor.commit();
     }
 
     @Override

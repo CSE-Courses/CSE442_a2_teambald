@@ -136,6 +136,15 @@ public class HomeFragment extends Fragment {
         if(activity.getmAuth()!=null)
             updateUI(activity.getmAuth().getCurrentUser());
         // [END on_start_sign_in]
+
+        //Read isRecording value.
+        isRecording = sharedPref.getBoolean(getString(R.string.is_recording_key), false);
+
+        if(!isRecording){
+            recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
+        }else{
+            recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
+        }
     }
     private void updateUI(FirebaseUser account) {
         if (account != null) {

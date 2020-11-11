@@ -208,7 +208,12 @@ public class RecordingService extends Service {
                     }else{
                         SharedPreferences.Editor editor = sharedPref.edit();
                         editor.putBoolean(getString(R.string.is_recording_key), false);
-                        editor.apply();
+                        editor.commit();
+
+                        //Interrupt thread.
+                        mRecordingThread.quitSafely();
+                        stopForeground(true);
+                        stopSelf();
                     }
                 }
 
@@ -362,6 +367,7 @@ public class RecordingService extends Service {
         if(filelist.size()>5){
             filelist.get(0).delete();
         }
+        Log.i(TAG, "Auto delete is completed.");
     }
 
     private String readRecentRecordingLength(){
