@@ -57,18 +57,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         //Initialize SharedPref and read set recording length from SharedPreference (default: 1).
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         editor = sharedPref.edit();
-        if(!sharedPref.contains(getString(R.string.recording_length_key)))
-        {
-            editor.putInt(getString(R.string.recording_length_key),1);
-            editor.commit();
-            pval = sharedPref.getInt(getString(R.string.recording_length_key), 1);
-            Log.d(TAG, "PVAL didn't have value: "+pval);
-        }
-        else
-        {
-            pval = sharedPref.getInt(getString(R.string.recording_length_key), 1);
-            Log.d(TAG,"PVAL was initialized in sharedpref"+pval);
-        }
         autoRecord = sharedPref.getBoolean(getString(R.string.auto_record),false);
         Log.i(TAG, "PVAL: "+pval);
     }
@@ -87,6 +75,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         view.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
 
         sBar = view.findViewById(R.id.recording_seekBar);
+        pval = sharedPref.getInt(getString(R.string.recording_length_key), 1);
+
         //Set saved value.
         sBar.setProgress(pval);
 
