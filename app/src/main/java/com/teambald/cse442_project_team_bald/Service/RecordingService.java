@@ -103,7 +103,7 @@ public class RecordingService extends Service {
 
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                     .setContentTitle("SmartRecorder")
-                    .setContentText("SmartRecorder is recording audio.")
+                    .setContentText("SmartRecorder is running.")
                     .setSmallIcon(R.drawable.ic_mic_24)
                     .setContentIntent(pendingIntent)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -199,6 +199,10 @@ public class RecordingService extends Service {
                     if(toRestart)
                     {
                         startRecording(context);
+                    }else{
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putBoolean(getString(R.string.is_recording_key), false);
+                        editor.apply();
                     }
                 }
 
