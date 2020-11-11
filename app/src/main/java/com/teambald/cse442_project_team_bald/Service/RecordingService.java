@@ -77,7 +77,7 @@ public class RecordingService extends Service {
         mRecordingThread.start();
         mRecordingHandler = new Handler(mRecordingThread.getLooper());
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
     }
@@ -116,9 +116,23 @@ public class RecordingService extends Service {
 
     private void startRecording(final Context context) {
         //Read set recording length, default is 5 mins.
-        recordingLength = prefs.getInt(getString(R.string.recording_length_key), 1);
-        String recordingLengthString = "None";
+        if(!prefs.contains(getString(R.string.recording_length_key)))
+        {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt(getString(R.string.recording_length_key),1);
+            boolean editorCommit = editor.commit();
+            recordingLength = prefs.getInt(getString(R.string.recording_length_key), 1);
+            Log.d(TAG,"Setting and obtaining recording length: idx"+recordingLength+" editor commit:"+editorCommit);
+        }
+        else
+        {
+            recordingLength = prefs.getInt(getString(R.string.recording_length_key), 1);
+            Log.d(TAG,"Obtaining recording length: idx"+recordingLength);
+        }
         final int recordingTime = SettingFragment.times[recordingLength];
+
+
+        String recordingLengthString = "None";
         switch(recordingLength)
         {
             case 0:
@@ -133,7 +147,7 @@ public class RecordingService extends Service {
                 recordingLengthString = recordingTime+" mins";
                 break;
             default:
-                Log.d(TAG,"Invalid index for pval");
+                Log.d(TAG,"Invalid index for recordingLength "+recordingLength);
                 break;
         }
         Log.i(TAG, "Recording will be saved every " + recordingLengthString);
@@ -169,7 +183,7 @@ public class RecordingService extends Service {
                     //Auto upload to Firebase Storage for signed-in user.
                     final String fireBaseFolder = prefs.getString(SettingFragment.LogInEmail,null);
                     if(fireBaseFolder != null) {
-                        final String duration = recordingLength < 10 ? ("0" + recordingTime + ":00") : (recordingTime + ":00");
+                        final String duration = recordingTime < 10 ? ("0" + recordingTime + ":00") : (recordingTime + ":00");
                         //Encrypt audio.
                         byte[] encoded = EnDecryptAudio.encrypt(recordPath + File.separator + recordFile, context);
                         final String tempFilePath = getApplicationContext().getExternalFilesDir("/").getAbsolutePath()

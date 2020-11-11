@@ -29,7 +29,7 @@ import com.teambald.cse442_project_team_bald.R;
 public class SettingFragment extends Fragment implements View.OnClickListener {
     private SeekBar sBar;
     private TextView recording_length;
-    private int pval = 5;
+    private int pval = 1;
     private static SharedPreferences sharedPref;
     private static SharedPreferences.Editor editor;
 
@@ -55,11 +55,22 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Initialize SharedPref and read set recording length from SharedPreference (default: 1).
-        sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         editor = sharedPref.edit();
-        pval = sharedPref.getInt(getString(R.string.recording_length_key), 1);
+        if(!sharedPref.contains(getString(R.string.recording_length_key)))
+        {
+            editor.putInt(getString(R.string.recording_length_key),1);
+            editor.commit();
+            pval = sharedPref.getInt(getString(R.string.recording_length_key), 1);
+            Log.d(TAG, "PVAL didn't have value: "+pval);
+        }
+        else
+        {
+            pval = sharedPref.getInt(getString(R.string.recording_length_key), 1);
+            Log.d(TAG,"PVAL was initialized in sharedpref"+pval);
+        }
         autoRecord = sharedPref.getBoolean(getString(R.string.auto_record),false);
-        Log.i("Recording_Length", String.valueOf(pval));
+        Log.i(TAG, "PVAL: "+pval);
     }
 
     @Override
@@ -86,6 +97,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 //Save changed value.
+                Log.d(TAG,"Updating pval to :" +progress);
                 pval = progress;
                 updatePVALText();
             }
@@ -95,10 +107,11 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
             }
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                Log.d(TAG,"Updating pval sharedpref to :" +pval);
                 editor.putInt(getString(R.string.recording_length_key), pval);
-                editor.commit();
+                boolean editorCommit = editor.commit();
                 int s = sharedPref.getInt(getString(R.string.recording_length_key), 1);
-                Log.i("Recording_Length", String.valueOf(s));
+                Log.i("Recording_Length changed to ", String.valueOf(s)+" editorCommit: "+editorCommit);
             }
         });
 
@@ -157,7 +170,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                 recording_length.setText(times[pval]+" mins");
                 break;
             default:
-                Log.d(TAG,"Invalid index for pval");
+                Log.d(TAG,"Invalid index for pval:"+pval);
                 break;
         }
     }
