@@ -214,15 +214,13 @@ public class MainActivity extends AppCompatActivity
     // [START signOut]
     public void signOut() {
         mAuth.signOut();
-
-        mGoogleSignInClient.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                // [START_EXCLUDE]
-                // [END_EXCLUDE]
-                SettingFragment.updateSignInUI(null);
-            }
-        });
+        mGoogleSignInClient.revokeAccess().addOnCompleteListener(this,
+                new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        SettingFragment.updateSignInUI(null);
+                    }
+                });
     }
     // [END signOut]
 

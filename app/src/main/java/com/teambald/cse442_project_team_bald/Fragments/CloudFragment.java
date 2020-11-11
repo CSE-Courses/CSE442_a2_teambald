@@ -158,9 +158,7 @@ public class CloudFragment extends Fragment {
     }
     public void listFiles(String fireBaseFolder)
     {
-        GoogleSignInAccount gsi = GoogleSignIn.getLastSignedInAccount(getActivity());
-        Log.d(TAG,gsi+"");
-        if( gsi != null) {
+        if( activity.getmAuth().getCurrentUser() != null) {
             StorageReference listRef = storageRef.child(fireBaseFolder);
             CloudSuccListener rstListener = new CloudSuccListener(fireBaseFolder);
             listRef.listAll()
