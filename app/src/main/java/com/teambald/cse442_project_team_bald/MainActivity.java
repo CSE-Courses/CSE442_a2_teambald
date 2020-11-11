@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -143,6 +144,12 @@ public class MainActivity extends AppCompatActivity
 
                     }
                 }).attach();
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(getString(R.string.recording_length_key),1);
+        editor.commit();
+        Log.d(TAG,"Initialized recording length to pval 1");
     }
 
 
