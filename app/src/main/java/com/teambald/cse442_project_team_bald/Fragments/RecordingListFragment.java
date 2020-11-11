@@ -80,15 +80,13 @@ public class RecordingListFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        //Read local audio files. Will be updated in onResume().
-        readAllFiles(Directory_toRead);
-
         mAdapter = new LocalListAdapter(recordingList,getContext(),this,activity);
         recyclerView.setAdapter(mAdapter);
         ItemTouchHelper itemTouchHelper = new
                 ItemTouchHelper(new SwipeActionHandler( (LocalListAdapter)mAdapter,this,Directory_toRead,0, getContext()));
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
+        readAllFiles(Directory_toRead);
         //setup the Back Button
         this.BackButton = view.findViewById(R.id.Back_Button);
         this.BackButton.setOnClickListener(new View.OnClickListener() {
@@ -130,6 +128,7 @@ public class RecordingListFragment extends Fragment {
     public void onResume() {
         super.onResume();
         //Update saved audio file to make sure the recordings are up-to-date.
+        Log.d(TAG,"On Resume function");
         readAllFiles(Directory_toRead);
     }
 
