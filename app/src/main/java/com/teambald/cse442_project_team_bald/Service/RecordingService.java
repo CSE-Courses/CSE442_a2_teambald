@@ -183,23 +183,8 @@ public class RecordingService extends Service {
                     mediaRecorder.stop();
                     mediaRecorder.reset();
                     mediaRecorder.release();
-                    //check storage size after saving the file
-                    ArrayList<File> filelist= new ArrayList<>();
-                    File directory = new File(recordPath);
-                    File[] allFiles = directory.listFiles();
-                    Arrays.sort(allFiles, new Comparator<File>() {
-                        public int compare(File f1, File f2) {
-                            return Long.compare(f1.lastModified(), f2.lastModified());
-                        }
-                    });
-                    for (File f : allFiles) {
-                        if(!f.getName().contains("_L")){
-                            filelist.add(f);
-                        }
-                    }
-                    if(filelist.size()>5){
-                        filelist.get(0).delete();
-                    }
+
+                    autoDelete();
 
                     //Auto upload to Firebase Storage for signed-in user.
                     final String fireBaseFolder = prefs.getString(SettingFragment.LogInEmail,null);
@@ -253,6 +238,8 @@ public class RecordingService extends Service {
         mediaRecorder.reset();
         mediaRecorder.release();
         mediaRecorder = null;
+
+        autoDelete();
 
         //Auto upload to Firebase Storage for signed-in user.
         final String fireBaseFolder = prefs.getString(SettingFragment.LogInEmail,null);
@@ -354,6 +341,27 @@ public class RecordingService extends Service {
 
         //Remove temp file.
         f.delete();
+    }
+
+    //Once local recordings (unlocked) exceeds 5, the least recent one will be deleted.
+    private void autoDelete(){
+        //check storage size after saving the file
+        ArrayList<File> filelist= new ArrayList<>();
+        File directory = new File(recordPath);
+        File[] allFiles = directory.listFiles();
+        Arrays.sort(allFiles, new Comparator<File>() {
+            public int compare(File f1, File f2) {
+                return Long.compare(f1.lastModified(), f2.lastModified());
+            }
+        });
+        for (File f : allFiles) {
+            if(!f.getName().contains("_L")){
+                filelist.add(f);
+            }
+        }
+        if(filelist.size()>5){
+            filelist.get(0).delete();
+        }
     }
 
     private String readRecentRecordingLength(){
