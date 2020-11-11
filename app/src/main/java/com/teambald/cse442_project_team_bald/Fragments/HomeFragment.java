@@ -35,6 +35,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseUser;
 import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.R;
 import com.teambald.cse442_project_team_bald.Service.RecordingService;
@@ -121,8 +122,8 @@ public class HomeFragment extends Fragment {
         // [START on_start_sign_in]
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
-        updateUI(account);
+        if(activity.getmAuth()!=null)
+            updateUI(activity.getmAuth().getCurrentUser());
         // [END on_start_sign_in]
     }
     @Override
@@ -132,11 +133,11 @@ public class HomeFragment extends Fragment {
         // [START on_start_sign_in]
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
-        updateUI(account);
+        if(activity.getmAuth()!=null)
+            updateUI(activity.getmAuth().getCurrentUser());
         // [END on_start_sign_in]
     }
-    private void updateUI(@Nullable GoogleSignInAccount account) {
+    private void updateUI(FirebaseUser account) {
         if (account != null) {
             accountText.setText("Signed In as: "+account.getEmail());
         } else {
