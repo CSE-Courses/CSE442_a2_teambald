@@ -32,9 +32,12 @@ import com.teambald.cse442_project_team_bald.TabsController.SwipeActionHandler;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
@@ -101,7 +104,7 @@ public class RecordingListFragment extends Fragment {
     }
 
     //method use to Update the lists in external storage, need to be call on the background daily.
-    public void UpToDate() throws ParseException {
+    /*public void UpToDate() throws ParseException {
         String recordPath = getActivity().getExternalFilesDir("/").getAbsolutePath();
         File Data= new File(recordPath);
         String[] pathnames=Data.list();
@@ -121,7 +124,7 @@ public class RecordingListFragment extends Fragment {
             }
 
         }
-    }
+    }*/
 
     @Override
     public void onResume() {
@@ -139,11 +142,18 @@ public class RecordingListFragment extends Fragment {
         File directory = new File(path);
         allFiles = directory.listFiles();
         recordingList.clear();
+        ArrayList<RecordingItem> unlocked=new ArrayList<>();
+
         if(allFiles == null)
         {
             Log.d(TAG, "all files array null");
         }
         else {
+            Arrays.sort(allFiles, new Comparator<File>() {
+                public int compare(File f1, File f2) {
+                    return Long.compare(f1.lastModified(), f2.lastModified());
+                }
+            });
             Log.d(TAG, "reading " + allFiles.length + " items");
             for (File f : allFiles) {
                 try {
@@ -165,12 +175,22 @@ public class RecordingListFragment extends Fragment {
                     if (f.getName().indexOf("Record") == 0) {
                         name = f.getName();
                     }
+                    if(f.getName().contains("_L")){
+                        unlocked.add(new RecordingItem(name, durationStr, f.getPath(), true, f));
+                    }
                     recordingList.add(new RecordingItem(name, durationStr, f.getPath(), true, f));
                 } catch (Exception e) {
                     Log.e(TAG, "" + e);
                 }
             }
         }
+        while(unlocked.size()>5){
+            File file_delete =unlocked.get(0).getAudio_file();
+            unlocked.remove(0);
+            recordingList.remove(file_delete);
+            file_delete.delete();
+        }
+
         if(mAdapter != null) {
             mAdapter.notifyDataSetChanged();
             Log.d(TAG,"mAdapter notified, size of list "+ recordingList.size());
