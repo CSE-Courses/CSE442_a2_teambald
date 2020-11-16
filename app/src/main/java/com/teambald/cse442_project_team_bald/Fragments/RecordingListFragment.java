@@ -79,7 +79,6 @@ public class RecordingListFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(layoutManager);
-
         //Read local audio files. Will be updated in onResume().
         readAllFiles(Directory_toRead);
 

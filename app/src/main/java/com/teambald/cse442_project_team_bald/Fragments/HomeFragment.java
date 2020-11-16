@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +41,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.R;
 import com.teambald.cse442_project_team_bald.Service.RecordingService;
+import com.teambald.cse442_project_team_bald.Service.ShakeListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,9 +60,12 @@ public class HomeFragment extends Fragment {
     private MediaPlayer mediaPlayer = null;
     private String recordPermission = Manifest.permission.RECORD_AUDIO;
     private int PERMISSION_CODE = 21;
+    private int counter =0;
+    private ShakeListener mShaker;
     private String fileToPlay;
     private MediaRecorder mediaRecorder;
     private String recordFile;
+    private Switch ShakeSwitch;
     //Path of new recording.
     private String filePath;
     //SharedPreference
@@ -99,6 +105,10 @@ public class HomeFragment extends Fragment {
         recordButton.setOnClickListener(new recordClickListener());
         accountText = view.findViewById(R.id.login_account_text);
 
+        //Initialize My ShakeListener and Vibration feedback
+        mShaker = new ShakeListener(this.getContext());
+        final Vibrator vibe = (Vibrator)this.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+
         //initilize the Recroding Directory
         initilize_RecordDirctroy();
 
@@ -114,7 +124,41 @@ public class HomeFragment extends Fragment {
         }else{
             recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
         }
+
+        //Set My Shake Listener
+        mShaker.setOnShakeListener(new ShakeListener.OnShakeListener () {
+            public void onShake()
+            {
+                if (isRecording) {
+                    vibe.vibrate(100);
+                    //Stop Recording
+                    recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
+                    //stopRecording();
+                    stopService();
+                    isRecording = false;
+
+                } else {
+                    vibe.vibrate(100);
+                    //Start service that record audio consistently;
+                    startService();
+                    recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
+                    isRecording = true;
+                }
+                //Save isRecording value.
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean(getString(R.string.is_recording_key), isRecording);
+                editor.commit();
+
+            }
+        });
+
     }
+
+
+
+
+
+
     @Override
     public void onStart() {
         super.onStart();
@@ -129,6 +173,8 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        //
+
 
         // [START on_start_sign_in]
         // Check for existing Google Sign In account, if the user is already signed in
@@ -223,4 +269,7 @@ public class HomeFragment extends Fragment {
         CloudRecordList.mkdir();
         tmpRecordList.mkdir();
     }
+
+
+
 }
