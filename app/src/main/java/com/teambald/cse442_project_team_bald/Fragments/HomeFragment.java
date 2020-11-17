@@ -108,6 +108,9 @@ public class HomeFragment extends Fragment {
         //Initialize My ShakeListener and Vibration feedback
         mShaker = new ShakeListener(this.getContext());
         final Vibrator vibe = (Vibrator)this.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+        //Shake OnOff Switch
+        this.ShakeSwitch = (Switch) view.findViewById(R.id.ShakeSwitch);
+        ShakeSwitch.setChecked(true);
 
         //initilize the Recroding Directory
         initilize_RecordDirctroy();
@@ -129,25 +132,27 @@ public class HomeFragment extends Fragment {
         mShaker.setOnShakeListener(new ShakeListener.OnShakeListener () {
             public void onShake()
             {
-                if (isRecording) {
-                    vibe.vibrate(100);
-                    //Stop Recording
-                    recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
-                    //stopRecording();
-                    stopService();
-                    isRecording = false;
+                if (ShakeSwitch.isChecked()) {
+                    if (isRecording) {
+                        vibe.vibrate(100);
+                        //Stop Recording
+                        recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
+                        //stopRecording();
+                        stopService();
+                        isRecording = false;
 
-                } else {
-                    vibe.vibrate(100);
-                    //Start service that record audio consistently;
-                    startService();
-                    recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
-                    isRecording = true;
+                    } else {
+                        vibe.vibrate(100);
+                        //Start service that record audio consistently;
+                        startService();
+                        recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
+                        isRecording = true;
+                    }
+                    //Save isRecording value.
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putBoolean(getString(R.string.is_recording_key), isRecording);
+                    editor.commit();
                 }
-                //Save isRecording value.
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putBoolean(getString(R.string.is_recording_key), isRecording);
-                editor.commit();
 
             }
         });
