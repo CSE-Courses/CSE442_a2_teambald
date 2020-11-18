@@ -14,6 +14,9 @@
     <string name="auto_recording_text">Loop Recording</string>
     <string name="bio_auth_section_text">Authentication</string>
 
+    <string name="click_to_start">Click to Start Recording</string>
+    <string name="click_to_pause">Click to Pause Recording</string>
+
     <string name="biometric_authentication">BIOMETRIC AUTHENTICATION KEY</string>
 
     <!-- Server Client ID.  This should be a valid Web OAuth 2.0 Client ID obtained
