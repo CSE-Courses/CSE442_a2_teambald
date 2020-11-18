@@ -106,8 +106,8 @@ public class RecordingService extends Service {
                     0, notificationIntent, 0);
 
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setContentTitle("SmartRecorder")
-                    .setContentText("SmartRecorder is running.")
+                    .setContentTitle("Smart Recorder")
+                    .setContentText("Smart Recorder is running.")
                     .setSmallIcon(R.drawable.ic_mic_24)
                     .setContentIntent(pendingIntent)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)

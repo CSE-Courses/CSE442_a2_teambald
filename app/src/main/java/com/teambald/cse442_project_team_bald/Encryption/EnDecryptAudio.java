@@ -10,6 +10,8 @@ import java.io.OutputStream;
 
 public class EnDecryptAudio {
 
+    private static final String TAG = "EnDecrypt";
+
     /**
      * Encrypt and return the encoded bytes
      *
@@ -55,13 +57,14 @@ public class EnDecryptAudio {
             // Starts writing the bytes in it
             os.write(bytes);
             System.out.println("Successfully" + " byte inserted");
-
+            Log.d(TAG,"Successfully" + " byte inserted");
             // Close the file
             os.close();
         }
 
         catch (Exception e) {
-            System.out.println("writeByteToFile Exception: " + e);
+            Log.d(TAG,"writeByteToFile Exception: " + e);
+            e.printStackTrace();
         }
     }
 }

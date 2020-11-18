@@ -2,6 +2,7 @@ package com.teambald.cse442_project_team_bald.Fragments;
 
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,9 @@ public class RecordSelectFragment extends Fragment {
     private MainActivity activity;
 
 
+    private RecordingListFragment recordedFrag = null;
+    private RecordingListFragment downloadedFrag = null;
+
     public RecordSelectFragment(MainActivity mainActivity)
     {
         activity = mainActivity;
@@ -61,9 +65,9 @@ public class RecordSelectFragment extends Fragment {
         HomeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                RecordingListFragment recordingListFG = new RecordingListFragment(activity,LocalRecord_Directory);
+                recordedFrag = new RecordingListFragment(activity,LocalRecord_Directory);
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                transaction.add(((ViewGroup)getView().getParent()).getId() , recordingListFG );
+                transaction.add(((ViewGroup)getView().getParent()).getId() , recordedFrag );
                 transaction.addToBackStack(null);
                 transaction.commit();
             }
@@ -72,14 +76,34 @@ public class RecordSelectFragment extends Fragment {
         CloudButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                RecordingListFragment recordingListFG = new RecordingListFragment(activity,CloudRecord_Directory);
+                downloadedFrag = new RecordingListFragment(activity,CloudRecord_Directory);
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                transaction.add(((ViewGroup)getView().getParent()).getId() , recordingListFG );
+                transaction.add(((ViewGroup)getView().getParent()).getId() , downloadedFrag );
                 transaction.addToBackStack(null);
                 transaction.commit();
             }
         });
+    }
 
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG,"on resume in selector");
+        if(recordedFrag!=null)
+        {
+            recordedFrag.readAllFiles(LocalRecord_Directory);
+            Log.d(TAG,"updating recordedFrag");
+        }
+        else {
+            Log.d(TAG,"recordedFrag null");
+        }
+        if(downloadedFrag!=null)
+        {
+            downloadedFrag.readAllFiles(CloudRecord_Directory);
+            Log.d(TAG,"updating downloadedFrag");
+        }
+        else {
+            Log.d(TAG,"downloadedFrag null");
+        }
     }
 }
