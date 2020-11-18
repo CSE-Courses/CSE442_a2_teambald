@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -81,7 +83,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         //Toolbar
         Toolbar tb = findViewById(R.id.my_toolbar);
-        tb.setTitle(R.string.app_name);
         setSupportActionBar(tb);
         // Views
 
@@ -147,7 +148,26 @@ public class MainActivity extends AppCompatActivity
                 }).attach();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main,menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
 
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_favorite) {
+            Toast.makeText(MainActivity.this, "Action clicked", Toast.LENGTH_LONG).show();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
     @Override
     public void onStart() {
         super.onStart();
