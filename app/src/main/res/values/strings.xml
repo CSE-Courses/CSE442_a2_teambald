@@ -1,12 +1,18 @@
 <resources>
     <string name="app_name">Smart Recorder</string>
-    <string name="recording_length_text">Recording length</string>
     <string name="recording_length_key">RECORDING LENGTH KEY</string>
     <string name="auto_record">AUTO RECORDING KEY</string>
     <string name="is_recording_key">IS RECORDING KEY</string>
 
     <string name="sign_out">Sign Out</string>
 
+
+    <string name="sign_in_section_text">Account</string>
+    <string name="sign_in_account_text">Signed In As: </string>
+    <string name="recording_section_text">Recording</string>
+    <string name="recording_length_text">Single Recording length:</string>
+    <string name="auto_recording_text">Loop Recording</string>
+    <string name="bio_auth_section_text">Authentication</string>
 
     <string name="biometric_authentication">BIOMETRIC AUTHENTICATION KEY</string>
 
