@@ -34,9 +34,7 @@ public class AuthenActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         //Decide whether to use biometric
 
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        Intent intent;
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         boolean authenVal = sharedPref.getBoolean(getString(R.string.biometric_authentication),false);
         Log.d(TAG,"Reading authentication preference:"+authenVal);
