@@ -60,21 +60,10 @@ public class HomeFragment extends Fragment {
 
     private ImageButton recorderButton;
     private boolean isRecording;
-    private MediaPlayer mediaPlayer = null;
     private String recordPermission = Manifest.permission.RECORD_AUDIO;
     private int PERMISSION_CODE = 21;
-    private int counter =0;
     private ShakeListener mShaker;
-    private String fileToPlay;
-    private MediaRecorder mediaRecorder;
-    private String recordFile;
-    private Switch ShakeSwitch;
-    //Path of new recording.
-    private String filePath;
-    //SharedPreference
     private SharedPreferences sharedPref;
-
-    private Chronometer timer;
 
     private static final String TAG = "HOME_FRAGMENT: ";
 
@@ -83,8 +72,6 @@ public class HomeFragment extends Fragment {
     private TextView accountText;
 
     private TextView recordStatusText;
-
-    private HomeFragment homeFragObj;
 
     private MainActivity activity;
 
@@ -115,9 +102,6 @@ public class HomeFragment extends Fragment {
         //Initialize My ShakeListener and Vibration feedback
         mShaker = new ShakeListener(this.getContext());
         final Vibrator vibe = (Vibrator)this.getContext().getSystemService(Context.VIBRATOR_SERVICE);
-        //Shake OnOff Switch
-        this.ShakeSwitch = (Switch) view.findViewById(R.id.ShakeSwitch);
-        ShakeSwitch.setChecked(true);
 
         //initilize the Recroding Directory
         initilize_RecordDirctroy();
@@ -141,7 +125,9 @@ public class HomeFragment extends Fragment {
         mShaker.setOnShakeListener(new ShakeListener.OnShakeListener () {
             public void onShake()
             {
-                if (ShakeSwitch.isChecked()) {
+
+                boolean shakeVal = sharedPref.getBoolean(getString(R.string.shake_to_save),false);
+                if (shakeVal) {
                     if (isRecording) {
                         vibe.vibrate(100);
                         //Stop Recording

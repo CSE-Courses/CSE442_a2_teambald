@@ -44,17 +44,4 @@
         app:layout_constraintTop_toBottomOf="@+id/recordStatus"
         app:layout_constraintVertical_bias="0.932" />
 
-    <Switch
-        android:id="@+id/ShakeSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:paddingStart="18dp"
-        android:text="Shake"
-        app:layout_constraintBottom_toTopOf="@+id/recorder_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.912"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.409" />
 </androidx.constraintlayout.widget.ConstraintLayout>

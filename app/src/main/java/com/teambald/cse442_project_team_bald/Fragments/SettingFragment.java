@@ -1,6 +1,5 @@
 package com.teambald.cse442_project_team_bald.Fragments;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,7 +24,6 @@ import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.SignInButton;
 import com.google.firebase.auth.FirebaseUser;
 import com.teambald.cse442_project_team_bald.MainActivity;
@@ -57,10 +55,15 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     public static final int[] times = new int[]{1,5,10,15,20,25,30};
 
     private Switch autoRecordSwitch;
-    private boolean autoRecord = false;
+    private boolean autoRecordVal = false;
 
     private Switch authenSwitch;
     private boolean authenVal = false;
+
+    private Switch shakeSwitch;
+    private boolean shakeVal = false;
+
+    private Toast toast;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,18 +72,22 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         editor = sharedPref.edit();
         pval = sharedPref.getInt(getString(R.string.recording_length_key), 1);
-        autoRecord = sharedPref.getBoolean(getString(R.string.auto_record),false);
+        autoRecordVal = sharedPref.getBoolean(getString(R.string.auto_record),false);
         Log.i(TAG, "PVAL: "+pval);
-        Log.i(TAG, "auto record: "+autoRecord);
+        Log.i(TAG, "auto record: "+autoRecordVal);
         authenVal = sharedPref.getBoolean(getString(R.string.biometric_authentication),false);
         Log.d(TAG,"authenval: "+authenVal);
+        shakeVal = sharedPref.getBoolean(getString(R.string.shake_to_save),false);
+        Log.d(TAG,"shakeVal: "+shakeVal);
+
+        toast = Toast.makeText(getContext(),"",Toast.LENGTH_SHORT);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.setting_fragment, container, false);
+        return inflater.inflate(R.layout.fragment_setting, container, false);
     }
 
 
@@ -116,25 +123,51 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                 boolean editorCommit = editor.commit();
                 int s = sharedPref.getInt(getString(R.string.recording_length_key), 1);
                 Log.i("Recording_Length changed to ", String.valueOf(s)+" editorCommit: "+editorCommit);
+
+                toast.setText("Recording length changed to "+getPValString());
+                toast.show();
             }
         });
 
         autoRecordSwitch = view.findViewById(R.id.autoRecSwitch);
-        autoRecordSwitch.setChecked(autoRecord);
+        autoRecordSwitch.setChecked(autoRecordVal);
         autoRecordSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                autoRecord = isChecked;
-                editor.putBoolean(getString(R.string.auto_record),autoRecord);
+                autoRecordVal = isChecked;
+                editor.putBoolean(getString(R.string.auto_record),autoRecordVal);
                 Log.d(TAG,"Saving auto recording preference: "+isChecked);
                 editor.commit();
-                if(autoRecord)
+                if(autoRecordVal)
                 {
-                    Toast.makeText(getContext(),"Auto record ON",Toast.LENGTH_SHORT).show();
+                    toast.setText("Auto record ON");
+                    toast.show();
                 }
                 else
                 {
-                    Toast.makeText(getContext(),"Auto record OFF",Toast.LENGTH_SHORT).show();
+                    toast.setText("Auto record OFF");
+                    toast.show();
+                }
+            }
+        });
+        shakeSwitch = view.findViewById(R.id.shakeSwitch);
+        shakeSwitch.setChecked(shakeVal);
+        shakeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                shakeVal = isChecked;
+                editor.putBoolean(getString(R.string.shake_to_save),shakeVal);
+                Log.d(TAG,"Saving shake to save recording preference: "+isChecked);
+                editor.commit();
+                if(shakeVal)
+                {
+                    toast.setText("Shake to Save ON");
+                    toast.show();
+                }
+                else
+                {
+                    toast.setText("Shake to Save OFF");
+                    toast.show();
                 }
             }
         });
@@ -163,25 +196,27 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                 Log.d(TAG,"Unknown button clicked");
         }
     }
-    public void updatePVALText()
+    public String getPValString()
     {
         switch(pval)
         {
             case 0:
-                recording_length.setText("1 min");
-                break;
+                return "1 min";
             case 1:
             case 2:
             case 3:
             case 4:
             case 5:
             case 6:
-                recording_length.setText(times[pval]+" mins");
-                break;
+                return times[pval]+" mins";
             default:
                 Log.d(TAG,"Invalid index for pval:"+pval);
-                break;
+                return null;
         }
+    }
+    public void updatePVALText()
+    {
+        recording_length.setText(getPValString());
     }
     public void signIn()
     {
@@ -250,7 +285,9 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                         .setMessage("Error " + error)
                         .create()
                         .show();
-                Toast.makeText(getContext(),"Cannot use Biometrics on this device",Toast.LENGTH_SHORT).show();
+
+                toast.setText("Cannot use BIOMETRICS on this device");
+                toast.show();
                 buttonView.setChecked(false);
                 return;
             }
@@ -283,7 +320,9 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                             .setMessage(errorCode + ": " + errString)
                             .create()
                             .show();
-                    Toast.makeText(getContext(), "Biometric Setting Failed", Toast.LENGTH_SHORT).show();
+
+                    toast.setText("Biometric setting change failed");
+                    toast.show();
                     buttonView.setChecked(false);
                 }
 
@@ -303,7 +342,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                 public void onAuthenticationFailed() {
                     super.onAuthenticationFailed();
                     Log.d(TAG,"Authentication failed ...");
-                    Toast.makeText(getContext(), "Biometric Authentication Failed", Toast.LENGTH_SHORT).show();
+                    toast.setText("Biometric Authentication Failed");
+                    toast.show();
                     buttonView.setChecked(false);
                 }
             });
