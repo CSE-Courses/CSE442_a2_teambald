@@ -443,7 +443,7 @@ public class MainActivity extends AppCompatActivity {
             });
         }
     }
-    public void deleteFile(final String filename, final String fireBaseFolder,final CloudListFragment clf,final String firebaseFolder) {
+    public void deleteFile(final String filename, final String fireBaseFolder, final CloudListFragment clf, final String firebaseFolder, final boolean updateUI) {
         if (null != filename && null != fireBaseFolder) {
             StorageReference storageReference = storageRef.child(fireBaseFolder).child(filename);
             storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -452,7 +452,8 @@ public class MainActivity extends AppCompatActivity {
                     // File deleted successfully
                     Log.d(TAG, "File deleted from cloud successfully");
                     Log.d(TAG, "From:" + fireBaseFolder + "/" + filename);
-                    clf.listFiles(firebaseFolder);
+                    if(updateUI)
+                        clf.listFiles(firebaseFolder);
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -588,7 +589,7 @@ public class MainActivity extends AppCompatActivity {
                 for(RecordingItem item : checkedItems) {
                     File file = item.getAudio_file();
                     Log.d(TAG, "Deleting cloud file: " + file.getAbsolutePath());
-                    deleteFile(file.getName(), fireBaseFolder,clf,fireBaseFolder);
+                    deleteFile(file.getName(), fireBaseFolder,clf,fireBaseFolder,item.equals(checkedItems.get(checkedItems.size()-1)));
                 }
             }
             else if(fragmentIndicator == 1 && rlf_local != null && rla_local !=null)
