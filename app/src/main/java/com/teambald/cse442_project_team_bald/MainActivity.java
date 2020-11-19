@@ -44,6 +44,7 @@ import com.teambald.cse442_project_team_bald.TabsController.ViewPagerAdapter;
 
 import java.io.File;
 
+import androidx.appcompat.widget.Toolbar;
 /**
  * Activity to demonstrate basic retrieval of the Google user's ID, email address, and basic
  * profile, which also adds a request dialog to access the user's Google Drive.
@@ -77,6 +78,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //Toolbar
+        Toolbar tb = findViewById(R.id.my_toolbar);
+        setSupportActionBar(tb);
+
         // Views
 
         siawd = this;

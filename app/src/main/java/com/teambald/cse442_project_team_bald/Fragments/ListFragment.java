@@ -19,5 +19,4 @@ public class ListFragment extends Fragment {
     public ArrayList<RecordingItem> getItems()
     {return itemList;}
 
-
 }
