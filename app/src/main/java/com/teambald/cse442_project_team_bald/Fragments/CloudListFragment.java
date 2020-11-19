@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -41,8 +42,7 @@ import java.util.ArrayList;
 /**
  * A fragment representing a list of Items.
  */
-public class CloudFragment extends Fragment {
-    private ArrayList<RecordingItem> cloudList = new ArrayList<>();
+public class CloudListFragment extends ListFragment {
     private ArrayList<String> durations = new ArrayList<>();
 
     private static final String durationMetaDataConst = "Duration";
@@ -68,7 +68,7 @@ public class CloudFragment extends Fragment {
 
     private static final String TAG = "CloudFrag";
 
-    public CloudFragment(MainActivity mainActivity) {
+    public CloudListFragment(MainActivity mainActivity) {
         activity = mainActivity;
     }
 
@@ -79,6 +79,7 @@ public class CloudFragment extends Fragment {
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
+
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
     }
@@ -134,7 +135,7 @@ public class CloudFragment extends Fragment {
             //Log.d(TAG,filenames.toString());
             //Log.d(TAG,filenames.size()+"");
             listFiles(fireBaseFolder);
-            mAdapter = new CloudListAdapter(cloudList, getContext(),this,activity);
+            mAdapter = new CloudListAdapter(itemList, getContext(),this,activity);
             recyclerView.setAdapter(mAdapter);
             ItemTouchHelper itemTouchHelper = new
                     ItemTouchHelper(new SwipeActionHandler((CloudListAdapter) mAdapter,this,"CloudRecording",1, getContext()));
@@ -150,9 +151,9 @@ public class CloudFragment extends Fragment {
             //ArrayList<String> filenames =
             //Log.d(TAG,filenames.toString());
             //Log.d(TAG,filenames.size()+"");
-            cloudList.clear();
-            cloudList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
-            mAdapter = new CloudListAdapter(cloudList, getContext(),this,activity);
+            itemList.clear();
+            itemList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
+            mAdapter = new CloudListAdapter(itemList, getContext(),this,activity);
             recyclerView.setAdapter(mAdapter);
         }
     }
@@ -173,8 +174,8 @@ public class CloudFragment extends Fragment {
         }
         else
         {
-            cloudList.clear();
-            cloudList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
+            itemList.clear();
+            itemList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
             if(mAdapter != null) {
                 mAdapter.notifyDataSetChanged();
             }
@@ -182,11 +183,11 @@ public class CloudFragment extends Fragment {
     }
     public void updateFiles(ArrayList<String> filenames)
     {
-        cloudList.clear();
+        itemList.clear();
         for (int idx = 0;idx<filenames.size();idx++)
         {
             String filename = filenames.get(idx);
-            cloudList.add(new RecordingItem(filename, "Duration: ", filename, true, new File(filename)));
+            itemList.add(new RecordingItem(filename, "Duration: ", filename, true, new File(filename)));
         }
         RecyclerView recyclerView = getView().findViewById(R.id.recording_list_recyclerview_cloud);
         ItemTouchHelper itemTouchHelper = new
@@ -196,7 +197,7 @@ public class CloudFragment extends Fragment {
             mAdapter.notifyDataSetChanged();
             Log.d(TAG,"mAdapter notified");
         }
-        Log.d(TAG,"There are "+cloudList.size()+" items in cloud list");
+        Log.d(TAG,"There are "+itemList.size()+" items in cloud list");
     }
     private class CloudSuccListener implements OnSuccessListener<ListResult>
     {
@@ -270,7 +271,7 @@ public class CloudFragment extends Fragment {
         public void onSuccess(StorageMetadata metaDataRst) {
             metaDataValue = metaDataRst.getCustomMetadata(durationMetaDataConst);
             Log.d(TAG,"MetaData for File: "+filename+" Downloaded successfully");
-            cloudList.get(listIdx).setDuration(metaDataValue);
+            itemList.get(listIdx).setDuration(metaDataValue);
             if(mAdapter != null) {
                 mAdapter.notifyDataSetChanged();
                 Log.d(TAG,"Update the list for metadata idx: "+listIdx+" Metadata: "+metaDataValue);
@@ -296,15 +297,15 @@ public class CloudFragment extends Fragment {
             }
             else
             {
-                cloudList.clear();
-                cloudList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
+                itemList.clear();
+                itemList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
             }
 
         }
         else
         {
-            cloudList.clear();
-            cloudList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
+            itemList.clear();
+            itemList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
         }
         if(mAdapter != null) {
             mAdapter.notifyDataSetChanged();
@@ -324,25 +325,6 @@ public class CloudFragment extends Fragment {
             }
         }
     }
-    /*
-    public void updateAllFiles(String bucketname)
-    {
-        ArrayList<String> files = listFiles(bucketname);
-        Log.d(TAG,"There are "+files.size()+" items in files list");
-        cloudList.clear();
-        for (String filename : files)
-        {
-            File f = new File(filename);
-            Uri uri = Uri.parse(f.getAbsolutePath());
-            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-            mmr.setDataSource(getContext(), uri);
-            String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-            int seconds = Integer.parseInt(durationStr) / 1000;
-            durationStr = parseSeconds(seconds);
-            cloudList.add(new RecordingItem(f.getName(), durationStr , f.getPath(), true, f));
-        }
-        Log.d(TAG,"There are "+cloudList.size()+" items in cloud list");
-    }*/
     public String parseSeconds(int seconds) {
         int min = seconds / 60;
         seconds-=(min * 60);

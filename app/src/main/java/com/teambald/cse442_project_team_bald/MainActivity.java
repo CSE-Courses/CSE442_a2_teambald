@@ -1,27 +1,16 @@
 package com.teambald.cse442_project_team_bald;
 
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
-import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -48,7 +37,6 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.teambald.cse442_project_team_bald.Encryption.EnDecryptAudio;
-import com.teambald.cse442_project_team_bald.Fragments.CloudFragment;
 import com.teambald.cse442_project_team_bald.Fragments.SettingFragment;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
@@ -89,8 +77,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //Toolbar
-        Toolbar tb = findViewById(R.id.my_toolbar);
-        setSupportActionBar(tb);
         // Views
 
         siawd = this;
@@ -488,6 +474,7 @@ public class MainActivity extends AppCompatActivity {
         public boolean onMenuItemClick(MenuItem item) {
             Log.d(TAG, "Upload button pressed in menu");
             Toast.makeText(MainActivity.this, "Selecting all items", Toast.LENGTH_SHORT).show();
+            vpa.getAllItems();
             return false;
         }
     }

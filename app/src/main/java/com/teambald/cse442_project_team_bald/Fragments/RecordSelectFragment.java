@@ -108,4 +108,8 @@ public class RecordSelectFragment extends Fragment {
         Log.d(TAG,"Setting MenuItems Invisible");
         activity.setMenuItemsVisible(false);
     }
+    public RecordingListFragment getRecordedFrag()
+    {return recordedFrag;}
+    public RecordingListFragment getDownloadedFrag()
+    {return downloadedFrag;}
 }

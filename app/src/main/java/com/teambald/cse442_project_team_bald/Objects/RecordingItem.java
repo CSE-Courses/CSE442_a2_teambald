@@ -10,7 +10,7 @@ public class RecordingItem {
     int StartTime;
     boolean play;
     boolean locker;
-
+    boolean checked;
     public RecordingItem()
     {
         date = null;
@@ -19,12 +19,14 @@ public class RecordingItem {
         StartTime = -1;
         play = false;
         locker = false;
+        checked = false;
     }
     public RecordingItem(String date, String duration, boolean play) {
         this.date = date;
         this.duration = duration;
         this.play = play;
         this.locker=false; // set to true
+        this.checked=false;
     }
     public RecordingItem(String date, String duration,String path, boolean play,File audio_file) {
         this.date = date;
@@ -36,7 +38,9 @@ public class RecordingItem {
             this.locker = true; // set to false
         }
         StartTime = 0;
+        this.checked=false;
     }
+
     public boolean isLocked(){
         return this.locker;
     }
@@ -77,4 +81,9 @@ public class RecordingItem {
     public void setPlay(boolean play) {
         this.play = play;
     }
+
+    public boolean getChecked()
+    {return checked;}
+    public void setChecked(boolean checked)
+    {this.checked = checked;}
 }

@@ -1,18 +1,14 @@
 package com.teambald.cse442_project_team_bald.TabsController;
 
 import android.content.Context;
-import android.content.Intent;
 import android.media.MediaPlayer;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -20,20 +16,17 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.teambald.cse442_project_team_bald.Encryption.AudioEncryptionUtils;
 import com.teambald.cse442_project_team_bald.Encryption.FileUtils;
-import com.teambald.cse442_project_team_bald.Fragments.CloudFragment;
+import com.teambald.cse442_project_team_bald.Fragments.CloudListFragment;
 import com.teambald.cse442_project_team_bald.Fragments.RecordingListFragment;
 import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.R;
 
-import java.io.File;
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -45,7 +38,7 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
     public View PlayingView;
     public int preint;
     public Context context;
-    public CloudFragment cloudFragment;
+    public CloudListFragment cloudListFragment;
     public RecordingListFragment fragment;
     public MainActivity activity;
 

@@ -41,8 +41,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
-public class RecordingListFragment extends Fragment {
-    private ArrayList<RecordingItem> recordingList = new ArrayList<>();
+public class RecordingListFragment extends ListFragment {
     private MediaPlayer mediaPlayer = null;
     private ImageButton BackButton;
     private File[] allFiles;
@@ -80,7 +79,7 @@ public class RecordingListFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        mAdapter = new LocalListAdapter(recordingList,getContext(),this,activity);
+        mAdapter = new LocalListAdapter(itemList,getContext(),this,activity);
         recyclerView.setAdapter(mAdapter);
         ItemTouchHelper itemTouchHelper = new
                 ItemTouchHelper(new SwipeActionHandler( (LocalListAdapter)mAdapter,this,Directory_toRead,0, getContext()));
@@ -142,7 +141,7 @@ public class RecordingListFragment extends Fragment {
 //        path = path+File.separator+"LocalRecording";//Local
         File directory = new File(path);
         allFiles = directory.listFiles();
-        recordingList.clear();
+        itemList.clear();
         ArrayList<RecordingItem> unlocked=new ArrayList<>();
 
         if(allFiles == null)
@@ -179,7 +178,7 @@ public class RecordingListFragment extends Fragment {
                     if(!f.getName().contains("_L")){
                         unlocked.add(new RecordingItem(name, durationStr, f.getPath(), true, f));
                     }
-                    recordingList.add(new RecordingItem(name, durationStr, f.getPath(), true, f));
+                    itemList.add(new RecordingItem(name, durationStr, f.getPath(), true, f));
                 } catch (Exception e) {
                     Log.e(TAG, "" + e);
                 }
@@ -188,13 +187,13 @@ public class RecordingListFragment extends Fragment {
         while(unlocked.size()>5){
             File file_delete =unlocked.get(0).getAudio_file();
             unlocked.remove(0);
-            recordingList.remove(file_delete);
+            itemList.remove(file_delete);
             file_delete.delete();
         }
 
         if(mAdapter != null) {
             mAdapter.notifyDataSetChanged();
-            Log.d(TAG,"mAdapter notified, size of list "+ recordingList.size());
+            Log.d(TAG,"mAdapter notified, size of list "+ itemList.size());
         }
         else
         {
@@ -253,6 +252,5 @@ public class RecordingListFragment extends Fragment {
     private void setpath(String path){
         this.Directory_toRead = path;
     }
-
 }
 
