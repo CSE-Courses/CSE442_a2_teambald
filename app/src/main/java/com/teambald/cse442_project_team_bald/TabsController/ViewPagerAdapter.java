@@ -1,9 +1,11 @@
 package com.teambald.cse442_project_team_bald.TabsController;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.teambald.cse442_project_team_bald.Fragments.CloudListFragment;
@@ -13,8 +15,10 @@ import com.teambald.cse442_project_team_bald.Fragments.RecordingListFragment;
 import com.teambald.cse442_project_team_bald.Fragments.SettingFragment;
 import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
+import com.teambald.cse442_project_team_bald.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ViewPagerAdapter extends FragmentStateAdapter {
     private static final int TABS_SIZE = 4;
@@ -60,6 +64,12 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
 
     public void getAllItems()
     {
+        FragmentManager fm = mainActivity.getSupportFragmentManager();
+        List<Fragment> fragments = fm.getFragments();
+        Fragment lastFragment = fragments.get(fragments.size()-1);
+        String classText = "in "+lastFragment.getClass();
+        Log.d(TAG,classText);
+        Toast.makeText(mainActivity.getApplicationContext(), classText, Toast.LENGTH_SHORT).show();
         if(cloudListFragment !=null)
         {
             Log.d(TAG,"Cloud Frag !null");

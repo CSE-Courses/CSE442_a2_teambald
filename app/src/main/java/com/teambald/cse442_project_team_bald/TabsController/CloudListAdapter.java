@@ -45,7 +45,7 @@ public class CloudListAdapter extends RecordingListAdapter{
         // create a new view
         return new MyViewHolder(
                 LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.recording_list_item, parent, false)
+                        .inflate(R.layout.cloud_list_item, parent, false)
         );
     }
 
@@ -57,72 +57,17 @@ public class CloudListAdapter extends RecordingListAdapter{
         final TextView date = holder.recordingItemView.findViewById(R.id.recording_date_tv);
         TextView duration = holder.recordingItemView.findViewById(R.id.recording_duration_tv);
         ImageButton button = holder.recordingItemView.findViewById(R.id.recording_play_pause_button);
-        Switch locker=holder.recordingItemView.findViewById(R.id.locker);
-        Button rename=holder.recordingItemView.findViewById(R.id.rename_button);
-        final TextView text=holder.recordingItemView.findViewById(R.id.renaming_Text);
         final CheckBox checkBox = holder.recordingItemView.findViewById(R.id.checkBox);
         checkBox.setChecked(mDataset.get(position).getChecked());
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mDataset.get(position).setChecked(isChecked);
+                Log.d(TAG,"Cloud item:"+position+" is checked set to : "+isChecked);
             }
         });
         date.setText(mDataset.get(position).getDate());
         duration.setText(mDataset.get(position).getDuration());
-        //Renaming event
-        rename.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(text.getText()!=""){
-                    date.setText(text.getText());
-                    String name= mDataset.get(position).getAudio_file().getName();
-                    String path=mDataset.get(position).getAudio_file().getPath();
-                    String subName= name.substring(name.indexOf("Recording"));
-                    String SubPath=path.substring(0,path.indexOf(name));
-                    mDataset.get(position).getAudio_file().renameTo(new File(SubPath+text.getText()+"_"+subName ));
-                    text.setText("");
-                    notifyDataSetChanged();
-                    FragmentTransaction ft = cloudListFragment.getFragmentManager().beginTransaction();
-                    ft.detach(cloudListFragment);
-                    ft.attach(cloudListFragment);
-                    ft.commit();
-                }
-            }
-        });
-        //Locker event
-        locker.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {// lock
-                    String path= mDataset.get(position).getAudio_file().getPath();
-                    if(path.charAt(path.length()-5) !='L') {
-                        String name = path.substring(0, path.length() - 4);
-                        mDataset.get(position).getAudio_file().renameTo(new File(name + "_L.mp4"));
-                        FragmentTransaction ft = cloudListFragment.getFragmentManager().beginTransaction();
-                        ft.detach(cloudListFragment);
-                        ft.attach(cloudListFragment);
-                        ft.commit();
-
-                    }
-                } else {
-                    mDataset.get(position).unLock(); // unlock
-                    String path= mDataset.get(position).getAudio_file().getPath();
-                    String name= path.substring(0,path.length()-6);
-                    if(path.charAt(path.length()-5)== 'L') {
-                        mDataset.get(position).getAudio_file().renameTo(new File(name + ".mp4"));
-                        FragmentTransaction ft = cloudListFragment.getFragmentManager().beginTransaction();
-                        ft.detach(cloudListFragment);
-                        ft.attach(cloudListFragment);
-                        ft.commit();
-                    }
-                }
-            }
-        });
-        if(!mDataset.get(position).isLocked()) {
-            locker.setChecked(false); // if is locked set to true
-        }else{
-            locker.setChecked(true);
-        }
         button.setBackgroundResource(mDataset.get(position).isPlay() ? R.drawable.ic_play_button : R.drawable.ic_pause_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override

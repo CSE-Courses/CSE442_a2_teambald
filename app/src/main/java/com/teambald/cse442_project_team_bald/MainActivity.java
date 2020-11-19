@@ -1,5 +1,6 @@
 package com.teambald.cse442_project_team_bald;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,6 +12,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -144,6 +147,8 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 }).attach();
+        FragmentManager fm = getSupportFragmentManager();
+        fm.registerFragmentLifecycleCallbacks(new fragmentLCC(),true);
     }
 
     @Override
@@ -477,7 +482,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onMenuItemClick(MenuItem item) {
             Log.d(TAG, "Upload button pressed in menu");
-            Toast.makeText(MainActivity.this, "Selecting all items", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(MainActivity.this, "Selecting all items", Toast.LENGTH_SHORT).show();
             vpa.getAllItems();
             return false;
         }
@@ -489,6 +494,20 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Upload button pressed in menu");
             Toast.makeText(MainActivity.this, "Deselecting all items", Toast.LENGTH_SHORT).show();
             return false;
+        }
+    }
+    private class fragmentLCC extends FragmentManager.FragmentLifecycleCallbacks
+    {
+        @Override
+        public void onFragmentAttached(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull Context context) {
+            super.onFragmentAttached(fm, f, context);
+            Log.d(TAG,f.getClass()+" is attached");
+        }
+
+        @Override
+        public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment f) {
+            super.onFragmentResumed(fm, f);
+            Log.d(TAG,f.getClass()+" is resumed");
         }
     }
 }
