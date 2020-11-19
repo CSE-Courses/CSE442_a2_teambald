@@ -12,6 +12,7 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Chronometer;
@@ -43,6 +44,8 @@ import com.teambald.cse442_project_team_bald.R;
 import com.teambald.cse442_project_team_bald.Service.RecordingService;
 import com.teambald.cse442_project_team_bald.Service.ShakeListener;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -57,21 +60,10 @@ public class HomeFragment extends Fragment {
 
     private ImageButton recorderButton;
     private boolean isRecording;
-    private MediaPlayer mediaPlayer = null;
     private String recordPermission = Manifest.permission.RECORD_AUDIO;
     private int PERMISSION_CODE = 21;
-    private int counter =0;
     private ShakeListener mShaker;
-    private String fileToPlay;
-    private MediaRecorder mediaRecorder;
-    private String recordFile;
-    private Switch ShakeSwitch;
-    //Path of new recording.
-    private String filePath;
-    //SharedPreference
     private SharedPreferences sharedPref;
-
-    private Chronometer timer;
 
     private static final String TAG = "HOME_FRAGMENT: ";
 
@@ -79,7 +71,7 @@ public class HomeFragment extends Fragment {
 
     private TextView accountText;
 
-    private HomeFragment homeFragObj;
+    private TextView recordStatusText;
 
     private MainActivity activity;
 
@@ -105,12 +97,11 @@ public class HomeFragment extends Fragment {
         recordButton.setOnClickListener(new recordClickListener());
         accountText = view.findViewById(R.id.login_account_text);
 
+        recordStatusText = view.findViewById(R.id.recordStatus);
+
         //Initialize My ShakeListener and Vibration feedback
         mShaker = new ShakeListener(this.getContext());
         final Vibrator vibe = (Vibrator)this.getContext().getSystemService(Context.VIBRATOR_SERVICE);
-        //Shake OnOff Switch
-        this.ShakeSwitch = (Switch) view.findViewById(R.id.ShakeSwitch);
-        ShakeSwitch.setChecked(true);
 
         //initilize the Recroding Directory
         initilize_RecordDirctroy();
@@ -124,15 +115,19 @@ public class HomeFragment extends Fragment {
         recorderButton = view.findViewById(R.id.recorder_button);
         if(!isRecording){
             recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
+            recordStatusText.setText(getString(R.string.click_to_start));
         }else{
             recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
+            recordStatusText.setText(getString(R.string.click_to_pause));
         }
 
         //Set My Shake Listener
         mShaker.setOnShakeListener(new ShakeListener.OnShakeListener () {
             public void onShake()
             {
-                if (ShakeSwitch.isChecked()) {
+
+                boolean shakeVal = sharedPref.getBoolean(getString(R.string.shake_to_save),false);
+                if (shakeVal) {
                     if (isRecording) {
                         vibe.vibrate(100);
                         //Stop Recording
@@ -140,7 +135,6 @@ public class HomeFragment extends Fragment {
                         //stopRecording();
                         stopService();
                         isRecording = false;
-
                     } else {
                         vibe.vibrate(100);
                         //Start service that record audio consistently;
@@ -156,21 +150,13 @@ public class HomeFragment extends Fragment {
 
             }
         });
-
     }
-
-
-
-
 
 
     @Override
     public void onStart() {
         super.onStart();
 
-        // [START on_start_sign_in]
-        // Check for existing Google Sign In account, if the user is already signed in
-        // the GoogleSignInAccount will be non-null.
         if(activity.getmAuth()!=null)
             updateUI(activity.getmAuth().getCurrentUser());
         // [END on_start_sign_in]
@@ -180,6 +166,8 @@ public class HomeFragment extends Fragment {
         super.onResume();
         //
 
+        Log.d(TAG,"Setting MenuItems Invisible");
+        activity.setMenuItemsVisible(false);
 
         // [START on_start_sign_in]
         // Check for existing Google Sign In account, if the user is already signed in
@@ -193,8 +181,10 @@ public class HomeFragment extends Fragment {
 
         if(!isRecording){
             recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
+            recordStatusText.setText(getString(R.string.click_to_start));
         }else{
             recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
+            recordStatusText.setText(getString(R.string.click_to_pause));
         }
     }
     private void updateUI(FirebaseUser account) {
@@ -213,6 +203,8 @@ public class HomeFragment extends Fragment {
             if (isRecording) {
                 //Stop Recording
                 recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
+                recordStatusText.setText(getString(R.string.click_to_start));
+
                 //stopRecording();
                 stopService();
                 isRecording = false;
@@ -221,6 +213,7 @@ public class HomeFragment extends Fragment {
                 //Start service that record audio consistently;
                 startService();
                 recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
+                recordStatusText.setText(getString(R.string.click_to_pause));
                 isRecording = true;
             }
             //Save isRecording value.

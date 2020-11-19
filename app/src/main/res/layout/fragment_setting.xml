@@ -30,6 +30,7 @@
                 android:text="@string/sign_in_section_text"
                 android:textColor="#000000"
                 android:textSize="24sp"
+                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -47,6 +48,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
+                android:paddingLeft="4dp"
                 android:text="@string/sign_in_account_text"
                 android:textAlignment="center"
                 android:textColor="#000000"
@@ -123,6 +125,7 @@
                 android:text="@string/recording_section_text"
                 android:textColor="#000000"
                 android:textSize="24sp"
+                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -142,6 +145,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:paddingLeft="2dp"
                 android:text="@string/recording_length_text"
                 android:textAlignment="center"
                 android:textColor="#000000"
@@ -170,6 +174,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:paddingLeft="4dp"
                 android:text="5 min"
                 android:textAlignment="center"
                 android:textColor="#000000"
@@ -184,21 +189,33 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_weight="1"
+                android:paddingLeft="4dp"
                 android:text="@string/auto_recording_text"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/recording_length_tv" />
 
+            <Switch
+                android:id="@+id/shakeSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="8dp"
+                android:paddingLeft="4dp"
+                android:text="@string/shake_save_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/autoRecSwitch" />
+
             <View
                 android:id="@+id/divider3"
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
-                android:layout_marginTop="8dp"
                 android:background="?android:attr/listDivider"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/autoRecSwitch" />
+                app:layout_constraintTop_toBottomOf="@+id/shakeSwitch" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -223,6 +240,7 @@
                 android:text="@string/bio_auth_section_text"
                 android:textColor="#000000"
                 android:textSize="24sp"
+                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -244,6 +262,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_weight="1"
+                android:paddingLeft="4dp"
                 android:text="Biometrics"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
