@@ -45,7 +45,7 @@ public class RecordingListFragment extends ListFragment {
     private MediaPlayer mediaPlayer = null;
     private ImageButton BackButton;
     private File[] allFiles;
-    private RecyclerView.Adapter mAdapter;
+    private LocalListAdapter mAdapter;
     private static final String TAG = "RecordingListF";
     private String Directory_toRead;
 
@@ -98,41 +98,42 @@ public class RecordingListFragment extends ListFragment {
                 transaction.commit();
             }
         });
+        if(activity!=null)
+            showMenu();
     }
 
-    //method use to Update the lists in external storage, need to be call on the background daily.
-    /*public void UpToDate() throws ParseException {
-        String recordPath = getActivity().getExternalFilesDir("/").getAbsolutePath();
-        File Data= new File(recordPath);
-        String[] pathnames=Data.list();
-        SimpleDateFormat formatter = new SimpleDateFormat("MM_dd", Locale.US);
-        Date now = new Date();
-        int limite_time=7; // set time to delete to 7;
-        for(String pathname:pathnames){
-            //find the dates and compare with current date
-            String date=pathname.substring("Recording_".length()+5,"Recording_".length()+10);
-            Date save_date= formatter.parse(date);
-            long diff_in_date=now.getTime()-save_date.getTime();
-            long diffDays = diff_in_date / (24 * 60 * 60 * 1000); // find the different in day
-            if(diffDays>limite_time){
-                // do delete if difference greater than limite_time
-                File file = new File(pathname);
-                boolean deleted = file.delete(); // execute deletes
-            }
-
-        }
-    }*/
-
+    /*
+     * 0-Cloud
+     * 1-Local Recorded
+     * 2-Local Downloaded*/
     @Override
     public void onResume() {
         super.onResume();
         //Update saved audio file to make sure the recordings are up-to-date.
         Log.d(TAG,"On Resume function");
         readAllFiles(Directory_toRead);
-        Log.d(TAG,"Showing MenuItems");
-        activity.setMenuItemsVisible(true);
+        if(activity!=null)
+            showMenu();
+        else
+        {
+            Log.d(TAG,"Activity null, menu not shown");
+        }
     }
-
+    public String getDirectory_toRead(){return Directory_toRead;}
+    public void showMenu()
+    {
+        if(Directory_toRead !=null && Directory_toRead.contains("CloudRecording")) {
+            activity.setMenuItemsVisible(this, mAdapter, 2);
+            Log.d(TAG,"Showing MenuItems in recording list fragment: idx: "+2);
+        }
+        else if(Directory_toRead !=null && Directory_toRead.contains("LocalRecording")) {
+            activity.setMenuItemsVisible(this, mAdapter, 1);
+            Log.d(TAG,"Showing MenuItems in recording list fragment: idx: "+1);
+        }
+        else {
+            Log.d(TAG, "Unknown directory to read or null");
+        }
+    }
     /*
      * This will be called in onResume().
      */
@@ -191,9 +192,14 @@ public class RecordingListFragment extends ListFragment {
             file_delete.delete();
         }
 
+        Log.d(TAG,"mAdapter notified, size of list "+ itemList.size());
+        updateUI();
+    }
+
+    public void updateUI()
+    {
         if(mAdapter != null) {
             mAdapter.notifyDataSetChanged();
-            Log.d(TAG,"mAdapter notified, size of list "+ itemList.size());
         }
         else
         {
@@ -201,45 +207,6 @@ public class RecordingListFragment extends ListFragment {
         }
     }
 
-    /*
-     * For Encrypted files only.
-     * Update the items in recordingList and notify the mAdapter to display to change.
-     * This will be called in onResume().
-     */
-//    public void readAllEncryptedFiles() {
-//        String path = getActivity().getExternalFilesDir("/").getAbsolutePath();
-//        File directory = new File(path);
-//        allFiles = directory.listFiles();
-//        recordingList.clear();
-//        for(File f : allFiles){
-//            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-//
-//            //Decrypt audio file
-//            byte[] decrypt = decrypt(f);
-//            FileDescriptor decrypted;
-//            try{
-//                decrypted = FileUtils.getTempFileDescriptor(getContext(), decrypt);
-//            }catch (IOException e){
-//                Toast toast = Toast.makeText(getContext(), "Decrypt audio has failed.", Toast.LENGTH_SHORT);
-//                toast.show();
-//                return;
-//            }
-//
-//            mmr.setDataSource(decrypted);
-//
-//            String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-//            int seconds = Integer.parseInt(durationStr) / 1000;
-//            durationStr = parseSeconds(seconds);
-//            recordingList.add(new RecordingItem(f.getName(), durationStr , f.getPath(), true, f));
-//        }
-//        if(mAdapter != null) {
-//            mAdapter.notifyDataSetChanged();
-//        }
-//    }
-
-    /*
-     * Take seconds and parse into the form of 00:00.
-     */
     public String parseSeconds(int seconds) {
         int min = seconds / 60;
         seconds-=(min * 60);

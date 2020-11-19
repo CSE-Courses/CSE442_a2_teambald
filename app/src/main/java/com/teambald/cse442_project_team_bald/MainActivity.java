@@ -40,12 +40,19 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.teambald.cse442_project_team_bald.Encryption.EnDecryptAudio;
+import com.teambald.cse442_project_team_bald.Fragments.CloudListFragment;
+import com.teambald.cse442_project_team_bald.Fragments.ListFragment;
+import com.teambald.cse442_project_team_bald.Fragments.RecordingListFragment;
 import com.teambald.cse442_project_team_bald.Fragments.SettingFragment;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
+import com.teambald.cse442_project_team_bald.TabsController.CloudListAdapter;
+import com.teambald.cse442_project_team_bald.TabsController.LocalListAdapter;
 import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
 import com.teambald.cse442_project_team_bald.TabsController.ViewPagerAdapter;
 
 import java.io.File;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 import androidx.appcompat.widget.Toolbar;
 /**
@@ -75,6 +82,17 @@ public class MainActivity extends AppCompatActivity {
 
     private MenuItem uploadItem,downloadItem,deleteItem,selectAll,deselectAll;
 
+    private CloudListFragment clf;
+    private RecordingListFragment rlf_local;
+    private RecordingListFragment rlf_downloaded;
+    private CloudListAdapter cla;
+    private LocalListAdapter rla_local;
+    private LocalListAdapter rla_downloaded;
+    /*
+    * 0-Cloud
+    * 1-Local Recorded
+    * 2-Local Downloaded*/
+    private int fragmentIndicator = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,8 +165,6 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 }).attach();
-        FragmentManager fm = getSupportFragmentManager();
-        fm.registerFragmentLifecycleCallbacks(new fragmentLCC(),true);
     }
 
     @Override
@@ -427,87 +443,358 @@ public class MainActivity extends AppCompatActivity {
             });
         }
     }
-    public void setMenuItemsVisible(boolean visible)
-    {
-        if(uploadItem!=null)
-        {
-            uploadItem.setVisible(visible);
-        }
-        if(downloadItem!=null)
-        {
-            downloadItem.setVisible(visible);
-        }
-        if(deleteItem!=null)
-        {
-            deleteItem.setVisible(visible);
-        }
-        if(selectAll!=null)
-        {
-            selectAll.setVisible(visible);
-        }
-        if(deselectAll!=null)
-        {
-            deselectAll.setVisible(visible);
+    public void deleteFile(final String filename, final String fireBaseFolder,final CloudListFragment clf,final String firebaseFolder) {
+        if (null != filename && null != fireBaseFolder) {
+            StorageReference storageReference = storageRef.child(fireBaseFolder).child(filename);
+            storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    // File deleted successfully
+                    Log.d(TAG, "File deleted from cloud successfully");
+                    Log.d(TAG, "From:" + fireBaseFolder + "/" + filename);
+                    clf.listFiles(firebaseFolder);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Uh-oh, an error occurred!
+                    Log.d(TAG, "File not deleted from cloud!");
+                    Log.d(TAG, "From:" + fireBaseFolder + "/" + filename);
+                }
+            });
         }
     }
+
+    /*
+     * 0-Cloud
+     * 1-Local Recorded
+     * 2-Local Downloaded*/
     private class uploadItemListener implements MenuItem.OnMenuItemClickListener
     {
         @Override
-        public boolean onMenuItemClick(MenuItem item) {
+        public boolean onMenuItemClick(MenuItem menuitem) {
             Log.d(TAG, "Upload button pressed in menu");
-            Toast.makeText(MainActivity.this, "Uploading items", Toast.LENGTH_SHORT).show();
-            return false;
+            FirebaseUser fbuser = getmAuth().getCurrentUser();
+            if (fbuser == null) {
+                Toast.makeText(getApplicationContext(), "Please Log in", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            String fireBaseFolder = fbuser.getEmail();
+            if(fragmentIndicator == 1 && rlf_local != null && rla_local !=null)
+            {
+                Log.d(TAG, "Uploading local items");
+                ArrayList<RecordingItem> allItems = rla_local.getmDataset();
+                ArrayList<RecordingItem> checkedItems = getCheckedItems(allItems);
+                Log.d(TAG, "Uploading "+checkedItems.size()+" items from :"+allItems.size() +" items");
+                for(RecordingItem item:checkedItems) {
+                    File file = item.getAudio_file();
+                    Log.d(TAG, "Uploading file: " + file.getAbsolutePath());
+                    String path = rlf_local.getDirectory_toRead() + File.separator;
+
+                    byte[] encoded = EnDecryptAudio.encrypt(file.getPath(), getApplicationContext());
+                    final String tempFilePath = getApplicationContext().getExternalFilesDir("/").getAbsolutePath()
+                            + File.separator + "tmp" + File.separator + file.getName();
+                    //Write bytes to a file.
+                    EnDecryptAudio.writeByteToFile(encoded, tempFilePath);
+                    uploadRecording(tempFilePath, fireBaseFolder, item.getDuration());
+                }
+                Log.d(TAG,"Uploaded All Selected Items");
+            }
+            else if(fragmentIndicator == 2 && rlf_downloaded != null && rla_downloaded !=null)
+            {
+                Log.d(TAG, "Uploading downloaded items");
+                ArrayList<RecordingItem> allItems = rla_downloaded.getmDataset();
+                ArrayList<RecordingItem> checkedItems = getCheckedItems(allItems);
+                Log.d(TAG, "Uploading "+checkedItems.size()+" items from :"+allItems.size() +" items");
+                for(RecordingItem item:checkedItems) {
+                    File file = item.getAudio_file();
+                    Log.d(TAG, "Uploading file: " + file.getAbsolutePath());
+                    String path = rlf_downloaded.getDirectory_toRead() + File.separator;
+
+                    byte[] encoded = EnDecryptAudio.encrypt(file.getPath(), getApplicationContext());
+                    final String tempFilePath = getApplicationContext().getExternalFilesDir("/").getAbsolutePath()
+                            + File.separator + "tmp" + File.separator + file.getName();
+                    //Write bytes to a file.
+                    EnDecryptAudio.writeByteToFile(encoded, tempFilePath);
+                    uploadRecording(tempFilePath, fireBaseFolder, item.getDuration());
+                }
+                Log.d(TAG,"Uploaded All Selected Items");
+            }
+            else
+            {
+                Log.d(TAG,"unknown fragment indicator or fragment/adapters null");
+                return false;
+            }
+            return true;
         }
     }
     private class downloadItemListener implements MenuItem.OnMenuItemClickListener
     {
         @Override
-        public boolean onMenuItemClick(MenuItem item) {
+        public boolean onMenuItemClick(MenuItem menuitem) {
             Log.d(TAG, "Download button pressed in menu");
-            Toast.makeText(MainActivity.this, "Downloading items", Toast.LENGTH_SHORT).show();
-            return false;
+            FirebaseUser fbuser = getmAuth().getCurrentUser();
+            if (fbuser == null) {
+                Toast.makeText(getApplicationContext(), "Please Log in", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            String fireBaseFolder = fbuser.getEmail();
+            if(fragmentIndicator == 0 && clf != null && cla !=null)
+            {
+                Log.d(TAG, "Downloading cloud items");
+                ArrayList<RecordingItem> allItems = cla.getmDataset();
+                ArrayList<RecordingItem> checkedItems = getCheckedItems(allItems);
+                Log.d(TAG,"Downloading "+checkedItems.size() +" items out of "+allItems.size() + " items");
+                for(RecordingItem item:checkedItems) {
+                    File file = item.getAudio_file();
+                    Log.d(TAG, "Downloading file: " + file.getAbsolutePath());
+                    String path = getExternalFilesDir("/").getAbsolutePath() + File.separator + "CloudRecording" + File.separator;
+                    downloadFile(path, "", file.getName(), fireBaseFolder);
+                }
+                Log.d(TAG,"All items downloaded");
+            }
+            else if(fragmentIndicator == 2 && rlf_downloaded != null && rla_downloaded !=null)
+            {
+                Log.d(TAG, "Uploading downloaded items");
+                setDataSetCheck(rlf_downloaded.getItems(),true);
+                rla_downloaded.notifyDataSetChanged();
+                Log.d(TAG,"Checked all items in rla_downloaded");
+            }
+            else
+            {
+                Log.d(TAG,"unknown fragment indicator or fragment/adapters null");
+                return false;
+            }
+            return true;
         }
     }
     private class deleteItemListener implements MenuItem.OnMenuItemClickListener
     {
         @Override
-        public boolean onMenuItemClick(MenuItem item) {
+        public boolean onMenuItemClick(MenuItem menuitem) {
             Log.d(TAG, "Delete button pressed in menu");
-            Toast.makeText(MainActivity.this, "Deleting items", Toast.LENGTH_SHORT).show();
-            return false;
+            if(fragmentIndicator == 0 && clf!=null && cla!=null)
+            {
+                Log.d(TAG, "Deleting checked items in cloud fragment");
+                FirebaseUser fbuser = getmAuth().getCurrentUser();
+                if (fbuser == null) {
+                    Toast.makeText(getApplicationContext(), "Please Log in", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                String fireBaseFolder = fbuser.getEmail();
+                Log.d(TAG, "Deleting cloud items");
+                ArrayList<RecordingItem> allItems = cla.getmDataset();
+                ArrayList<RecordingItem> checkedItems = getCheckedItems(allItems);
+                for(RecordingItem item : checkedItems) {
+                    File file = item.getAudio_file();
+                    Log.d(TAG, "Deleting cloud file: " + file.getAbsolutePath());
+                    deleteFile(file.getName(), fireBaseFolder,clf,fireBaseFolder);
+                }
+            }
+            else if(fragmentIndicator == 1 && rlf_local != null && rla_local !=null)
+            {
+                Log.d(TAG, "Deleting checked items in local fragment");
+                ArrayList<RecordingItem> allItems = rla_local.getmDataset();
+                ArrayList<Integer> checkedItems = getCheckedItemsPosition(allItems);
+                for(int idx = checkedItems.size()-1;idx>=0;idx--)
+                {
+                    int pos = checkedItems.get(idx);
+                    rla_local.deleteItem(idx);
+                    rla_local.notifyDataSetChanged();
+                    Log.d(TAG, "Deleting local file at position: " + pos);
+                }
+                Log.d(TAG, "Deleted all checked local files");
+            }
+            else if(fragmentIndicator == 2 && rlf_downloaded != null && rla_downloaded !=null)
+            {
+                Log.d(TAG, "Deleting checked items in downloaded fragment");
+                ArrayList<RecordingItem> allItems = rla_downloaded.getmDataset();
+                ArrayList<Integer> checkedItems = getCheckedItemsPosition(allItems);
+                for(int idx = checkedItems.size()-1;idx>=0;idx--)
+                {
+                    int pos = checkedItems.get(idx);
+                    rla_downloaded.deleteItem(idx);
+                    rla_downloaded.notifyDataSetChanged();
+                    Log.d(TAG, "Deleting downloaded file at position: " + pos);
+                }
+                Log.d(TAG, "Deleted all checked downloaded files");
+            }
+            else
+            {
+                Log.d(TAG,"unknown fragment indicator or fragment/adapters null");
+                return false;
+            }
+            return true;
         }
     }
+    public ArrayList<RecordingItem> getCheckedItems(ArrayList<RecordingItem> items)
+    {
+        Log.d(TAG,"Getting checked items");
+        ArrayList<RecordingItem> checkedItems = new ArrayList<>();
+        if(items == null)
+        {
+            Log.d(TAG,"items object null");
+            return checkedItems;
+        }
+        for(RecordingItem item : items)
+        {
+            if(item.getChecked())
+            {
+                checkedItems.add(item);
+                Log.d(TAG,"An item is checked");
+            }
+            else
+            {
+                Log.d(TAG,"An item is not checked");
+            }
+        }
+        return checkedItems;
+    }
+    public ArrayList<Integer> getCheckedItemsPosition(ArrayList<RecordingItem> items)
+    {
+        Log.d(TAG,"Getting checked items position");
+        ArrayList<Integer> checkedItems = new ArrayList<>();
+        if(items == null)
+        {
+            Log.d(TAG,"items object null");
+            return checkedItems;
+        }
+        for(int idx = 0; idx<items.size();idx++)
+        {
+            RecordingItem item = items.get(idx);
+            if(item.getChecked())
+            {
+                checkedItems.add(idx);
+                Log.d(TAG,"An item is checked");
+            }
+            else
+            {
+                Log.d(TAG,"An item is not checked");
+            }
+        }
+        return checkedItems;
+    }
+    /*
+     * 0-Cloud
+     * 1-Local Recorded
+     * 2-Local Downloaded*/
     private class selectAllItemListener implements MenuItem.OnMenuItemClickListener
     {
         @Override
-        public boolean onMenuItemClick(MenuItem item) {
-            Log.d(TAG, "Upload button pressed in menu");
+        public boolean onMenuItemClick(MenuItem menuitem) {
+            Log.d(TAG, "Select All button pressed in menu");
             //Toast.makeText(MainActivity.this, "Selecting all items", Toast.LENGTH_SHORT).show();
-            vpa.getAllItems();
-            return false;
+            if(fragmentIndicator == 0 && clf!=null && cla!=null)
+            {
+                setDataSetCheck(cla.getmDataset(),true);
+                cla.notifyDataSetChanged();
+            }
+            else if(fragmentIndicator == 1 && rlf_local != null && rla_local !=null)
+            {
+                setDataSetCheck(rla_local.getmDataset(),true);
+                rla_local.notifyDataSetChanged();
+            }
+            else if(fragmentIndicator == 2 && rlf_downloaded != null && rla_downloaded !=null)
+            {
+                setDataSetCheck(rlf_downloaded.getItems(),true);
+                rla_downloaded.notifyDataSetChanged();
+            }
+            else
+            {
+                Log.d(TAG,"unknown fragment indicator or fragment/adapters null");
+                return false;
+            }
+            return true;
         }
     }
     private class deselectAllItemListener implements MenuItem.OnMenuItemClickListener
     {
         @Override
-        public boolean onMenuItemClick(MenuItem item) {
-            Log.d(TAG, "Upload button pressed in menu");
-            Toast.makeText(MainActivity.this, "Deselecting all items", Toast.LENGTH_SHORT).show();
-            return false;
+        public boolean onMenuItemClick(MenuItem menuitem) {
+            Log.d(TAG, "Deselect all button pressed in menu");
+            if(fragmentIndicator == 0 && clf!=null && cla!=null)
+            {
+                setDataSetCheck(cla.getmDataset(),false);
+                cla.notifyDataSetChanged();
+                Log.d(TAG,"Unchecked all items in cla");
+            }
+            else if(fragmentIndicator == 1 && rlf_local != null && rla_local !=null)
+            {
+                setDataSetCheck(rla_local.getmDataset(),false);
+                rla_local.notifyDataSetChanged();
+                Log.d(TAG,"Unchecked all items in rla_local");
+            }
+            else if(fragmentIndicator == 2 && rlf_downloaded != null && rla_downloaded !=null)
+            {
+                setDataSetCheck(rlf_downloaded.getItems(),false);
+                rla_downloaded.notifyDataSetChanged();
+                Log.d(TAG,"Unchecked all items in rla_downloaded");
+            }
+            else
+            {
+                Log.d(TAG,"unknown fragment indicator or fragment/adapters null");
+                return false;
+            }
+            return true;
         }
     }
-    private class fragmentLCC extends FragmentManager.FragmentLifecycleCallbacks
+    public void setDataSetCheck(ArrayList<RecordingItem> items,boolean check)
     {
-        @Override
-        public void onFragmentAttached(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull Context context) {
-            super.onFragmentAttached(fm, f, context);
-            Log.d(TAG,f.getClass()+" is attached");
+        for(RecordingItem item1 : items)
+        {
+            item1.setChecked(check);
         }
+    }
 
-        @Override
-        public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment f) {
-            super.onFragmentResumed(fm, f);
-            Log.d(TAG,f.getClass()+" is resumed");
+    /*
+     * 0-Cloud
+     * 1-Local Recorded
+     * 2-Local Downloaded*/
+    public void setMenuItemsVisible(boolean visible)
+    {
+        if(!visible)
+        {fragmentIndicator = -1;}
+        if(uploadItem!=null){uploadItem.setVisible(visible);}
+        if(downloadItem!=null){downloadItem.setVisible(visible);}
+        if(deleteItem!=null){deleteItem.setVisible(visible);}
+        if(selectAll!=null){selectAll.setVisible(visible);}
+        if(deselectAll!=null){deselectAll.setVisible(visible);}
+    }
+    public void setMenuItemsVisible(CloudListFragment cloudListFragment, CloudListAdapter cloudListAdapter)
+    {
+        fragmentIndicator = 0;
+        clf = cloudListFragment;
+        cla = cloudListAdapter;
+        Log.d(TAG,"Cloud fragment registered");
+        if(uploadItem!=null){uploadItem.setVisible(false);}
+        if(downloadItem!=null){downloadItem.setVisible(true);}
+        if(deleteItem!=null){deleteItem.setVisible(true);}
+        if(selectAll!=null){selectAll.setVisible(true);}
+        if(deselectAll!=null){deselectAll.setVisible(true);}
+    }
+    public void setMenuItemsVisible(RecordingListFragment recordingListFragment, LocalListAdapter recordingListAdapter,int ind)
+    {
+        fragmentIndicator = ind;
+        if(ind == 1)
+        {
+            rlf_local = recordingListFragment;
+            rla_local = recordingListAdapter;
+            Log.d(TAG,"Local fragment registered");
         }
+        else if(ind == 2)
+        {
+            rlf_downloaded = recordingListFragment;
+            rla_downloaded = recordingListAdapter;
+            Log.d(TAG,"Downloaded fragment registered");
+        }
+        else
+        {
+            Log.d(TAG,"Invalid index");
+        }
+        if(uploadItem!=null){uploadItem.setVisible(true);}
+        if(downloadItem!=null){downloadItem.setVisible(false);}
+        if(deleteItem!=null){deleteItem.setVisible(true);}
+        if(selectAll!=null){selectAll.setVisible(true);}
+        if(deselectAll!=null){deselectAll.setVisible(true);}
     }
 }

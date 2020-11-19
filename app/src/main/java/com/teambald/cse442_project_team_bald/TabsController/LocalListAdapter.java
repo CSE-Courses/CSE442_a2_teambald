@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.Switch;
@@ -65,6 +66,15 @@ public class LocalListAdapter extends RecordingListAdapter{
         Switch locker=holder.recordingItemView.findViewById(R.id.locker);
         Button rename=holder.recordingItemView.findViewById(R.id.rename_button);
         final TextView text=holder.recordingItemView.findViewById(R.id.renaming_Text);
+        final CheckBox checkBox = holder.recordingItemView.findViewById(R.id.checkBox);
+        checkBox.setChecked(mDataset.get(position).getChecked());
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mDataset.get(position).setChecked(isChecked);
+                Log.d(TAG,"Local item:"+position+" is checked set to : "+isChecked);
+            }
+        });
 
         date.setText(mDataset.get(position).getDate());
         duration.setText(mDataset.get(position).getDuration());

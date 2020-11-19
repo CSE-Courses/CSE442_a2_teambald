@@ -26,7 +26,7 @@ public class RecordSelectFragment extends Fragment {
     private MediaPlayer mediaPlayer = null;
     private File[] allFiles;
     private RecyclerView.Adapter mAdapter;
-    private static final String TAG = "RecordingListF";
+    private static final String TAG = "RecordingSelectF";
     private Button HomeButton;
     private Button CloudButton;
     private Button BackButton;
@@ -89,9 +89,12 @@ public class RecordSelectFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d(TAG,"on resume in selector");
+        Log.d(TAG,"Setting MenuItems Invisible");
+        activity.setMenuItemsVisible(false);
         if(recordedFrag!=null)
         {
             recordedFrag.readAllFiles(LocalRecord_Directory);
+            recordedFrag.showMenu();
             Log.d(TAG,"updating recordedFrag");
         }
         else {
@@ -100,13 +103,12 @@ public class RecordSelectFragment extends Fragment {
         if(downloadedFrag!=null)
         {
             downloadedFrag.readAllFiles(CloudRecord_Directory);
+            downloadedFrag.showMenu();
             Log.d(TAG,"updating downloadedFrag");
         }
         else {
             Log.d(TAG,"downloadedFrag null");
         }
-        Log.d(TAG,"Setting MenuItems Invisible");
-        activity.setMenuItemsVisible(false);
     }
     public RecordingListFragment getRecordedFrag()
     {return recordedFrag;}

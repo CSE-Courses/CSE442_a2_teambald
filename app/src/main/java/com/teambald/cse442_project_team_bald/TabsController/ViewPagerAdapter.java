@@ -61,37 +61,4 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
     public int getItemCount() {
         return TABS_SIZE;
     }
-
-    public void getAllItems()
-    {
-        FragmentManager fm = mainActivity.getSupportFragmentManager();
-        List<Fragment> fragments = fm.getFragments();
-        Fragment lastFragment = fragments.get(fragments.size()-1);
-        String classText = "in "+lastFragment.getClass();
-        Log.d(TAG,classText);
-        Toast.makeText(mainActivity.getApplicationContext(), classText, Toast.LENGTH_SHORT).show();
-        if(cloudListFragment !=null)
-        {
-            Log.d(TAG,"Cloud Frag !null");
-            ArrayList<RecordingItem> cloudItems = cloudListFragment.getItems();
-            cloudItems.get(0).setChecked(true);
-            cloudListFragment.onResume();
-        }
-        if(recordSelectFragment!=null)
-        {
-            RecordingListFragment localFragment = recordSelectFragment.getRecordedFrag();
-            RecordingListFragment downloadFragment = recordSelectFragment.getDownloadedFrag();
-            if(localFragment!=null)
-            {
-                Log.d(TAG,"Local Frag !null");
-                ArrayList<RecordingItem> localItems = localFragment.getItems();
-            }
-            if(downloadFragment!=null)
-            {
-                Log.d(TAG,"Downloaded Frag !null");
-                ArrayList<RecordingItem> localItems = downloadFragment.getItems();
-            }
-        }
-        Log.d(TAG,"All items read------------------------");
-    }
 }

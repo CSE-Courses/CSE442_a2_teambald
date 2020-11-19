@@ -43,8 +43,6 @@ import java.util.ArrayList;
  * A fragment representing a list of Items.
  */
 public class CloudListFragment extends ListFragment {
-    private ArrayList<String> durations = new ArrayList<>();
-
     private static final String durationMetaDataConst = "Duration";
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -52,15 +50,10 @@ public class CloudListFragment extends ListFragment {
     // TODO: Customize parameters
     private static FirebaseStorage storage;
     private static StorageReference storageRef;
-    private RecyclerView.Adapter mAdapter;
+    private CloudListAdapter mAdapter;
 
     private MainActivity activity;
     private String fireBaseFolder = null;
-    /*
-    private Button down;
-    private Button up;
-    private Button list;
-    */
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -89,33 +82,6 @@ public class CloudListFragment extends ListFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_cloud_list, container, false);
-        /*View view = inflater.inflate(R.layout.dummy_layout_cloud, container, false);
-
-        up = view.findViewById(R.id.uploadbu);
-        down = view.findViewById(R.id.downbu);
-        list = view.findViewById(R.id.listbu);
-        up.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String path = getActivity().getExternalFilesDir("/").getAbsolutePath();
-                uploadFile(path,"Recording_2020_10_21_06_34_00","mp4","baicheng");
-            }
-        });
-
-        down.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String path = getActivity().getExternalFilesDir("/").getAbsolutePath();
-                downloadFile(path,"testRec1","mp4","baicheng");
-            }
-        });
-
-        list.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listFiles("baicheng");
-            }
-        });*/
         return view;
     }
     @Override
@@ -131,9 +97,6 @@ public class CloudListFragment extends ListFragment {
 
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext());
             recyclerView.setLayoutManager(layoutManager);
-            //ArrayList<String> filenames =
-            //Log.d(TAG,filenames.toString());
-            //Log.d(TAG,filenames.size()+"");
             listFiles(fireBaseFolder);
             mAdapter = new CloudListAdapter(itemList, getContext(),this,activity);
             recyclerView.setAdapter(mAdapter);
@@ -148,9 +111,6 @@ public class CloudListFragment extends ListFragment {
 
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext());
             recyclerView.setLayoutManager(layoutManager);
-            //ArrayList<String> filenames =
-            //Log.d(TAG,filenames.toString());
-            //Log.d(TAG,filenames.size()+"");
             itemList.clear();
             itemList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
             mAdapter = new CloudListAdapter(itemList, getContext(),this,activity);
@@ -176,9 +136,7 @@ public class CloudListFragment extends ListFragment {
         {
             itemList.clear();
             itemList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
-            if(mAdapter != null) {
-                mAdapter.notifyDataSetChanged();
-            }
+            updateUI();
         }
     }
     public void updateFiles(ArrayList<String> filenames)
@@ -193,10 +151,7 @@ public class CloudListFragment extends ListFragment {
         ItemTouchHelper itemTouchHelper = new
                 ItemTouchHelper(new SwipeActionHandler((CloudListAdapter) mAdapter,this,"CloudRecording",1, getContext()));
         itemTouchHelper.attachToRecyclerView(recyclerView);
-        if(mAdapter != null) {
-            mAdapter.notifyDataSetChanged();
-            Log.d(TAG,"mAdapter notified");
-        }
+        updateUI();
         Log.d(TAG,"There are "+itemList.size()+" items in cloud list");
     }
     private class CloudSuccListener implements OnSuccessListener<ListResult>
@@ -226,7 +181,6 @@ public class CloudListFragment extends ListFragment {
     }
     private void updateMetaData(ArrayList<String> filenames,String fireBaseFolder)
     {
-        durations = new ArrayList<>();
         ArrayList<CloudMetaSuccListener> succListeners = new ArrayList<>();
         for(int idx = 0;idx<filenames.size();idx++)
         {
@@ -244,14 +198,9 @@ public class CloudListFragment extends ListFragment {
                         }
                     });
         }
-        if(mAdapter != null) {
-            mAdapter.notifyDataSetChanged();
-            Log.d(TAG,"Update the list for durations");
-        }
-        else
-        {
-            Log.d(TAG,"mAdapter null");
-        }
+
+        updateUI();
+        Log.d(TAG,"Update the list for durations");
     }
     private class CloudMetaSuccListener implements OnSuccessListener<StorageMetadata>
     {
@@ -272,10 +221,8 @@ public class CloudListFragment extends ListFragment {
             metaDataValue = metaDataRst.getCustomMetadata(durationMetaDataConst);
             Log.d(TAG,"MetaData for File: "+filename+" Downloaded successfully");
             itemList.get(listIdx).setDuration(metaDataValue);
-            if(mAdapter != null) {
-                mAdapter.notifyDataSetChanged();
-                Log.d(TAG,"Update the list for metadata idx: "+listIdx+" Metadata: "+metaDataValue);
-            }
+            updateUI();
+            Log.d(TAG,"Update the list for metadata idx: "+listIdx+" Metadata: "+metaDataValue);
         }
     }
 
@@ -283,9 +230,8 @@ public class CloudListFragment extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-
         Log.d(TAG,"Showing MenuItems");
-        activity.setMenuItemsVisible(true);
+        activity.setMenuItemsVisible(this, mAdapter);
 
         if(storageRef!=null) {
             Log.d(TAG,"OnResume: ");
@@ -307,10 +253,8 @@ public class CloudListFragment extends ListFragment {
             itemList.clear();
             itemList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
         }
-        if(mAdapter != null) {
-            mAdapter.notifyDataSetChanged();
-            Log.d(TAG,"Update the list");
-        }
+        updateUI();
+        Log.d(TAG,"Update the list");
     }
 
     @Override
@@ -320,10 +264,18 @@ public class CloudListFragment extends ListFragment {
             Log.d(TAG,"OnAttach: ");
             fireBaseFolder = activity.getmAuth().getCurrentUser().getEmail();
             listFiles(fireBaseFolder);
-            if(mAdapter != null) {
-                mAdapter.notifyDataSetChanged();
-            }
+            updateUI();
         }
+        Log.d(TAG,"Showing MenuItems");
+        activity.setMenuItemsVisible(this, mAdapter);
+    }
+    public void updateUI()
+    {
+        if(mAdapter != null) {
+            mAdapter.notifyDataSetChanged();
+        }
+        else
+        {Log.d(TAG,"madapter null");}
     }
     public String parseSeconds(int seconds) {
         int min = seconds / 60;
