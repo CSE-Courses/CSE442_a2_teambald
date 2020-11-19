@@ -19,6 +19,12 @@
 
     <string name="biometric_authentication">BIOMETRIC AUTHENTICATION KEY</string>
 
+    <string name="menu_upload">Upload</string>
+    <string name="menu_download">Download</string>
+    <string name="menu_delete">Delete</string>
+    <string name="menu_selectall">Select All</string>
+    <string name="menu_deselectall">Deselect All</string>
+
     <!-- Server Client ID.  This should be a valid Web OAuth 2.0 Client ID obtained
          from https://console.developers.google.com/ -->
     <string name="server_client_id">606946566326-ald71c4sljtisqj9v6jgkvr0pna4idui.apps.googleusercontent.com</string>

@@ -130,6 +130,8 @@ public class RecordingListFragment extends Fragment {
         //Update saved audio file to make sure the recordings are up-to-date.
         Log.d(TAG,"On Resume function");
         readAllFiles(Directory_toRead);
+        Log.d(TAG,"Showing MenuItems");
+        activity.setMenuItemsVisible(true);
     }
 
     /*

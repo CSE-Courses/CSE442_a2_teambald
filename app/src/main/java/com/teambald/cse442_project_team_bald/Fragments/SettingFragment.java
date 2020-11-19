@@ -217,6 +217,13 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG,"Setting MenuItems Invisible");
+        activity.setMenuItemsVisible(false);
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         FirebaseUser currentUser = null;

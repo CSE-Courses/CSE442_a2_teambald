@@ -12,6 +12,7 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Chronometer;
@@ -148,7 +149,6 @@ public class HomeFragment extends Fragment {
                         //stopRecording();
                         stopService();
                         isRecording = false;
-
                     } else {
                         vibe.vibrate(100);
                         //Start service that record audio consistently;
@@ -180,6 +180,8 @@ public class HomeFragment extends Fragment {
         super.onResume();
         //
 
+        Log.d(TAG,"Setting MenuItems Invisible");
+        activity.setMenuItemsVisible(false);
 
         // [START on_start_sign_in]
         // Check for existing Google Sign In account, if the user is already signed in

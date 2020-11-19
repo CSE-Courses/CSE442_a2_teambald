@@ -5,10 +5,26 @@
     tools:context=".MainActivity">
 
     <item
-        android:id="@+id/action_favorite"
-        android:orderInCategory="300"
-        android:title="@string/app_name"
-        android:icon="@drawable/setting_black"
-        app:showAsAction="ifRoom"></item>
+        android:id="@+id/upload"
+        android:icon="@drawable/upload"
+        android:title="@string/menu_upload" />
+    <item
+        android:id="@+id/download"
+        android:icon="@drawable/download"
+        android:title="@string/menu_download" />
+    <item
+        android:id="@+id/delete"
+        android:icon="@drawable/delete"
+        android:title="@string/menu_delete" />
+
+    <item
+        android:id="@+id/selectall"
+        android:icon="@drawable/selectall"
+        android:title="@string/menu_selectall" />
+
+    <item
+        android:id="@+id/deselectall"
+        android:icon="@drawable/deselectall"
+        android:title="@string/menu_deselectall" />
 
 </menu>

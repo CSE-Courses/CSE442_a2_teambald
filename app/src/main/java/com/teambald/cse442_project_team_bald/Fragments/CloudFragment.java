@@ -282,6 +282,10 @@ public class CloudFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
+        Log.d(TAG,"Showing MenuItems");
+        activity.setMenuItemsVisible(true);
+
         if(storageRef!=null) {
             Log.d(TAG,"OnResume: ");
             //Check if signed in to avoid NullPointerException.

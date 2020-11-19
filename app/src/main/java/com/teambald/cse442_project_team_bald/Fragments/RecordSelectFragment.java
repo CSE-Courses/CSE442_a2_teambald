@@ -105,5 +105,7 @@ public class RecordSelectFragment extends Fragment {
         else {
             Log.d(TAG,"downloadedFrag null");
         }
+        Log.d(TAG,"Setting MenuItems Invisible");
+        activity.setMenuItemsVisible(false);
     }
 }

@@ -1,13 +1,16 @@
 package com.teambald.cse442_project_team_bald;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -17,6 +20,8 @@ import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -43,6 +48,7 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.teambald.cse442_project_team_bald.Encryption.EnDecryptAudio;
+import com.teambald.cse442_project_team_bald.Fragments.CloudFragment;
 import com.teambald.cse442_project_team_bald.Fragments.SettingFragment;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
@@ -54,8 +60,7 @@ import java.io.File;
  * Activity to demonstrate basic retrieval of the Google user's ID, email address, and basic
  * profile, which also adds a request dialog to access the user's Google Drive.
  */
-public class MainActivity extends AppCompatActivity
-{
+public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainAct";
     private static final int RC_SIGN_IN = 9001;
@@ -75,6 +80,8 @@ public class MainActivity extends AppCompatActivity
     private ViewPager2 viewPager;
     private TabLayout tabLayout;
     private ViewPagerAdapter vpa;
+
+    private MenuItem uploadItem,downloadItem,deleteItem,selectAll,deselectAll;
 
 
     @Override
@@ -104,7 +111,7 @@ public class MainActivity extends AppCompatActivity
         // [END build_client]
         FirebaseApp.initializeApp(getBaseContext());
         mAuth = FirebaseAuth.getInstance();
-        Log.d(TAG,"mAuth null is:"+ (null==mAuth));
+        Log.d(TAG, "mAuth null is:" + (null == mAuth));
         // [START customize_button]
         // Customize sign-in button. The sign-in button can be displayed in
         // multiple sizes.
@@ -124,8 +131,9 @@ public class MainActivity extends AppCompatActivity
 
         new TabLayoutMediator(tabLayout, viewPager,
                 new TabLayoutMediator.TabConfigurationStrategy() {
-                    @Override public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
-                        switch(position){
+                    @Override
+                    public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
+                        switch (position) {
                             case 0:
                                 tab.setText("Home");
                                 tab.setIcon(R.drawable.ic_home_icon);
@@ -150,24 +158,30 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main,menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        uploadItem = menu.findItem(R.id.upload);
+        downloadItem = menu.findItem(R.id.download);
+        deleteItem = menu.findItem(R.id.delete);
+        selectAll = menu.findItem(R.id.selectall);
+        deselectAll = menu.findItem(R.id.deselectall);
+        setMenuItemsVisible(false);
+        uploadItem.setOnMenuItemClickListener(new uploadItemListener());
+        downloadItem.setOnMenuItemClickListener(new downloadItemListener());
+        deleteItem.setOnMenuItemClickListener(new deleteItemListener());
+        selectAll.setOnMenuItemClickListener(new selectAllItemListener());
+        deselectAll.setOnMenuItemClickListener(new deselectAllItemListener());
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_favorite) {
-            Toast.makeText(MainActivity.this, "Action clicked", Toast.LENGTH_LONG).show();
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -240,28 +254,26 @@ public class MainActivity extends AppCompatActivity
     // [END signOut]
 
 
-
     private ViewPagerAdapter createTabAdapter() {
         vpa = new ViewPagerAdapter(this);
         return vpa;
     }
 
-    public FirebaseAuth getmAuth()
-    {return mAuth;}
-
-    public boolean downloadFile(String path,String localFolder,String filenamePref,String filenameSuf,String fireBaseFolder)
-    {
-        return downloadFile(path,localFolder,filenamePref+"."+filenameSuf,fireBaseFolder);
+    public FirebaseAuth getmAuth() {
+        return mAuth;
     }
-    public boolean downloadFile(String path,String localFolder,String filename,String fireBaseFolder)
-    {
-        try
-        {
-            Log.d(TAG,"Downloading from");
-            Log.d(TAG,fireBaseFolder);
-            Log.d(TAG,filename);
+
+    public boolean downloadFile(String path, String localFolder, String filenamePref, String filenameSuf, String fireBaseFolder) {
+        return downloadFile(path, localFolder, filenamePref + "." + filenameSuf, fireBaseFolder);
+    }
+
+    public boolean downloadFile(String path, String localFolder, String filename, String fireBaseFolder) {
+        try {
+            Log.d(TAG, "Downloading from");
+            Log.d(TAG, fireBaseFolder);
+            Log.d(TAG, filename);
             StorageReference storageReference = storageRef.child(fireBaseFolder).child(filename);
-            final String fullPath = path + "/" +localFolder+ "/" + filename;
+            final String fullPath = path + "/" + localFolder + "/" + filename;
             final File tempFile = new File(fullPath);
             storageReference.getFile(tempFile)
                     .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
@@ -271,8 +283,8 @@ public class MainActivity extends AppCompatActivity
                             byte[] decrpted = EnDecryptAudio.decrypt(tempFile, getApplicationContext());
                             EnDecryptAudio.writeByteToFile(decrpted, tempFile.getPath());
 
-                            Log.d(TAG,"File download Successful");
-                            Toast tst = Toast.makeText(getApplicationContext(),"File download Successful", Toast.LENGTH_SHORT);
+                            Log.d(TAG, "File download Successful");
+                            Toast tst = Toast.makeText(getApplicationContext(), "File download Successful", Toast.LENGTH_SHORT);
                             tst.show();
                         }
                     })
@@ -281,44 +293,41 @@ public class MainActivity extends AppCompatActivity
                         public void onFailure(@NonNull Exception exception) {
                             // Handle failed download
                             // ...
-                            Log.d(TAG,"Read file error on Failure");
-                            Toast tst = Toast.makeText(getApplicationContext(),"File download Unsuccessful", Toast.LENGTH_SHORT);
+                            Log.d(TAG, "Read file error on Failure");
+                            Toast tst = Toast.makeText(getApplicationContext(), "File download Unsuccessful", Toast.LENGTH_SHORT);
                             tst.show();
                         }
                     });
-        }
-        catch (Exception e)
-        {
-            Log.d(TAG,"Read file error");
+        } catch (Exception e) {
+            Log.d(TAG, "Read file error");
             e.printStackTrace();
             return false;
         }
         return true;
     }
-    public boolean downloadFileToPlay(String path, String localFolder, String filename, String fireBaseFolder, final RecordingListAdapter rla, final RecordingItem recordingItem)
-    {
-        try
-        {
-            Log.d(TAG,"Downloading from");
-            Log.d(TAG,fireBaseFolder);
-            Log.d(TAG,filename);
+
+    public boolean downloadFileToPlay(String path, String localFolder, String filename, String fireBaseFolder, final RecordingListAdapter rla, final RecordingItem recordingItem) {
+        try {
+            Log.d(TAG, "Downloading from");
+            Log.d(TAG, fireBaseFolder);
+            Log.d(TAG, filename);
             StorageReference storageReference = storageRef.child(fireBaseFolder).child(filename);
-            final String fullPath = path + "/" +localFolder+ "/" + filename;
+            final String fullPath = path + "/" + localFolder + "/" + filename;
             final File tempFile = new File(fullPath);
             storageReference.getFile(tempFile)
                     .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
 
-                            Log.d(TAG,"File Download Successful");
-                            Log.d(TAG,"Start playing now");
+                            Log.d(TAG, "File Download Successful");
+                            Log.d(TAG, "Start playing now");
 
                             //Decrypt and overwrite the file.
                             byte[] decrpted = EnDecryptAudio.decrypt(tempFile, getApplicationContext());
                             EnDecryptAudio.writeByteToFile(decrpted, tempFile.getPath());
 
-                            Toast tst = Toast.makeText(getApplicationContext(),"Start playing now", Toast.LENGTH_SHORT);
-                            rla.playAudio(tempFile,recordingItem);
+                            Toast tst = Toast.makeText(getApplicationContext(), "Start playing now", Toast.LENGTH_SHORT);
+                            rla.playAudio(tempFile, recordingItem);
                             tst.show();
                         }
                     })
@@ -327,22 +336,20 @@ public class MainActivity extends AppCompatActivity
                         public void onFailure(@NonNull Exception exception) {
                             // Handle failed download
                             // ...
-                            Log.d(TAG,"Read file error on Failure");
-                            Toast tst = Toast.makeText(getApplicationContext(),"File download Unsuccessful", Toast.LENGTH_SHORT);
+                            Log.d(TAG, "Read file error on Failure");
+                            Toast tst = Toast.makeText(getApplicationContext(), "File download Unsuccessful", Toast.LENGTH_SHORT);
                             tst.show();
                         }
                     });
-        }
-        catch (Exception e)
-        {
-            Log.d(TAG,"Read file error");
+        } catch (Exception e) {
+            Log.d(TAG, "Read file error");
             e.printStackTrace();
             return false;
         }
         return true;
     }
 
-    public void uploadRecording(final String fileUri, final String fireBaseFolder, final String duration){
+    public void uploadRecording(final String fileUri, final String fireBaseFolder, final String duration) {
 //        final String fullPath = path + "/" + filename;
 //        final String fullFBPath = fireBaseFolder + "/" + filename;
 
@@ -358,9 +365,9 @@ public class MainActivity extends AppCompatActivity
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         // Get a URL to the uploaded content
                         Log.d(TAG, "File upload successful");
-                        Toast tst = Toast.makeText(getApplicationContext(),"File upload Successful", Toast.LENGTH_SHORT);
+                        Toast tst = Toast.makeText(getApplicationContext(), "File upload Successful", Toast.LENGTH_SHORT);
                         tst.show();
-                        Log.d(TAG,"Uploading metadata for: "+fileUri +" Metadata: "+duration);
+                        Log.d(TAG, "Uploading metadata for: " + fileUri + " Metadata: " + duration);
                         // Create file metadata including the content type
                         StorageMetadata metadata = new StorageMetadata.Builder()
                                 .setContentType("audio/mp4")
@@ -372,17 +379,17 @@ public class MainActivity extends AppCompatActivity
                                     @Override
                                     public void onSuccess(StorageMetadata storageMetadata) {
                                         // Updated metadata is in storageMetadata
-                                        Log.d(TAG,"File metadata update successful");
+                                        Log.d(TAG, "File metadata update successful");
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception exception) {
                                         // Uh-oh, an error occurred!
-                                        Log.d(TAG,"File metadata update unsuccessful");
-                                        Log.d(TAG,"Errors:");
+                                        Log.d(TAG, "File metadata update unsuccessful");
+                                        Log.d(TAG, "Errors:");
                                         exception.printStackTrace();
-                                        Log.d(TAG,exception.getLocalizedMessage());
+                                        Log.d(TAG, exception.getLocalizedMessage());
                                     }
                                 });
                     }
@@ -393,7 +400,7 @@ public class MainActivity extends AppCompatActivity
                         // Handle unsuccessful uploads
                         // ...
                         Log.d(TAG, "File upload unsuccessful");
-                        Toast tst = Toast.makeText(getApplicationContext(),"File upload Unsuccessful", Toast.LENGTH_SHORT);
+                        Toast tst = Toast.makeText(getApplicationContext(), "File upload Unsuccessful", Toast.LENGTH_SHORT);
                         tst.show();
                     }
                 });
@@ -401,28 +408,96 @@ public class MainActivity extends AppCompatActivity
         f.delete();
     }
 
-    public void deleteFile(final String filenamePref, final String filenameSuf, final String fireBaseFolder)
-    {deleteFile(filenamePref + "." + filenameSuf,fireBaseFolder);}
-    public void deleteFile(final String filename, final String fireBaseFolder)
-    {
-        if(null!=filename && null!=fireBaseFolder)
-        {
+    public void deleteFile(final String filenamePref, final String filenameSuf, final String fireBaseFolder) {
+        deleteFile(filenamePref + "." + filenameSuf, fireBaseFolder);
+    }
+
+    public void deleteFile(final String filename, final String fireBaseFolder) {
+        if (null != filename && null != fireBaseFolder) {
             StorageReference storageReference = storageRef.child(fireBaseFolder).child(filename);
             storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     // File deleted successfully
-                    Log.d(TAG,"File deleted from cloud successfully");
-                    Log.d(TAG, "From:" + fireBaseFolder+"/"+filename);
+                    Log.d(TAG, "File deleted from cloud successfully");
+                    Log.d(TAG, "From:" + fireBaseFolder + "/" + filename);
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception exception) {
                     // Uh-oh, an error occurred!
-                    Log.d(TAG,"File not deleted from cloud!");
-                    Log.d(TAG, "From:" + fireBaseFolder+"/"+filename);
+                    Log.d(TAG, "File not deleted from cloud!");
+                    Log.d(TAG, "From:" + fireBaseFolder + "/" + filename);
                 }
             });
+        }
+    }
+    public void setMenuItemsVisible(boolean visible)
+    {
+        if(uploadItem!=null)
+        {
+            uploadItem.setVisible(visible);
+        }
+        if(downloadItem!=null)
+        {
+            downloadItem.setVisible(visible);
+        }
+        if(deleteItem!=null)
+        {
+            deleteItem.setVisible(visible);
+        }
+        if(selectAll!=null)
+        {
+            selectAll.setVisible(visible);
+        }
+        if(deselectAll!=null)
+        {
+            deselectAll.setVisible(visible);
+        }
+    }
+    private class uploadItemListener implements MenuItem.OnMenuItemClickListener
+    {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            Log.d(TAG, "Upload button pressed in menu");
+            Toast.makeText(MainActivity.this, "Uploading items", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+    private class downloadItemListener implements MenuItem.OnMenuItemClickListener
+    {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            Log.d(TAG, "Download button pressed in menu");
+            Toast.makeText(MainActivity.this, "Downloading items", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+    private class deleteItemListener implements MenuItem.OnMenuItemClickListener
+    {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            Log.d(TAG, "Delete button pressed in menu");
+            Toast.makeText(MainActivity.this, "Deleting items", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+    private class selectAllItemListener implements MenuItem.OnMenuItemClickListener
+    {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            Log.d(TAG, "Upload button pressed in menu");
+            Toast.makeText(MainActivity.this, "Selecting all items", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+    private class deselectAllItemListener implements MenuItem.OnMenuItemClickListener
+    {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            Log.d(TAG, "Upload button pressed in menu");
+            Toast.makeText(MainActivity.this, "Deselecting all items", Toast.LENGTH_SHORT).show();
+            return false;
         }
     }
 }

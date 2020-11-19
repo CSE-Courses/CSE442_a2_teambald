@@ -82,9 +82,9 @@ public class CloudListAdapter extends RecordingListAdapter{
                     mDataset.get(position).getAudio_file().renameTo(new File(SubPath+text.getText()+"_"+subName ));
                     text.setText("");
                     notifyDataSetChanged();
-                    FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
-                    ft.detach(fragment);
-                    ft.attach(fragment);
+                    FragmentTransaction ft = cloudFragment.getFragmentManager().beginTransaction();
+                    ft.detach(cloudFragment);
+                    ft.attach(cloudFragment);
                     ft.commit();
                 }
             }
@@ -97,9 +97,9 @@ public class CloudListAdapter extends RecordingListAdapter{
                     if(path.charAt(path.length()-5) !='L') {
                         String name = path.substring(0, path.length() - 4);
                         mDataset.get(position).getAudio_file().renameTo(new File(name + "_L.mp4"));
-                        FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
-                        ft.detach(fragment);
-                        ft.attach(fragment);
+                        FragmentTransaction ft = cloudFragment.getFragmentManager().beginTransaction();
+                        ft.detach(cloudFragment);
+                        ft.attach(cloudFragment);
                         ft.commit();
 
                     }
@@ -109,9 +109,9 @@ public class CloudListAdapter extends RecordingListAdapter{
                     String name= path.substring(0,path.length()-6);
                     if(path.charAt(path.length()-5)== 'L') {
                         mDataset.get(position).getAudio_file().renameTo(new File(name + ".mp4"));
-                        FragmentTransaction ft = fragment.getFragmentManager().beginTransaction();
-                        ft.detach(fragment);
-                        ft.attach(fragment);
+                        FragmentTransaction ft = cloudFragment.getFragmentManager().beginTransaction();
+                        ft.detach(cloudFragment);
+                        ft.attach(cloudFragment);
                         ft.commit();
                     }
                 }
