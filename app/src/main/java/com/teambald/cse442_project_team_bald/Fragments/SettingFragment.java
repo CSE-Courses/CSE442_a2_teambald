@@ -425,7 +425,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
             editor.putBoolean(getString(R.string.auto_delete_key), autoDelete);
             Log.d(TAG,"Saving auto delete preference: "+isChecked);
             editor.commit();
-            if(autoUpload)
+            if(autoDelete)
             {
                 toast.setText("Auto Delete ON");
                 toast.show();
