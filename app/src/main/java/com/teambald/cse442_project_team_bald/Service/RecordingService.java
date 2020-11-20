@@ -296,9 +296,15 @@ public class RecordingService extends Service {
         }
     }
 
-    void uploadRecording(String fileUri, final String fireBaseFolder, final String duration){
+    public void uploadRecording(String fileUri, final String fireBaseFolder, final String duration){
 //        final String fullPath = path + "/" + filename;
 //        final String fullFBPath = fireBaseFolder + "/" + filename;
+        boolean autoUploadVal = prefs.getBoolean(getString(R.string.auto_upload_key),false);
+        if(!autoUploadVal)
+        {
+            Log.d(TAG,"Not auto uploading");
+            return;
+        }
 
         Log.i(TAG, "Trying auto upload Recording, duration = " + duration);
 
@@ -350,6 +356,24 @@ public class RecordingService extends Service {
 
     //Once local recordings (unlocked) exceeds 5, the least recent one will be deleted.
     private void autoDelete(){
+        boolean autoDeleteVal = prefs.getBoolean(getString(R.string.auto_delete_key),false);
+        if(!autoDeleteVal)
+        {
+            Log.d(TAG,"Not auto deleting");
+            return;
+        }
+        int autoDeleteFreqVal = prefs.getInt(getString(R.string.auto_delete_freq_key),1);
+        int autoDeleteThreshold = SettingFragment.fileCounts[autoDeleteFreqVal];
+        if(autoDeleteThreshold==-100)
+        {
+            Log.d(TAG,"Not auto deleting due to unlimited threshold");
+            return;
+        }
+        else if(autoDeleteThreshold <=0)
+        {
+            Log.d(TAG,"Unknown auto delete threshold in service:"+autoDeleteThreshold);
+            return;
+        }
         //check storage size after saving the file
         ArrayList<File> filelist= new ArrayList<>();
         File directory = new File(recordPath);
@@ -364,7 +388,7 @@ public class RecordingService extends Service {
                 filelist.add(f);
             }
         }
-        if(filelist.size()>5){
+        if(filelist.size()>autoDeleteThreshold){
             filelist.get(0).delete();
         }
         Log.i(TAG, "Auto delete is completed.");

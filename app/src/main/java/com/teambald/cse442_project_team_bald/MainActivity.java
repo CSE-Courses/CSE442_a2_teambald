@@ -94,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
     * 2-Local Downloaded*/
     private int fragmentIndicator = -1;
 
+    private Toast toast;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -165,6 +167,8 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 }).attach();
+
+        toast = Toast.makeText(getApplicationContext(),"",Toast.LENGTH_SHORT);
     }
 
     @Override
@@ -295,8 +299,9 @@ public class MainActivity extends AppCompatActivity {
                             EnDecryptAudio.writeByteToFile(decrpted, tempFile.getPath());
 
                             Log.d(TAG, "File download Successful");
-                            Toast tst = Toast.makeText(getApplicationContext(), "File download Successful", Toast.LENGTH_SHORT);
-                            tst.show();
+                            toast.setText("File download Successful");
+                            toast.show();
+
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -305,8 +310,8 @@ public class MainActivity extends AppCompatActivity {
                             // Handle failed download
                             // ...
                             Log.d(TAG, "Read file error on Failure");
-                            Toast tst = Toast.makeText(getApplicationContext(), "File download Unsuccessful", Toast.LENGTH_SHORT);
-                            tst.show();
+                            toast.setText("File download Unsuccessful");
+                            toast.show();
                         }
                     });
         } catch (Exception e) {
@@ -337,9 +342,9 @@ public class MainActivity extends AppCompatActivity {
                             byte[] decrpted = EnDecryptAudio.decrypt(tempFile, getApplicationContext());
                             EnDecryptAudio.writeByteToFile(decrpted, tempFile.getPath());
 
-                            Toast tst = Toast.makeText(getApplicationContext(), "Start playing now", Toast.LENGTH_SHORT);
+                            toast.setText("Starting Audio Now");
+                            toast.show();
                             rla.playAudio(tempFile, recordingItem);
-                            tst.show();
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -348,8 +353,8 @@ public class MainActivity extends AppCompatActivity {
                             // Handle failed download
                             // ...
                             Log.d(TAG, "Read file error on Failure");
-                            Toast tst = Toast.makeText(getApplicationContext(), "File download Unsuccessful", Toast.LENGTH_SHORT);
-                            tst.show();
+                            toast.setText("Audio Read Unsuccessful");
+                            toast.show();
                         }
                     });
         } catch (Exception e) {
@@ -376,8 +381,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         // Get a URL to the uploaded content
                         Log.d(TAG, "File upload successful");
-                        Toast tst = Toast.makeText(getApplicationContext(), "File upload Successful", Toast.LENGTH_SHORT);
-                        tst.show();
+                        toast.setText("File Upload Successful");
+                        toast.show();
                         Log.d(TAG, "Uploading metadata for: " + fileUri + " Metadata: " + duration);
                         // Create file metadata including the content type
                         StorageMetadata metadata = new StorageMetadata.Builder()
@@ -411,8 +416,9 @@ public class MainActivity extends AppCompatActivity {
                         // Handle unsuccessful uploads
                         // ...
                         Log.d(TAG, "File upload unsuccessful");
-                        Toast tst = Toast.makeText(getApplicationContext(), "File upload Unsuccessful", Toast.LENGTH_SHORT);
-                        tst.show();
+
+                        toast.setText("File upload Unsuccessful");
+                        toast.show();
                     }
                 });
         //Remove temp file.
@@ -432,6 +438,9 @@ public class MainActivity extends AppCompatActivity {
                     // File deleted successfully
                     Log.d(TAG, "File deleted from cloud successfully");
                     Log.d(TAG, "From:" + fireBaseFolder + "/" + filename);
+
+                    toast.setText("File deleted from cloud successfully");
+                    toast.show();
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -439,6 +448,9 @@ public class MainActivity extends AppCompatActivity {
                     // Uh-oh, an error occurred!
                     Log.d(TAG, "File not deleted from cloud!");
                     Log.d(TAG, "From:" + fireBaseFolder + "/" + filename);
+
+                    toast.setText("File not deleted from cloud!");
+                    toast.show();
                 }
             });
         }
@@ -454,6 +466,8 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "From:" + fireBaseFolder + "/" + filename);
                     if(updateUI)
                         clf.listFiles(firebaseFolder);
+                    toast.setText("File deleted from cloud successfully");
+                    toast.show();
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -463,6 +477,8 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "From:" + fireBaseFolder + "/" + filename);
                     if(updateUI)
                         clf.listFiles(firebaseFolder);
+                    toast.setText("File not deleted from cloud!");
+                    toast.show();
                 }
             });
         }
