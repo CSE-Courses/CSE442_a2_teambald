@@ -1,27 +1,41 @@
 <resources>
     <string name="app_name">Smart Recorder</string>
+
+    <!-- Account Section in Setting Frag -->
+    <string name="sign_in_section_text">Account</string>
+    <string name="sign_in_account_text">Signed In As: </string>
+    <string name="sign_out">Sign Out</string>
+
+
+    <!-- Recording Section in Setting Frag -->
+    <string name="recording_section_text">Recording</string>
+    <string name="recording_length_text">Single Recording length:</string>
+    <string name="auto_recording_text">Loop Recording</string>
     <string name="recording_length_key">RECORDING LENGTH KEY</string>
     <string name="auto_record">AUTO RECORDING KEY</string>
     <string name="is_recording_key">IS RECORDING KEY</string>
 
-    <string name="sign_out">Sign Out</string>
-
-
-    <string name="sign_in_section_text">Account</string>
-    <string name="sign_in_account_text">Signed In As: </string>
-    <string name="recording_section_text">Recording</string>
-    <string name="recording_length_text">Single Recording length:</string>
-    <string name="auto_recording_text">Loop Recording</string>
+    <!-- Saving Section in Setting Frag -->
+    <string name="saving_section_text">Saving</string>
     <string name="shake_save_text">Shake To Save Recording</string>
+    <string name="shake_to_save">SHAKE SAVE KEY</string>
+    <string name="auto_upload_key">AUTO UPLOAD KEY</string>
+    <string name="auto_delete_key">AUTO DELETE KEY</string>
+    <string name="auto_delete_freq_key">AUTO DELETE FREQ KEY</string>
+
+
+
+    <!-- Authentication Section in Setting Frag -->
     <string name="bio_auth_section_text">Authentication</string>
+    <string name="biometric_authentication">BIOMETRIC AUTHENTICATION KEY</string>
+
 
     <string name="click_to_start">Click to Start Recording</string>
     <string name="click_to_pause">Click to Pause Recording</string>
 
-    <string name="biometric_authentication">BIOMETRIC AUTHENTICATION KEY</string>
 
-    <string name="shake_to_save">SHAKE SAVE KEY</string>
 
+    <!-- Menu items in multiple selection fragments -->
     <string name="menu_upload">Upload</string>
     <string name="menu_download">Download</string>
     <string name="menu_delete">Delete</string>
