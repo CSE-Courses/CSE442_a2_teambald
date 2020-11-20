@@ -461,6 +461,8 @@ public class MainActivity extends AppCompatActivity {
                     // Uh-oh, an error occurred!
                     Log.d(TAG, "File not deleted from cloud!");
                     Log.d(TAG, "From:" + fireBaseFolder + "/" + filename);
+                    if(updateUI)
+                        clf.listFiles(firebaseFolder);
                 }
             });
         }
