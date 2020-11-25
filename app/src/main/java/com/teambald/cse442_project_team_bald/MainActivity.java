@@ -2,12 +2,17 @@ package com.teambald.cse442_project_team_bald;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -51,6 +56,7 @@ import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter
 import com.teambald.cse442_project_team_bald.TabsController.ViewPagerAdapter;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
@@ -95,6 +101,14 @@ public class MainActivity extends AppCompatActivity {
     private int fragmentIndicator = -1;
 
     private Toast toast;
+
+    //Seekbar
+    private SeekBar seekBar;
+    private ImageButton seekBarButton;
+    private MediaPlayer mediaPlayer;
+    private String previousFile = "";
+    //Keep track of progress and update seekbar.
+    private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,6 +183,36 @@ public class MainActivity extends AppCompatActivity {
                 }).attach();
 
         toast = Toast.makeText(getApplicationContext(),"",Toast.LENGTH_SHORT);
+
+        mediaPlayer = new MediaPlayer();
+
+        //Initialize seekBar.
+        seekBar = findViewById(R.id.seekBar);
+        seekBarButton = findViewById(R.id.seekBar_button);
+        seekBarButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mediaPlayer == null || previousFile == ""){
+                    toast = Toast.makeText(getApplicationContext(),"Please choose an audio to play",Toast.LENGTH_SHORT);
+                    toast.show();
+                    return;
+                }
+
+                if(mediaPlayer.isPlaying()){
+                    //Pause audio.
+                    mediaPlayer.pause();
+
+                    seekBarButton.setImageResource(R.drawable.ic_seekbar_play_button_48);
+                }else{
+                    //Play audio.
+                    mediaPlayer.start();
+
+                    seekBarButton.setImageResource(R.drawable.ic_seekbar_pause_button_48);
+                }
+
+            }
+        });
+
     }
 
     @Override
@@ -311,49 +355,6 @@ public class MainActivity extends AppCompatActivity {
                             // ...
                             Log.d(TAG, "Read file error on Failure");
                             toast.setText("File download Unsuccessful");
-                            toast.show();
-                        }
-                    });
-        } catch (Exception e) {
-            Log.d(TAG, "Read file error");
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    public boolean downloadFileToPlay(String path, String localFolder, String filename, String fireBaseFolder, final RecordingListAdapter rla, final RecordingItem recordingItem) {
-        try {
-            Log.d(TAG, "Downloading from");
-            Log.d(TAG, fireBaseFolder);
-            Log.d(TAG, filename);
-            StorageReference storageReference = storageRef.child(fireBaseFolder).child(filename);
-            final String fullPath = path + "/" + localFolder + "/" + filename;
-            final File tempFile = new File(fullPath);
-            storageReference.getFile(tempFile)
-                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-
-                            Log.d(TAG, "File Download Successful");
-                            Log.d(TAG, "Start playing now");
-
-                            //Decrypt and overwrite the file.
-                            byte[] decrpted = EnDecryptAudio.decrypt(tempFile, getApplicationContext());
-                            EnDecryptAudio.writeByteToFile(decrpted, tempFile.getPath());
-
-                            toast.setText("Starting Audio Now");
-                            toast.show();
-                            rla.playAudio(tempFile, recordingItem);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Handle failed download
-                            // ...
-                            Log.d(TAG, "Read file error on Failure");
-                            toast.setText("Audio Read Unsuccessful");
                             toast.show();
                         }
                     });
@@ -815,5 +816,130 @@ public class MainActivity extends AppCompatActivity {
         if(deleteItem!=null){deleteItem.setVisible(true);}
         if(selectAll!=null){selectAll.setVisible(true);}
         if(deselectAll!=null){deselectAll.setVisible(true);}
+    }
+
+    public void playAudio(final RecordingItem item, boolean ifLocal){
+        File file;
+        if(ifLocal){
+            file = item.getAudio_file();
+        }else{
+            //Download first, then play
+            file = downloadFile(item);
+        }
+
+        //If try to play the same file, do nothing.
+        if(file.getAbsolutePath().equals(previousFile)){
+            return;
+        }
+
+        try {
+            mediaPlayer = new MediaPlayer();
+
+            mediaPlayer.setDataSource(file.getAbsolutePath());
+            mediaPlayer.prepare();
+            mediaPlayer.seekTo(item.getStartTimeTime());
+            mediaPlayer.start();
+
+            //Set max
+            seekBar.setMax(mediaPlayer.getDuration());
+            //TODO: Update progress text.
+
+            //update Seekbar on UI thread
+            mHandler = new Handler();
+            MainActivity.this.runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    if(mediaPlayer != null && mediaPlayer.isPlaying()){
+                        int mCurrentPosition = mediaPlayer.getCurrentPosition() / 1000;
+                        seekBar.setProgress(mCurrentPosition);
+                    }
+                    mHandler.postDelayed(this, 1000);
+                }
+            });
+
+            //Set button icon to pause(meaning playing) and update data.
+            seekBarButton.setImageResource(R.drawable.ic_seekbar_pause_button_48);
+
+            //Record played audio file directory.
+            setPreviousFile(file.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //Play the audio
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                //Stop the audio at the beginning to make sure user can play again by clicking play
+                item.setStartTime(0);
+                mediaPlayer.stop();
+
+                //Set button icon to pause(meaning playing) and update data.
+                seekBarButton.setImageResource(R.drawable.ic_seekbar_play_button_48);
+            }
+        });
+
+    }
+
+    public File downloadFile(final RecordingItem recordingItem) {
+
+        try {
+            String path = getExternalFilesDir("/").getAbsolutePath();
+            String localFolder = "tmp";
+            String fireBaseFolder = getmAuth().getCurrentUser().getEmail();
+            String filename = recordingItem.getDate();
+            Log.d(TAG, "Downloading from");
+            Log.d(TAG, fireBaseFolder);
+            Log.d(TAG, filename);
+            StorageReference storageReference = storageRef.child(fireBaseFolder).child(filename);
+            final String fullPath = path + "/" + localFolder + "/" + filename;
+            final File tempFile = new File(fullPath);
+            storageReference.getFile(tempFile)
+                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+
+                            Log.d(TAG, "File Download Successful");
+                            Log.d(TAG, "Start playing now");
+
+                            //Decrypt and overwrite the file.
+                            byte[] decrpted = EnDecryptAudio.decrypt(tempFile, getApplicationContext());
+                            EnDecryptAudio.writeByteToFile(decrpted, tempFile.getPath());
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle failed download
+                            // ...
+                            Log.d(TAG, "Read file error on Failure");
+                            toast.setText("Audio Read Unsuccessful");
+                            toast.show();
+                            tempFile.delete();
+                        }
+                    });
+            return tempFile;
+        } catch (Exception e) {
+            Log.d(TAG, "Read file error");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
+    }
+
+    public void resetMediaPlayer() {
+        mediaPlayer = new MediaPlayer();
+    }
+
+    public String getPreviousFile() {
+        return previousFile;
+    }
+
+    public void setPreviousFile(String previousFile) {
+        this.previousFile = previousFile;
     }
 }

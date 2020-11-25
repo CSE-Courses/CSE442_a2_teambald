@@ -45,6 +45,7 @@
             >
 
             <ImageButton
+                android:id="@+id/seekBar_button"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:src="@drawable/ic_seekbar_play_button_48"
