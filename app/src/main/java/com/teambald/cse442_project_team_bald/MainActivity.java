@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -109,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
     private String previousFile = "";
     //Keep track of progress and update seekbar.
     private Handler mHandler;
+    private TextView seekBarCurrentTv, seekBarMaxTv, seekBarTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -188,6 +190,9 @@ public class MainActivity extends AppCompatActivity {
 
         //Initialize seekBar.
         seekBar = findViewById(R.id.seekBar);
+        seekBarCurrentTv = findViewById(R.id.seekBar_current_text);
+        seekBarMaxTv = findViewById(R.id.seekBar_max_text);
+        seekBarTitle = findViewById(R.id.seekBar_title);
         seekBarButton = findViewById(R.id.seekBar_button);
         seekBarButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -841,8 +846,12 @@ public class MainActivity extends AppCompatActivity {
             mediaPlayer.start();
 
             //Set max
-            seekBar.setMax(mediaPlayer.getDuration());
-            //TODO: Update progress text.
+            seekBar.setProgress(0);
+            seekBar.setMax(mediaPlayer.getDuration()/1000);
+            seekBarMaxTv.setText(parseTime(mediaPlayer.getDuration()/1000));
+
+            //Set title
+            seekBarTitle.setText(file.getName());
 
             //update Seekbar on UI thread
             mHandler = new Handler();
@@ -851,9 +860,12 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     if(mediaPlayer != null && mediaPlayer.isPlaying()){
+                        Log.i(TAG, "updating progress");
                         int mCurrentPosition = mediaPlayer.getCurrentPosition() / 1000;
                         seekBar.setProgress(mCurrentPosition);
+                        seekBarCurrentTv.setText(parseTime(mediaPlayer.getCurrentPosition()/1000));
                     }
+
                     mHandler.postDelayed(this, 1000);
                 }
             });
@@ -870,6 +882,11 @@ public class MainActivity extends AppCompatActivity {
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
+                //Update seekbar info
+                int mCurrentPosition = mediaPlayer.getCurrentPosition() / 1000;
+                seekBar.setProgress(mCurrentPosition);
+                seekBarCurrentTv.setText(parseTime(mediaPlayer.getCurrentPosition()/1000));
+
                 //Stop the audio at the beginning to make sure user can play again by clicking play
                 item.setStartTime(0);
                 mediaPlayer.stop();
@@ -899,8 +916,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
 
-                            Log.d(TAG, "File Download Successful");
-                            Log.d(TAG, "Start playing now");
+                            Log.d(TAG, "File Download for playing Successful");
 
                             //Decrypt and overwrite the file.
                             byte[] decrpted = EnDecryptAudio.decrypt(tempFile, getApplicationContext());
@@ -925,6 +941,16 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public String parseTime(int length){
+        StringBuilder builder = new StringBuilder();
+        int mins = length > 60 ? (length % 60) : 0;
+        int sec = length - (60 * mins);
+        builder.append((mins < 10)?"0"+mins : mins);
+        builder.append(":");
+        builder.append((sec < 10)?"0"+sec : sec);
+        return builder.toString();
     }
 
     public MediaPlayer getMediaPlayer() {
