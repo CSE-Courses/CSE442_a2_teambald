@@ -74,7 +74,7 @@ public class CloudListAdapter extends RecordingListAdapter{
         item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                activity.playAudio(mDataset.get(position), false);
+                activity.downloadFileAndPlay(mDataset.get(position));
             }
         });
     }

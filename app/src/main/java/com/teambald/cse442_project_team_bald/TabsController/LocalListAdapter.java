@@ -138,7 +138,7 @@ public class LocalListAdapter extends RecordingListAdapter{
             @Override
             public void onClick(View view) {
                 Log.i(TAG, "Play audio.");
-                activity.playAudio(mDataset.get(position), true);
+                activity.playAudio(mDataset.get(position));
             }
         });
     }

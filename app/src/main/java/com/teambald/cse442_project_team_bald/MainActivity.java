@@ -1,9 +1,9 @@
 package com.teambald.cse442_project_team_bald;
 
-import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -18,8 +18,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -47,21 +45,21 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.teambald.cse442_project_team_bald.Encryption.EnDecryptAudio;
 import com.teambald.cse442_project_team_bald.Fragments.CloudListFragment;
-import com.teambald.cse442_project_team_bald.Fragments.ListFragment;
 import com.teambald.cse442_project_team_bald.Fragments.RecordingListFragment;
 import com.teambald.cse442_project_team_bald.Fragments.SettingFragment;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.TabsController.CloudListAdapter;
 import com.teambald.cse442_project_team_bald.TabsController.LocalListAdapter;
-import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
 import com.teambald.cse442_project_team_bald.TabsController.ViewPagerAdapter;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import androidx.appcompat.widget.Toolbar;
+
+import static org.apache.http.client.methods.RequestBuilder.post;
+
 /**
  * Activity to demonstrate basic retrieval of the Google user's ID, email address, and basic
  * profile, which also adds a request dialog to access the user's Google Drive.
@@ -823,14 +821,8 @@ public class MainActivity extends AppCompatActivity {
         if(deselectAll!=null){deselectAll.setVisible(true);}
     }
 
-    public void playAudio(final RecordingItem item, boolean ifLocal){
-        File file;
-        if(ifLocal){
-            file = item.getAudio_file();
-        }else{
-            //Download first, then play
-            file = downloadFile(item);
-        }
+    public void playAudio(final RecordingItem item){
+        File file = item.getAudio_file();
 
         //If try to play the same file, do nothing.
         if(file.getAbsolutePath().equals(previousFile)){
@@ -873,6 +865,9 @@ public class MainActivity extends AppCompatActivity {
             //Set button icon to pause(meaning playing) and update data.
             seekBarButton.setImageResource(R.drawable.ic_seekbar_pause_button_48);
 
+            //Delete previous temp file.
+            clearTempFolder(file.getName());
+
             //Record played audio file directory.
             setPreviousFile(file.getAbsolutePath());
         } catch (IOException e) {
@@ -898,7 +893,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public File downloadFile(final RecordingItem recordingItem) {
+    public File downloadFileAndPlay(final RecordingItem recordingItem) {
 
         try {
             String path = getExternalFilesDir("/").getAbsolutePath();
@@ -922,6 +917,10 @@ public class MainActivity extends AppCompatActivity {
                             byte[] decrpted = EnDecryptAudio.decrypt(tempFile, getApplicationContext());
                             EnDecryptAudio.writeByteToFile(decrpted, tempFile.getPath());
 
+                            //Set audio file and play.
+                            recordingItem.setAudio_file(tempFile);
+                            playAudio(recordingItem);
+
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -942,6 +941,22 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
     }
+
+    public void clearTempFolder(String exclude){
+        File[] allFiles = new File(getExternalFilesDir("/").getAbsolutePath()+File.separator+"tmp").listFiles();
+
+        if(allFiles.length == 0){
+            return;
+        }else {
+            //Delete all
+            for(File f : allFiles){
+                if(!f.getName().equals(exclude)){
+                    f.delete();
+                }
+            }
+        }
+    }
+
 
     public String parseTime(int length){
         StringBuilder builder = new StringBuilder();
