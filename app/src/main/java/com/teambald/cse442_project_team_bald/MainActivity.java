@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -184,8 +185,6 @@ public class MainActivity extends AppCompatActivity {
 
         toast = Toast.makeText(getApplicationContext(),"",Toast.LENGTH_SHORT);
 
-        mediaPlayer = new MediaPlayer();
-
         //Initialize seekBar.
         seekBar = findViewById(R.id.seekBar);
         seekBarCurrentTv = findViewById(R.id.seekBar_current_text);
@@ -216,6 +215,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                mediaPlayer.pause();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar sb) {
+                //Seek the audio.
+                if(mediaPlayer == null || mediaPlayer.getDuration() <= 0){
+                    seekBar.setProgress(0);
+                    return;
+                }
+
+                int seekPosition = sb.getProgress() * 1000;
+                mediaPlayer.seekTo(seekPosition);
+                mediaPlayer.start();
+                if(sb.getProgress() < sb.getMax()){
+                    seekBarButton.setImageResource(R.drawable.ic_seekbar_pause_button_48);
+                }
+                seekBarCurrentTv.setText(parseTime(sb.getProgress()));
+
+            }
+        });
     }
 
     @Override
@@ -830,6 +857,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         try {
+            if(mediaPlayer != null && mediaPlayer.getDuration() > 0) {
+                mediaPlayer.stop();
+            }
             mediaPlayer = new MediaPlayer();
 
             mediaPlayer.setDataSource(file.getAbsolutePath());
@@ -884,7 +914,7 @@ public class MainActivity extends AppCompatActivity {
 
                 //Stop the audio at the beginning to make sure user can play again by clicking play
                 item.setStartTime(0);
-                mediaPlayer.stop();
+//                mediaPlayer.stop();
 
                 //Set button icon to pause(meaning playing) and update data.
                 seekBarButton.setImageResource(R.drawable.ic_seekbar_play_button_48);
@@ -956,7 +986,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 
     public String parseTime(int length){
         StringBuilder builder = new StringBuilder();
