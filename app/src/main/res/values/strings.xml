@@ -45,4 +45,16 @@
     <!-- Server Client ID.  This should be a valid Web OAuth 2.0 Client ID obtained
          from https://console.developers.google.com/ -->
     <string name="server_client_id">606946566326-ald71c4sljtisqj9v6jgkvr0pna4idui.apps.googleusercontent.com</string>
+
+    <!-- Application Tour Sequence -->
+    <string name="Home_Recorder_Title">This is the Recorder button</string>
+    <string name="Home_Recorder_Description">Click the button Once it will start recording,
+        Click the recording button twice to end the recording!!!</string>
+
+    <string name="Home_SignStatus_Title">This shows your Account Status</string>
+    <string name="Home_SignStatus_description"></string>
+
+
+
+
 </resources>

@@ -61,5 +61,8 @@ dependencies {
 
     //Biometrics
     implementation 'androidx.biometric:biometric:1.0.1'
+
+    //TaptargetView
+    implementation 'com.getkeepsafe.taptargetview:taptargetview:1.13.0'
 }
 apply plugin: 'com.google.gms.google-services'

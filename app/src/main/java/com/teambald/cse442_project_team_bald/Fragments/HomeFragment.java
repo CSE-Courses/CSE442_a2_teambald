@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
@@ -31,6 +32,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -68,12 +72,15 @@ public class HomeFragment extends Fragment {
     private static final String TAG = "HOME_FRAGMENT: ";
 
     private ImageButton recordButton;
+    private ImageButton HomeInfoBut;
 
     private TextView accountText;
 
     private TextView recordStatusText;
 
     private MainActivity activity;
+
+    private TapTargetSequence introSequence;
 
     public HomeFragment(MainActivity mainActivity) {
         activity = mainActivity;
@@ -95,6 +102,8 @@ public class HomeFragment extends Fragment {
         view.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
         recordButton = view.findViewById(R.id.recorder_button);
         recordButton.setOnClickListener(new recordClickListener());
+        HomeInfoBut = view.findViewById(R.id.Home_info);
+        HomeInfoBut.setOnClickListener(new infoClickListener());
         accountText = view.findViewById(R.id.login_account_text);
 
         recordStatusText = view.findViewById(R.id.recordStatus);
@@ -150,7 +159,74 @@ public class HomeFragment extends Fragment {
 
             }
         });
-    }
+
+        //Set the TapTargetView Sequence
+//        TapTargetView.showFor(this.activity,                 // `this` is an Activity
+//                TapTarget.forView(view.findViewById(R.id.recorder_button), getString(R.string.Home_Recorder_Title),
+//                        getString(R.string.Home_Recorder_Description))
+//                        // All options below are optional
+//                        .outerCircleColor(R.color.ubBlue)      // Specify a color for the outer circle
+//                        .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
+//                        .targetCircleColor(R.color.white)   // Specify a color for the target circle
+//                        .titleTextSize(40)                  // Specify the size (in sp) of the title text
+//                        .titleTextColor(R.color.white)      // Specify the color of the title text
+//                        .descriptionTextSize(20)            // Specify the size (in sp) of the description text
+//                        .descriptionTextColor(R.color.white)  // Specify the color of the description text
+//                        .textColor(R.color.white)            // Specify a color for both the title and description text
+//                        .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
+//                        .dimColor(R.color.white)            // If set, will dim behind the view with 30% opacity of the given color
+//                        .drawShadow(true)                   // Whether to draw a drop shadow or not
+//                        .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
+//                        .tintTarget(true)                   // Whether to tint the target view's color
+//                        .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
+//                        .targetRadius(120),                  // Specify the target radius (in dp)
+//                new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
+//                    @Override
+//                    public void onTargetClick(TapTargetView view) {
+//                        super.onTargetClick(view);      // This call is optional
+//                        view.dismiss(true);
+//                    }
+//                });
+
+        this.introSequence= new TapTargetSequence(this.activity)
+                .targets(
+                        TapTarget.forView(view.findViewById(R.id.recorder_button), getString(R.string.Home_Recorder_Title),
+                                getString(R.string.Home_Recorder_Description))
+                                .outerCircleColor(R.color.ubBlue)      // Specify a color for the outer circle
+                        .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
+                        .targetCircleColor(R.color.white)   // Specify a color for the target circle
+                        .titleTextSize(40)                  // Specify the size (in sp) of the title text
+                        .titleTextColor(R.color.white)      // Specify the color of the title text
+                        .descriptionTextSize(20)            // Specify the size (in sp) of the description text
+                        .descriptionTextColor(R.color.white)  // Specify the color of the description text
+                        .textColor(R.color.white)            // Specify a color for both the title and description text
+                        .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
+                        .dimColor(R.color.white)            // If set, will dim behind the view with 30% opacity of the given color
+                        .drawShadow(true)                   // Whether to draw a drop shadow or not
+                        .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
+                        .tintTarget(true)                   // Whether to tint the target view's color
+                        .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
+                        .targetRadius(120),                  // Specify the target radius (in dp)
+                        TapTarget.forView(view.findViewById(R.id.login_account_text), getString(R.string.Home_SignStatus_Title),
+                                getString(R.string.Home_SignStatus_description))
+                                .outerCircleColor(R.color.ubBlue)
+                                .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
+                                .targetCircleColor(R.color.white)   // Specify a color for the target circle
+                                .titleTextSize(40)                  // Specify the size (in sp) of the title text
+                                .titleTextColor(R.color.white)      // Specify the color of the title text
+                                .descriptionTextSize(20)            // Specify the size (in sp) of the description text
+                                .descriptionTextColor(R.color.white)  // Specify the color of the description text
+                                .textColor(R.color.white)            // Specify a color for both the title and description text
+                                .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
+                                .dimColor(R.color.white)            // If set, will dim behind the view with 30% opacity of the given color
+                                .drawShadow(true)                   // Whether to draw a drop shadow or not
+                                .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
+                                .tintTarget(true)                   // Whether to tint the target view's color
+                                .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
+                                .targetRadius(70)
+                        );
+
+    }//ON view Created End
 
 
     @Override
@@ -220,6 +296,12 @@ public class HomeFragment extends Fragment {
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putBoolean(getString(R.string.is_recording_key), isRecording);
             editor.commit();
+        }
+    }
+    private class infoClickListener implements View.OnClickListener{
+        @Override
+        public void onClick(View view) {
+            introSequence.startAt(0);
         }
     }
 
