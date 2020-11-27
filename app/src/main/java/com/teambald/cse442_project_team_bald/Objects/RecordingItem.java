@@ -82,6 +82,10 @@ public class RecordingItem {
         this.play = play;
     }
 
+    public void setAudio_file(File audio_file) {
+        this.audio_file = audio_file;
+    }
+
     public boolean getChecked()
     {return checked;}
     public void setChecked(boolean checked)

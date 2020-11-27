@@ -1,19 +1,24 @@
 package com.teambald.cse442_project_team_bald;
 
-import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -41,20 +46,21 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.teambald.cse442_project_team_bald.Encryption.EnDecryptAudio;
 import com.teambald.cse442_project_team_bald.Fragments.CloudListFragment;
-import com.teambald.cse442_project_team_bald.Fragments.ListFragment;
 import com.teambald.cse442_project_team_bald.Fragments.RecordingListFragment;
 import com.teambald.cse442_project_team_bald.Fragments.SettingFragment;
 import com.teambald.cse442_project_team_bald.Objects.RecordingItem;
 import com.teambald.cse442_project_team_bald.TabsController.CloudListAdapter;
 import com.teambald.cse442_project_team_bald.TabsController.LocalListAdapter;
-import com.teambald.cse442_project_team_bald.TabsController.RecordingListAdapter;
 import com.teambald.cse442_project_team_bald.TabsController.ViewPagerAdapter;
 
 import java.io.File;
-import java.lang.reflect.Array;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import androidx.appcompat.widget.Toolbar;
+
+import static org.apache.http.client.methods.RequestBuilder.post;
+
 /**
  * Activity to demonstrate basic retrieval of the Google user's ID, email address, and basic
  * profile, which also adds a request dialog to access the user's Google Drive.
@@ -95,6 +101,15 @@ public class MainActivity extends AppCompatActivity {
     private int fragmentIndicator = -1;
 
     private Toast toast;
+
+    //Seekbar
+    private SeekBar seekBar;
+    private ImageButton seekBarButton;
+    private MediaPlayer mediaPlayer;
+    private String previousFile = "";
+    //Keep track of progress and update seekbar.
+    private Handler mHandler;
+    private TextView seekBarCurrentTv, seekBarMaxTv, seekBarTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,6 +184,65 @@ public class MainActivity extends AppCompatActivity {
                 }).attach();
 
         toast = Toast.makeText(getApplicationContext(),"",Toast.LENGTH_SHORT);
+
+        //Initialize seekBar.
+        seekBar = findViewById(R.id.seekBar);
+        seekBarCurrentTv = findViewById(R.id.seekBar_current_text);
+        seekBarMaxTv = findViewById(R.id.seekBar_max_text);
+        seekBarTitle = findViewById(R.id.seekBar_title);
+        seekBarButton = findViewById(R.id.seekBar_button);
+        seekBarButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mediaPlayer == null || previousFile == ""){
+                    toast = Toast.makeText(getApplicationContext(),"Please choose an audio to play",Toast.LENGTH_SHORT);
+                    toast.show();
+                    return;
+                }
+
+                if(mediaPlayer.isPlaying()){
+                    //Pause audio.
+                    mediaPlayer.pause();
+
+                    seekBarButton.setImageResource(R.drawable.ic_seekbar_play_button_48);
+                }else{
+                    //Play audio.
+                    mediaPlayer.start();
+
+                    seekBarButton.setImageResource(R.drawable.ic_seekbar_pause_button_48);
+                }
+
+            }
+        });
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                mediaPlayer.pause();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar sb) {
+                //Seek the audio.
+                if(mediaPlayer == null || mediaPlayer.getDuration() <= 0){
+                    seekBar.setProgress(0);
+                    return;
+                }
+
+                int seekPosition = sb.getProgress() * 1000;
+                mediaPlayer.seekTo(seekPosition);
+                mediaPlayer.start();
+                if(sb.getProgress() < sb.getMax()){
+                    seekBarButton.setImageResource(R.drawable.ic_seekbar_pause_button_48);
+                }
+                seekBarCurrentTv.setText(parseTime(sb.getProgress()));
+
+            }
+        });
     }
 
     @Override
@@ -311,49 +385,6 @@ public class MainActivity extends AppCompatActivity {
                             // ...
                             Log.d(TAG, "Read file error on Failure");
                             toast.setText("File download Unsuccessful");
-                            toast.show();
-                        }
-                    });
-        } catch (Exception e) {
-            Log.d(TAG, "Read file error");
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    public boolean downloadFileToPlay(String path, String localFolder, String filename, String fireBaseFolder, final RecordingListAdapter rla, final RecordingItem recordingItem) {
-        try {
-            Log.d(TAG, "Downloading from");
-            Log.d(TAG, fireBaseFolder);
-            Log.d(TAG, filename);
-            StorageReference storageReference = storageRef.child(fireBaseFolder).child(filename);
-            final String fullPath = path + "/" + localFolder + "/" + filename;
-            final File tempFile = new File(fullPath);
-            storageReference.getFile(tempFile)
-                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-
-                            Log.d(TAG, "File Download Successful");
-                            Log.d(TAG, "Start playing now");
-
-                            //Decrypt and overwrite the file.
-                            byte[] decrpted = EnDecryptAudio.decrypt(tempFile, getApplicationContext());
-                            EnDecryptAudio.writeByteToFile(decrpted, tempFile.getPath());
-
-                            toast.setText("Starting Audio Now");
-                            toast.show();
-                            rla.playAudio(tempFile, recordingItem);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Handle failed download
-                            // ...
-                            Log.d(TAG, "Read file error on Failure");
-                            toast.setText("Audio Read Unsuccessful");
                             toast.show();
                         }
                     });
@@ -815,5 +846,170 @@ public class MainActivity extends AppCompatActivity {
         if(deleteItem!=null){deleteItem.setVisible(true);}
         if(selectAll!=null){selectAll.setVisible(true);}
         if(deselectAll!=null){deselectAll.setVisible(true);}
+    }
+
+    public void playAudio(final RecordingItem item){
+        File file = item.getAudio_file();
+
+        //If try to play the same file, do nothing.
+        if(file.getAbsolutePath().equals(previousFile)){
+            return;
+        }
+
+        try {
+            if(mediaPlayer != null && mediaPlayer.getDuration() > 0) {
+                mediaPlayer.stop();
+            }
+            mediaPlayer = new MediaPlayer();
+
+            mediaPlayer.setDataSource(file.getAbsolutePath());
+            mediaPlayer.prepare();
+            mediaPlayer.seekTo(item.getStartTimeTime());
+            mediaPlayer.start();
+
+            //Set max
+            seekBar.setProgress(0);
+            seekBar.setMax(mediaPlayer.getDuration()/1000);
+            seekBarMaxTv.setText(parseTime(mediaPlayer.getDuration()/1000));
+
+            //Set title
+            seekBarTitle.setText(file.getName());
+
+            //update Seekbar on UI thread
+            mHandler = new Handler();
+            MainActivity.this.runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    if(mediaPlayer != null && mediaPlayer.isPlaying()){
+                        Log.i(TAG, "updating progress");
+                        int mCurrentPosition = mediaPlayer.getCurrentPosition() / 1000;
+                        seekBar.setProgress(mCurrentPosition);
+                        seekBarCurrentTv.setText(parseTime(mediaPlayer.getCurrentPosition()/1000));
+                    }
+
+                    mHandler.postDelayed(this, 1000);
+                }
+            });
+
+            //Set button icon to pause(meaning playing) and update data.
+            seekBarButton.setImageResource(R.drawable.ic_seekbar_pause_button_48);
+
+            //Delete previous temp file.
+            clearTempFolder(file.getName());
+
+            //Record played audio file directory.
+            setPreviousFile(file.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //Play the audio
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                //Update seekbar info
+                int mCurrentPosition = mediaPlayer.getCurrentPosition() / 1000;
+                seekBar.setProgress(mCurrentPosition);
+                seekBarCurrentTv.setText(parseTime(mediaPlayer.getCurrentPosition()/1000));
+
+                //Stop the audio at the beginning to make sure user can play again by clicking play
+                item.setStartTime(0);
+//                mediaPlayer.stop();
+
+                //Set button icon to pause(meaning playing) and update data.
+                seekBarButton.setImageResource(R.drawable.ic_seekbar_play_button_48);
+            }
+        });
+
+    }
+
+    public File downloadFileAndPlay(final RecordingItem recordingItem) {
+
+        try {
+            String path = getExternalFilesDir("/").getAbsolutePath();
+            String localFolder = "tmp";
+            String fireBaseFolder = getmAuth().getCurrentUser().getEmail();
+            String filename = recordingItem.getDate();
+            Log.d(TAG, "Downloading from");
+            Log.d(TAG, fireBaseFolder);
+            Log.d(TAG, filename);
+            StorageReference storageReference = storageRef.child(fireBaseFolder).child(filename);
+            final String fullPath = path + "/" + localFolder + "/" + filename;
+            final File tempFile = new File(fullPath);
+            storageReference.getFile(tempFile)
+                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+
+                            Log.d(TAG, "File Download for playing Successful");
+
+                            //Decrypt and overwrite the file.
+                            byte[] decrpted = EnDecryptAudio.decrypt(tempFile, getApplicationContext());
+                            EnDecryptAudio.writeByteToFile(decrpted, tempFile.getPath());
+
+                            //Set audio file and play.
+                            recordingItem.setAudio_file(tempFile);
+                            playAudio(recordingItem);
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle failed download
+                            // ...
+                            Log.d(TAG, "Read file error on Failure");
+                            toast.setText("Audio Read Unsuccessful");
+                            toast.show();
+                            tempFile.delete();
+                        }
+                    });
+            return tempFile;
+        } catch (Exception e) {
+            Log.d(TAG, "Read file error");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void clearTempFolder(String exclude){
+        File[] allFiles = new File(getExternalFilesDir("/").getAbsolutePath()+File.separator+"tmp").listFiles();
+
+        if(allFiles.length == 0){
+            return;
+        }else {
+            //Delete all
+            for(File f : allFiles){
+                if(!f.getName().equals(exclude)){
+                    f.delete();
+                }
+            }
+        }
+    }
+
+    public String parseTime(int length){
+        StringBuilder builder = new StringBuilder();
+        int mins = length > 60 ? (length % 60) : 0;
+        int sec = length - (60 * mins);
+        builder.append((mins < 10)?"0"+mins : mins);
+        builder.append(":");
+        builder.append((sec < 10)?"0"+sec : sec);
+        return builder.toString();
+    }
+
+    public MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
+    }
+
+    public void resetMediaPlayer() {
+        mediaPlayer = new MediaPlayer();
+    }
+
+    public String getPreviousFile() {
+        return previousFile;
+    }
+
+    public void setPreviousFile(String previousFile) {
+        this.previousFile = previousFile;
     }
 }
