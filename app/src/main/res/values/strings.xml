@@ -55,6 +55,10 @@
     <string name="Home_SignStatus_description"></string>
 
 
+    <string name="Setting_Account">This the is area for your account</string>
+    <string name="Setting_Record">This the is area to change your record settings</string>
+    <string name="Setting_Saving">This is the Place for you to change your autosaving setting</string>
+    <string name="Setting_BioAuthTex"> You can enable or disable your biometric authentication here</string>
 
 
 </resources>

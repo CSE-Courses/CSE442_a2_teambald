@@ -115,6 +115,33 @@ public class CloudListFragment extends ListFragment {
             itemList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
             mAdapter = new CloudListAdapter(itemList, getContext(),this,activity);
             recyclerView.setAdapter(mAdapter);
+            //        TapTargetView.showFor(this.activity,                 // `this` is an Activity
+//                TapTarget.forView(view.findViewById(R.id.recorder_button), getString(R.string.Home_Recorder_Title),
+//                        getString(R.string.Home_Recorder_Description))
+//                        // All options below are optional
+//                        .outerCircleColor(R.color.ubBlue)      // Specify a color for the outer circle
+//                        .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
+//                        .targetCircleColor(R.color.white)   // Specify a color for the target circle
+//                        .titleTextSize(40)                  // Specify the size (in sp) of the title text
+//                        .titleTextColor(R.color.white)      // Specify the color of the title text
+//                        .descriptionTextSize(20)            // Specify the size (in sp) of the description text
+//                        .descriptionTextColor(R.color.white)  // Specify the color of the description text
+//                        .textColor(R.color.white)            // Specify a color for both the title and description text
+//                        .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
+//                        .dimColor(R.color.white)            // If set, will dim behind the view with 30% opacity of the given color
+//                        .drawShadow(true)                   // Whether to draw a drop shadow or not
+//                        .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
+//                        .tintTarget(true)                   // Whether to tint the target view's color
+//                        .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
+//                        .targetRadius(120),                  // Specify the target radius (in dp)
+//                new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
+//                    @Override
+//                    public void onTargetClick(TapTargetView view) {
+//                        super.onTargetClick(view);      // This call is optional
+//                        view.dismiss(true);
+//                    }
+//                });
+
         }
     }
     public void listFiles(String fireBaseFolder)

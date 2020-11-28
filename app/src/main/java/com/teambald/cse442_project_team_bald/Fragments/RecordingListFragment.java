@@ -1,5 +1,6 @@
 package com.teambald.cse442_project_team_bald.Fragments;
 
+import android.graphics.Typeface;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -21,6 +22,8 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.teambald.cse442_project_team_bald.Encryption.AudioEncryptionUtils;
 import com.teambald.cse442_project_team_bald.Encryption.FileUtils;
 import com.teambald.cse442_project_team_bald.MainActivity;
@@ -74,7 +77,6 @@ public class RecordingListFragment extends ListFragment {
         super.onViewCreated(view, savedInstanceState);
         view.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
         RecyclerView recyclerView = view.findViewById(R.id.recording_list_recyclerview);
-
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -100,7 +102,10 @@ public class RecordingListFragment extends ListFragment {
         });
         if(activity!=null)
             showMenu();
-    }
+
+
+
+    }// On view created end
 
     /*
      * 0-Cloud

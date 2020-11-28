@@ -10,7 +10,7 @@
         android:id="@+id/Home"
         android:layout_width="300dp"
         android:layout_height="190dp"
-        android:background="#008080"
+        android:background="#005bbb"
         android:text="Recoreded"
         android:textAllCaps="false"
         android:textColor="#FFFFFF"
@@ -27,7 +27,7 @@
         android:id="@+id/Cloud"
         android:layout_width="300dp"
         android:layout_height="190dp"
-        android:background="#008080"
+        android:background="#005bbb"
 
         android:text="Downloaded"
         android:textAllCaps="false"

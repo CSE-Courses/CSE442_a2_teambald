@@ -1,6 +1,7 @@
 package com.teambald.cse442_project_team_bald.Fragments;
 
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -24,6 +25,8 @@ import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.google.android.gms.common.SignInButton;
 import com.google.firebase.auth.FirebaseUser;
 import com.teambald.cse442_project_team_bald.MainActivity;
@@ -165,7 +168,86 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         authenSwitch = view.findViewById(R.id.bioSwitch);
         authenSwitch.setChecked(authenVal);
         authenSwitch.setOnCheckedChangeListener(new bioAuthChangeListener());
-    }
+
+        final TapTargetSequence sequence = new TapTargetSequence(this.activity)
+                .targets(
+                        TapTarget.forView(view.findViewById(R.id.sign_out_button), "Here To Sign in or Sign Out",
+                                getString(R.string.Setting_Account))
+                                .targetCircleColor(R.color.ubBlue)
+                                .outerCircleColor(R.color.ubBlue)      // Specify a color for the outer circle
+                                .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
+                                .targetCircleColor(R.color.white)   // Specify a color for the target circle
+                                .titleTextSize(40)                  // Specify the size (in sp) of the title text
+                                .titleTextColor(R.color.white)      // Specify the color of the title text
+                                .descriptionTextSize(20)            // Specify the size (in sp) of the description text
+                                .descriptionTextColor(R.color.white)  // Specify the color of the description text
+                                .textColor(R.color.white)            // Specify a color for both the title and description text
+                                .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
+                                .dimColor(R.color.white)            // If set, will dim behind the view with 30% opacity of the given color
+                                .drawShadow(true)                   // Whether to draw a drop shadow or not
+                                .cancelable(true)                  // Whether tapping outside the outer circle dismisses the view
+                                .tintTarget(true)                   // Whether to tint the target view's color
+                                .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
+                                .targetRadius(200)
+                        ,                  // Specify the target radius (in dp)
+                        //For Recoding section
+                        TapTarget.forView(view.findViewById(R.id.recording_seekBar), "Recording length",
+                                getString(R.string.Setting_Record))
+                                .targetCircleColor(R.color.ubBlue)
+                                .outerCircleColor(R.color.ubBlue)
+                                .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
+                                .targetCircleColor(R.color.white)   // Specify a color for the target circle
+                                .titleTextSize(40)                  // Specify the size (in sp) of the title text
+                                .titleTextColor(R.color.white)      // Specify the color of the title text
+                                .descriptionTextSize(20)            // Specify the size (in sp) of the description text
+                                .descriptionTextColor(R.color.white)  // Specify the color of the description text
+                                .textColor(R.color.white)            // Specify a color for both the title and description text
+                                .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
+                                .dimColor(R.color.white)            // If set, will dim behind the view with 30% opacity of the given color
+                                .drawShadow(true)                   // Whether to draw a drop shadow or not
+                                .cancelable(true)                  // Whether tapping outside the outer circle dismisses the view
+                                .tintTarget(true)                   // Whether to tint the target view's color
+                                .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
+                                .targetRadius(200)
+                        ,
+                        //For the Saving Section
+                        TapTarget.forView(view.findViewById(R.id.autoUploadSwitch), "Auto Upload/Delete",
+                                getString(R.string.Setting_Saving))
+                                .outerCircleColor(R.color.ubBlue)
+                                .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
+                                .targetCircleColor(R.color.white)   // Specify a color for the target circle
+                                .titleTextSize(40)                  // Specify the size (in sp) of the title text
+                                .titleTextColor(R.color.white)      // Specify the color of the title text
+                                .descriptionTextSize(20)            // Specify the size (in sp) of the description text
+                                .descriptionTextColor(R.color.white)  // Specify the color of the description text
+                                .textColor(R.color.white)            // Specify a color for both the title and description text
+                                .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
+                                .dimColor(R.color.white)            // If set, will dim behind the view with 30% opacity of the given color
+                                .drawShadow(true)                   // Whether to draw a drop shadow or not
+                                .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
+                                .tintTarget(true)                   // Whether to tint the target view's color
+                                .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
+                                .targetRadius(200)).listener(new TapTargetSequence.Listener() {
+                    @Override
+                    public void onSequenceFinish() {
+
+                    }
+
+                    @Override
+                    public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+
+                    }
+
+                    @Override
+                    public void onSequenceCanceled(TapTarget lastTarget) {
+
+                    }
+                });
+
+
+        sequence.start();
+
+    }// On view Created End
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
