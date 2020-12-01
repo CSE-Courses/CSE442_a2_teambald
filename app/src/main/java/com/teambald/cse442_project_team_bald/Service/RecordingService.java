@@ -388,10 +388,11 @@ public class RecordingService extends Service {
                 filelist.add(f);
             }
         }
+        Log.i(TAG, "val:"+autoDeleteThreshold);
         if(filelist.size()>autoDeleteThreshold){
             filelist.get(0).delete();
+            Log.i(TAG, "Auto delete is completed.");
         }
-        Log.i(TAG, "Auto delete is completed.");
     }
 
     private String readRecentRecordingLength(){
