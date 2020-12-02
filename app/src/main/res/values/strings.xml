@@ -24,7 +24,6 @@
     <string name="auto_delete_freq_key">AUTO DELETE FREQ KEY</string>
 
 
-
     <!-- Authentication Section in Setting Frag -->
     <string name="bio_auth_section_text">Authentication</string>
     <string name="biometric_authentication">BIOMETRIC AUTHENTICATION KEY</string>
@@ -32,7 +31,6 @@
 
     <string name="click_to_start">Click to Start Recording</string>
     <string name="click_to_pause">Click to Pause Recording</string>
-
 
 
     <!-- Menu items in multiple selection fragments -->

@@ -21,4 +21,8 @@
         <item name="android:background">#303F9F</item>
     </style>
 
+    <style name="AppTheme.PopMe">
+        <item name="android:windowIsTranslucent"> true </item>
+        <item name="android:windowCloseOnTouchOutside"> true </item>
+    </style>
 </resources>
