@@ -60,5 +60,7 @@
     <string name="Setting_Saving">This is the Place for you to change your autosaving setting</string>
     <string name="Setting_BioAuthTex"> You can enable or disable your biometric authentication here</string>
 
+    <string name="Record_List_Back">This will take you to the last page</string>
+
 
 </resources>

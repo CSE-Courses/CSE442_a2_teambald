@@ -47,6 +47,7 @@ import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.R;
 import com.teambald.cse442_project_team_bald.Service.RecordingService;
 import com.teambald.cse442_project_team_bald.Service.ShakeListener;
+import com.teambald.cse442_project_team_bald.Service.ShakeService;
 
 import org.w3c.dom.Text;
 
@@ -138,16 +139,27 @@ public class HomeFragment extends Fragment {
                 boolean shakeVal = sharedPref.getBoolean(getString(R.string.shake_to_save),false);
                 if (shakeVal) {
                     if (isRecording) {
-                        vibe.vibrate(100);
+                        vibe.vibrate(50);
                         //Stop Recording
                         recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
                         //stopRecording();
-                        stopService();
+                        System.out.println("Try Stop Recording!!!");
+                        try {
+                            stopService();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         isRecording = false;
                     } else {
                         vibe.vibrate(100);
                         //Start service that record audio consistently;
-                        startService();
+                        System.out.println("Try Start Recording!!!");
+                        try{
+                            startService();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
                         recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
                         isRecording = true;
                     }

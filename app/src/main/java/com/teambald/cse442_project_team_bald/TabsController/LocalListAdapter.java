@@ -1,6 +1,7 @@
 package com.teambald.cse442_project_team_bald.TabsController;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +20,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.teambald.cse442_project_team_bald.Encryption.AudioEncryptionUtils;
 import com.teambald.cse442_project_team_bald.Encryption.FileUtils;
 import com.teambald.cse442_project_team_bald.Fragments.RecordingListFragment;
@@ -56,6 +59,7 @@ public class LocalListAdapter extends RecordingListAdapter{
         );
     }
 
+
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(MyViewHolder holder, final int position) {
@@ -77,6 +81,7 @@ public class LocalListAdapter extends RecordingListAdapter{
                 Log.d(TAG,"Local item:"+position+" is checked set to : "+isChecked);
             }
         });
+
 
         date.setText(mDataset.get(position).getDate());
         duration.setText(mDataset.get(position).getDuration());
