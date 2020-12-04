@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -118,7 +119,15 @@ public class MainActivity extends AppCompatActivity {
         //Toolbar
         Toolbar tb = findViewById(R.id.my_toolbar);
         setSupportActionBar(tb);
-
+        Boolean isFirstRun= getSharedPreferences("PREFERENCE",MODE_PRIVATE)
+                .getBoolean("isfirstrun",true);
+        if(isFirstRun){
+        //Pop up the intro window
+            Intent i= new Intent(getApplicationContext(), PopupActivity.class);
+            startActivity(i);
+            getSharedPreferences("PREFERENCE",MODE_PRIVATE).edit()
+                    .putBoolean("isfirstrun",false).commit();
+        }
         // Views
 
         siawd = this;

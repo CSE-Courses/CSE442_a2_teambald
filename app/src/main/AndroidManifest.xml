@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.teambald.cse442_project_team_bald" >
+    package="com.teambald.cse442_project_team_bald">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -10,18 +10,19 @@
     <uses-permission android:name="android.permission.REQUEST_COMPANION_RUN_IN_BACKGROUND" />
     <uses-permission android:name="android.permission.REQUEST_COMPANION_USE_DATA_IN_BACKGROUND" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
-
+        android:theme="@style/AppTheme">
+        <activity android:name=".PopupActivity"
+            android:theme="@style/AppTheme.PopMe">
+        </activity>
         <activity
-            android:name="com.teambald.cse442_project_team_bald.AuthenActivity"
+            android:name=".AuthenActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,14 +30,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name="com.teambald.cse442_project_team_bald.MainActivity"
-            android:label="Main Activity">
-        </activity>
-
-        <!--Service for running recording in background-->
-        <service android:name=".Service.RecordingService"/>
+            android:name=".MainActivity"
+            android:label="Main Activity"></activity> <!-- Service for running recording in background -->
+        <service android:name=".Service.RecordingService" />
     </application>
 
 </manifest>

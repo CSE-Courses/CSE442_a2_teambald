@@ -176,20 +176,12 @@ public class RecordingListFragment extends ListFragment {
                     if (f.getName().indexOf("Record") == 0) {
                         name = f.getName();
                     }
-                    if(!f.getName().contains("_L")){
-                        unlocked.add(new RecordingItem(name, durationStr, f.getPath(), true, f));
-                    }
+
                     itemList.add(new RecordingItem(name, durationStr, f.getPath(), true, f));
                 } catch (Exception e) {
                     Log.e(TAG, "" + e);
                 }
             }
-        }
-        while(unlocked.size()>5){
-            File file_delete =unlocked.get(0).getAudio_file();
-            unlocked.remove(0);
-            itemList.remove(file_delete);
-            file_delete.delete();
         }
 
         Log.d(TAG,"mAdapter notified, size of list "+ itemList.size());
