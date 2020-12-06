@@ -43,4 +43,12 @@
     <!-- Server Client ID.  This should be a valid Web OAuth 2.0 Client ID obtained
          from https://console.developers.google.com/ -->
     <string name="server_client_id">606946566326-ald71c4sljtisqj9v6jgkvr0pna4idui.apps.googleusercontent.com</string>
+
+
+
+    <string name="tutorial_text">   To use our product you can simply click the button on
+                                    the main page or shake your phone to start the recorder.
+                                    \n \n Our product provides the auto upload feature if you login to your google account.
+                                    Your recording will automatically upload to the cloud and the local files will be deleted on your demand to save your storage space.
+    \n</string>
 </resources>
