@@ -231,7 +231,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                mediaPlayer.pause();
+                if(mediaPlayer != null && mediaPlayer.isPlaying()){
+                    mediaPlayer.pause();
+                }
             }
 
             @Override
