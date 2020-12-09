@@ -56,7 +56,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     //Recording Section
     private Switch autoRecordSwitch;
     private boolean autoRecordVal = false;
-    public static final int[] times = new int[]{1,5,10,15,20,25,30};
+    public static final int[] times = new int[]{1, 5, 10, 15, 20, 25, 30};
     private SeekBar recordingLengthSeekBar;
     private int recordingLengthSeekBarVal = 1;
     private TextView recording_length;
@@ -74,14 +74,16 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     private Switch autoDeleteSwitch;
     private boolean autoDelete = false;
     private SeekBar autoDeleteFreqSeekBar;
-    public static final int[] fileCounts = new int[]{10,20,30,40,50,60,70,80,90,100,-100};
+    public static final int[] fileCounts = new int[]{10, 20, 30, 40, 50, 60, 70, 80, 90, 100, -100};
     private TextView autoDeletefreqText;
     private int autodeleteFreqVal = 1;
 
 
     private Toast toast;
 
-    public SettingFragment(MainActivity mainActivity) { activity = mainActivity;}
+    public SettingFragment(MainActivity mainActivity) {
+        activity = mainActivity;
+    }
 
     //Account Section
     //Recording Section
@@ -97,23 +99,23 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         //Account Section
         //Recording Section
         recordingLengthSeekBarVal = sharedPref.getInt(getString(R.string.recording_length_key), 1);
-        autoRecordVal = sharedPref.getBoolean(getString(R.string.auto_record),false);
-        Log.d(TAG, "recordingLengthSeekBarVal: "+recordingLengthSeekBarVal);
-        Log.d(TAG, "auto record: "+autoRecordVal);
+        autoRecordVal = sharedPref.getBoolean(getString(R.string.auto_record), false);
+        Log.d(TAG, "recordingLengthSeekBarVal: " + recordingLengthSeekBarVal);
+        Log.d(TAG, "auto record: " + autoRecordVal);
         //Saving Section
-        shakeVal = sharedPref.getBoolean(getString(R.string.shake_to_save),false);
-        Log.d(TAG,"shake val: "+shakeVal);
-        autoUpload = sharedPref.getBoolean(getString(R.string.auto_upload_key),false);
-        Log.d(TAG,"auto upload val: "+autoUpload);
-        autoDelete = sharedPref.getBoolean(getString(R.string.auto_delete_key),false);
-        Log.d(TAG,"auto delete val: "+autoDelete);
-        autodeleteFreqVal = sharedPref.getInt(getString(R.string.auto_delete_freq_key),1);
-        Log.d(TAG,"auto delete freq val: "+autodeleteFreqVal);
+        shakeVal = sharedPref.getBoolean(getString(R.string.shake_to_save), false);
+        Log.d(TAG, "shake val: " + shakeVal);
+        autoUpload = sharedPref.getBoolean(getString(R.string.auto_upload_key), false);
+        Log.d(TAG, "auto upload val: " + autoUpload);
+        autoDelete = sharedPref.getBoolean(getString(R.string.auto_delete_key), false);
+        Log.d(TAG, "auto delete val: " + autoDelete);
+        autodeleteFreqVal = sharedPref.getInt(getString(R.string.auto_delete_freq_key), 1);
+        Log.d(TAG, "auto delete freq val: " + autodeleteFreqVal);
         //Biometric Section
-        authenVal = sharedPref.getBoolean(getString(R.string.biometric_authentication),false);
-        Log.d(TAG,"bioauthen val: "+authenVal);
+        authenVal = sharedPref.getBoolean(getString(R.string.biometric_authentication), false);
+        Log.d(TAG, "bioauthen val: " + authenVal);
 
-        toast = Toast.makeText(getContext(),"",Toast.LENGTH_SHORT);
+        toast = Toast.makeText(getContext(), "", Toast.LENGTH_SHORT);
     }
 
     @Override
@@ -124,7 +126,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     }
 
 
-    @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         view.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
@@ -168,6 +171,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         authenSwitch = view.findViewById(R.id.bioSwitch);
         authenSwitch.setChecked(authenVal);
         authenSwitch.setOnCheckedChangeListener(new bioAuthChangeListener());
+
 
         final TapTargetSequence sequence = new TapTargetSequence(this.activity)
                 .targets(
@@ -247,7 +251,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
 
         sequence.start();
 
-    }// On view Created End
+    }
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -258,38 +262,35 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                 signOut();
                 break;
             default:
-                Log.d(TAG,"Unknown button clicked");
+                Log.d(TAG, "Unknown button clicked");
         }
     }
-    public void signIn()
-    {
+
+    public void signIn() {
         activity.signIn();
     }
-    public void signOut()
-    {
+
+    public void signOut() {
         activity.signOut();
     }
 
-    public static void updateSignInUI(FirebaseUser account)
-    {
-        if(null != account)
-        {
-            editor.putBoolean(LogedInBl,true);
-            editor.putString(LogInName,account.getDisplayName());
-            editor.putString(LogInEmail,account.getEmail());
+    public static void updateSignInUI(FirebaseUser account) {
+        if (null != account) {
+            editor.putBoolean(LogedInBl, true);
+            editor.putString(LogInName, account.getDisplayName());
+            editor.putString(LogInEmail, account.getEmail());
             signInButton.setVisibility(View.INVISIBLE);
             signOutButton.setVisibility(View.VISIBLE);
-            statusText.setText("Signed In as: "+account.getEmail());
-            Log.d(TAG,"Log in successful as:" + account.getEmail());
-        }
-        else{
-            editor.putBoolean(LogedInBl,false);
-            editor.putString(LogInName,"null");
-            editor.putString(LogInEmail,"null");
+            statusText.setText("Signed In as: " + account.getEmail());
+            Log.d(TAG, "Log in successful as:" + account.getEmail());
+        } else {
+            editor.putBoolean(LogedInBl, false);
+            editor.putString(LogInName, "null");
+            editor.putString(LogInEmail, "null");
             signInButton.setVisibility(View.VISIBLE);
             signOutButton.setVisibility(View.INVISIBLE);
             statusText.setText("Signed In as: None");
-            Log.d(TAG,"Log in unsuccessful as");
+            Log.d(TAG, "Log in unsuccessful as");
         }
         editor.commit();
     }
@@ -297,7 +298,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG,"Setting MenuItems Invisible");
+        Log.d(TAG, "Setting MenuItems Invisible");
         activity.setMenuItemsVisible(false);
     }
 
@@ -305,20 +306,18 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     public void onStart() {
         super.onStart();
         FirebaseUser currentUser = null;
-        if(activity.getmAuth() != null){
+        if (activity.getmAuth() != null) {
             currentUser = activity.getmAuth().getCurrentUser();
         }
         // Check if the user is already signed in and all required scopes are granted
-        if (currentUser != null ) {
+        if (currentUser != null) {
             updateSignInUI(currentUser);
-        }
-        else
-        {
+        } else {
             updateSignInUI(null);
         }
     }
-    private class bioAuthChangeListener implements CompoundButton.OnCheckedChangeListener
-    {
+
+    private class bioAuthChangeListener implements CompoundButton.OnCheckedChangeListener {
         @Override
         public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
             int error = BiometricManager.from(getActivity()).canAuthenticate();
@@ -351,7 +350,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                         // Just negative button tap
                         return;
                     }
-                    Log.d(TAG,"Authentication error ...");
+                    Log.d(TAG, "Authentication error ...");
                     toast.setText("Authentication error");
                     toast.show();
                     buttonView.setChecked(false);
@@ -360,19 +359,19 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                 @Override
                 public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                     super.onAuthenticationSucceeded(result);
-                    Log.d(TAG,"Authentication Success ...");
+                    Log.d(TAG, "Authentication Success ...");
                     Toast.makeText(getContext(), "Biometric Setting Updated", Toast.LENGTH_SHORT).show();
 
                     authenVal = isChecked;
-                    editor.putBoolean(getString(R.string.biometric_authentication),authenVal);
-                    Log.d(TAG,"Saving authentication preference: "+authenVal);
+                    editor.putBoolean(getString(R.string.biometric_authentication), authenVal);
+                    Log.d(TAG, "Saving authentication preference: " + authenVal);
                     editor.commit();
                 }
 
                 @Override
                 public void onAuthenticationFailed() {
                     super.onAuthenticationFailed();
-                    Log.d(TAG,"Authentication failed ...");
+                    Log.d(TAG, "Authentication failed ...");
                     toast.setText("Biometric Authentication Failed");
                     toast.show();
                     buttonView.setChecked(false);
@@ -389,38 +388,39 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
             biometricPrompt.authenticate(promptInfo);
         }
     }
-    private class recordingLengthSeekBarListener implements SeekBar.OnSeekBarChangeListener
-    {
-        public recordingLengthSeekBarListener()
-        {}
+
+    private class recordingLengthSeekBarListener implements SeekBar.OnSeekBarChangeListener {
+        public recordingLengthSeekBarListener() {
+        }
+
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             //Save changed value.
-            Log.d(TAG,"Updating recordingLengthSeekBarVal to :" +progress);
+            Log.d(TAG, "Updating recordingLengthSeekBarVal to :" + progress);
             recordingLengthSeekBarVal = progress;
             updateRecordingLengthText();
         }
+
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
             //write custom code to on start progress
         }
+
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
-            Log.d(TAG,"Updating recordingLengthSeekBarVal sharedpref to :" +recordingLengthSeekBarVal);
+            Log.d(TAG, "Updating recordingLengthSeekBarVal sharedpref to :" + recordingLengthSeekBarVal);
             editor.putInt(getString(R.string.recording_length_key), recordingLengthSeekBarVal);
             boolean editorCommit = editor.commit();
             int s = sharedPref.getInt(getString(R.string.recording_length_key), 1);
-            Log.i("Recording_Length changed to ", String.valueOf(s)+" editorCommit: "+editorCommit);
+            Log.i("Recording_Length changed to ", String.valueOf(s) + " editorCommit: " + editorCommit);
 
-            toast.setText("Recording length changed to "+getRecordingLengthString());
+            toast.setText("Recording length changed to " + getRecordingLengthString());
             toast.show();
         }
     }
 
-    public String getRecordingLengthString()
-    {
-        switch(recordingLengthSeekBarVal)
-        {
+    public String getRecordingLengthString() {
+        switch (recordingLengthSeekBarVal) {
             case 0:
                 return "1 min";
             case 1:
@@ -429,124 +429,114 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
             case 4:
             case 5:
             case 6:
-                return times[recordingLengthSeekBarVal]+" mins";
+                return times[recordingLengthSeekBarVal] + " mins";
             default:
-                Log.d(TAG,"Invalid index for recordingLengthSeekBarVal:"+recordingLengthSeekBarVal);
+                Log.d(TAG, "Invalid index for recordingLengthSeekBarVal:" + recordingLengthSeekBarVal);
                 return null;
         }
     }
-    public void updateRecordingLengthText()
-    {
+
+    public void updateRecordingLengthText() {
         recording_length.setText(getRecordingLengthString());
     }
-    private class autoRecordChangeListener implements CompoundButton.OnCheckedChangeListener
-    {
+
+    private class autoRecordChangeListener implements CompoundButton.OnCheckedChangeListener {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             autoRecordVal = isChecked;
-            editor.putBoolean(getString(R.string.auto_record),autoRecordVal);
-            Log.d(TAG,"Saving auto recording preference: "+isChecked);
+            editor.putBoolean(getString(R.string.auto_record), autoRecordVal);
+            Log.d(TAG, "Saving auto recording preference: " + isChecked);
             editor.commit();
-            if(autoRecordVal)
-            {
+            if (autoRecordVal) {
                 toast.setText("Auto record ON");
                 toast.show();
-            }
-            else
-            {
+            } else {
                 toast.setText("Auto record OFF");
                 toast.show();
             }
         }
     }
-    private class shakeChangeListener implements CompoundButton.OnCheckedChangeListener
-    {
+
+    private class shakeChangeListener implements CompoundButton.OnCheckedChangeListener {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             shakeVal = isChecked;
-            editor.putBoolean(getString(R.string.shake_to_save),shakeVal);
-            Log.d(TAG,"Saving shake to save recording preference: "+isChecked);
+            editor.putBoolean(getString(R.string.shake_to_save), shakeVal);
+            Log.d(TAG, "Saving shake to save recording preference: " + isChecked);
             editor.commit();
-            if(shakeVal)
-            {
+            if (shakeVal) {
                 toast.setText("Shake to Save ON");
                 toast.show();
-            }
-            else
-            {
+            } else {
                 toast.setText("Shake to Save OFF");
                 toast.show();
             }
         }
     }
-    private class autoUploadChangeListener implements CompoundButton.OnCheckedChangeListener
-    {
+
+    private class autoUploadChangeListener implements CompoundButton.OnCheckedChangeListener {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             autoUpload = isChecked;
             editor.putBoolean(getString(R.string.auto_upload_key), autoUpload);
-            Log.d(TAG,"Saving auto upload preference: "+isChecked);
+            Log.d(TAG, "Saving auto upload preference: " + isChecked);
             editor.commit();
-            if(autoUpload)
-            {
+            if (autoUpload) {
                 toast.setText("Auto Upload ON");
                 toast.show();
-            }
-            else
-            {
+            } else {
                 toast.setText("Auto Upload OFF");
                 toast.show();
             }
         }
     }
-    private class autoDeleteChangeListener implements CompoundButton.OnCheckedChangeListener
-    {
+
+    private class autoDeleteChangeListener implements CompoundButton.OnCheckedChangeListener {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             autoDelete = isChecked;
             editor.putBoolean(getString(R.string.auto_delete_key), autoDelete);
-            Log.d(TAG,"Saving auto delete preference: "+isChecked);
+            Log.d(TAG, "Saving auto delete preference: " + isChecked);
             editor.commit();
-            if(autoDelete)
-            {
+            if (autoDelete) {
                 toast.setText("Auto Delete ON");
                 toast.show();
-            }
-            else
-            {
+            } else {
                 toast.setText("Auto Delete OFF");
                 toast.show();
             }
         }
     }
-    private class autoDeleteSeekbarChangeListener implements SeekBar.OnSeekBarChangeListener
-    {
-        public autoDeleteSeekbarChangeListener()
-        {}
+
+    private class autoDeleteSeekbarChangeListener implements SeekBar.OnSeekBarChangeListener {
+        public autoDeleteSeekbarChangeListener() {
+        }
+
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             //Save changed value.
-            Log.d(TAG,"Updating auto delete freq to :" +progress);
+            Log.d(TAG, "Updating auto delete freq to :" + progress);
             autodeleteFreqVal = progress;
             updateAutoDeleteText();
         }
+
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
             //write custom code to on start progress
         }
+
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
-            Log.d(TAG,"Updating auto delete freq sharedpref to :" +autodeleteFreqVal);
+            Log.d(TAG, "Updating auto delete freq sharedpref to :" + autodeleteFreqVal);
             editor.putInt(getString(R.string.auto_delete_freq_key), autodeleteFreqVal);
             editor.commit();
-            toast.setText("Auto-delete Threshold is now "+getAutoDeleteFreqString());
+            toast.setText("Auto-delete Threshold is now " + getAutoDeleteFreqString());
             toast.show();
         }
     }
-    public String getAutoDeleteFreqString()
-    {
-        switch(autodeleteFreqVal)
-        {
+
+    public String getAutoDeleteFreqString() {
+        switch (autodeleteFreqVal) {
             case 0:
             case 1:
             case 2:
@@ -557,16 +547,16 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
             case 7:
             case 8:
             case 9:
-                return fileCounts[autodeleteFreqVal]+" files";
+                return fileCounts[autodeleteFreqVal] + " files";
             case 10:
                 return "Unlimited";
             default:
-                Log.d(TAG,"Invalid index for auto delete freq string:"+autodeleteFreqVal);
+                Log.d(TAG, "Invalid index for auto delete freq string:" + autodeleteFreqVal);
                 return null;
         }
     }
-    public void updateAutoDeleteText()
-    {
+
+    public void updateAutoDeleteText() {
         autoDeletefreqText.setText(getAutoDeleteFreqString());
     }
 }

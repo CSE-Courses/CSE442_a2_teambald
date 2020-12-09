@@ -1,8 +1,12 @@
 package com.teambald.cse442_project_team_bald.Encryption;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Base64;
+import android.util.Log;
 
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
@@ -16,6 +20,7 @@ public class AudioEncryptionUtils {
     public static AudioEncryptionUtils instance = null;
     private static PrefUtils prefUtils;
     private static String KEY_ALGORITHM = "AES";
+    public static final String LogInEmail = "LogInEmail";
 
     public static AudioEncryptionUtils getInstance(Context context) {
 
@@ -51,9 +56,19 @@ public class AudioEncryptionUtils {
         prefUtils.saveSecretKey(encodedKey);
     }
 
-    public SecretKey getSecretKey() {
+    public SecretKey getSecretKey(Context context) {
         final int outputKeyLength = 256;
-        String encodedKey = prefUtils.getSecretKey();
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        String email = sharedPref.getString(LogInEmail, "");
+        //Unique to email
+        String encodedKey = "";
+        try{
+            encodedKey = SHA256(email);
+        }catch (NoSuchAlgorithmException e){
+            Log.e("AudioEncryptionUtils getSecretKey: ", e.toString());
+        }
+
         if (null == encodedKey || encodedKey.isEmpty()) {
             SecureRandom secureRandom = new SecureRandom();
             KeyGenerator keyGenerator = null;
@@ -72,5 +87,15 @@ public class AudioEncryptionUtils {
         byte[] decodedKey = Base64.decode(encodedKey, Base64.NO_WRAP);
         SecretKey originalKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, KEY_ALGORITHM);
         return originalKey;
+    }
+
+    public static String SHA256 (String text) throws NoSuchAlgorithmException {
+
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+
+        md.update(text.getBytes());
+        byte[] digest = md.digest();
+
+        return Base64.encodeToString(digest, Base64.DEFAULT);
     }
 }

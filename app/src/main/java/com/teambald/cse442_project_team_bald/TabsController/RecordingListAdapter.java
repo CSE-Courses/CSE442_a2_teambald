@@ -113,22 +113,4 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
     public void setmDataset(ArrayList<RecordingItem> mDataset) {
         this.mDataset = mDataset;
     }
-
-    /**
-     * Decrypt and return the decoded bytes
-     *
-     * @return
-     */
-    public byte[] decrypt(File file) {
-        String filePath = file.getPath();
-        try {
-            byte[] fileData = FileUtils.readFile(filePath);
-            byte[] decryptedBytes = AudioEncryptionUtils.decode(AudioEncryptionUtils.getInstance(context).getSecretKey(), fileData);
-            return decryptedBytes;
-        } catch (Exception e) {
-            Toast toast = Toast.makeText(context, "Decryption failed.", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-        return null;
-    }
 }
