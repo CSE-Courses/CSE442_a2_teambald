@@ -19,77 +19,93 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             >
 
             <TextView
-                android:id="@+id/recording_date_tv"
-                android:layout_width="308dp"
-                android:layout_height="50dp"
-                android:layout_marginTop="4dp"
-                android:autoSizeTextType="uniform"
-                android:maxLines="2"
-                android:paddingLeft="12dp"
-                android:paddingTop="8dp"
-                android:text="Recording Filename"
-                android:textSize="26sp"/>
+                android:id="@+id/item_index"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="30sp"
+                android:layout_gravity="center"
+                android:text="01"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 >
 
                 <TextView
-                    android:id="@+id/recording_duration_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="12"
-                    android:paddingLeft="14dp"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp"
-                    android:text="Recording Duration"
-                    android:textSize="20sp"/>
-
-                <Switch
-                    android:id="@+id/locker"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_gravity="end"
-                    android:layout_weight="1"
-                    android:paddingStart="18dp"
-                    android:text="Lock" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <EditText
-                    android:id="@+id/renaming_Text"
-                    android:layout_width="match_parent"
+                    android:id="@+id/recording_date_tv"
+                    android:layout_width="308dp"
                     android:layout_height="50dp"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:inputType="textPersonName"/>
+                    android:layout_marginTop="4dp"
+                    android:autoSizeTextType="uniform"
+                    android:maxLines="2"
+                    android:paddingLeft="12dp"
+                    android:paddingTop="8dp"
+                    android:text="Recording Filename"
+                    android:textSize="26sp"/>
 
-                <Button
-                    android:id="@+id/rename_button"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/ubBlue"
-                    android:textColor="@color/white"
-                    android:text="Rename"/>
+                    android:orientation="horizontal"
+                    >
 
-                <CheckBox
-                    android:id="@+id/checkBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp" />
+                    <TextView
+                        android:id="@+id/recording_duration_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_weight="12"
+                        android:paddingLeft="14dp"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp"
+                        android:text="Recording Duration"
+                        android:textSize="20sp"/>
+
+                    <Switch
+                        android:id="@+id/locker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_gravity="end"
+                        android:layout_weight="1"
+                        android:paddingStart="18dp"
+                        android:text="Lock" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/renaming_Text"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:inputType="textPersonName"/>
+
+                    <Button
+                        android:id="@+id/rename_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/ubBlue"
+                        android:textColor="@color/white"
+                        android:text="Rename"/>
+
+                    <CheckBox
+                        android:id="@+id/checkBox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp" />
+                </LinearLayout>
+
             </LinearLayout>
-
         </LinearLayout>
+
 
     </androidx.cardview.widget.CardView>
 
