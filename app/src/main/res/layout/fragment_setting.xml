@@ -16,16 +16,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" />
-            </ScrollView>
-
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -135,7 +125,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/Accounts">
 
                     <TextView
-                        android:id="@+id/textView3"
+                        android:id="@+id/recordingHeaderText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:paddingStart="12dp"
@@ -158,7 +148,7 @@
                         android:background="?android:attr/listDivider"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+                        app:layout_constraintTop_toBottomOf="@+id/recordingHeaderText" />
 
                     <TextView
                         android:id="@+id/recording_length_tv2"

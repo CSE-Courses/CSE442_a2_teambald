@@ -36,7 +36,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.R;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Executor;
+
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetSequence;
 
 public class SettingFragment extends Fragment implements View.OnClickListener {
     private static SharedPreferences sharedPref;
@@ -86,7 +91,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
 
     private Switch guidanceSwitch;
     private boolean guidanceVal = false;
-    private TapTargetSequence introSequence;
+    private MaterialTapTargetSequence mtts;
 
     private ScrollView settingPage;
 
@@ -144,6 +149,9 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
 
         view.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
 
+        //ScrollView
+        settingPage = view.findViewById(R.id.settingPage);
+
         //Account Section
         signInButton = view.findViewById(R.id.sign_in_button);
         signOutButton = view.findViewById(R.id.sign_out_button);
@@ -188,10 +196,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         guidanceSwitch = view.findViewById(R.id.guideSwitch);
         guidanceSwitch.setChecked(guidanceVal);
         guidanceSwitch.setOnCheckedChangeListener(new guideChangeListener());
-        initGuidance();
 
-        //ScrollView
-        settingPage = view.findViewById(R.id.settingPage);
+        Log.d(TAG,"On view created");
     }
     @Override
     public void onClick(View v) {
@@ -207,68 +213,63 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    public void initGuidance()
+    public void showGuidance()
     {
-        introSequence = new TapTargetSequence(getActivity())
-                .targets(
-                        TapTarget.forView(getView().findViewById(R.id.sign_out_button), "Here To Sign in or Sign Out",
-                                getString(R.string.Setting_Account))
-                                .targetCircleColor(R.color.ubBlue)
-                                .outerCircleColor(R.color.ubBlue)      // Specify a color for the outer circle
-                                .outerCircleAlpha(0.5f)            // Specify the alpha amount for the outer circle
-                                .targetCircleColor(R.color.white)   // Specify a color for the target circle
-                                .titleTextSize(40)                  // Specify the size (in sp) of the title text
-                                .titleTextColor(R.color.white)      // Specify the color of the title text
-                                .descriptionTextSize(20)            // Specify the size (in sp) of the description text
-                                .descriptionTextColor(R.color.white)  // Specify the color of the description text
-                                .textColor(R.color.white)            // Specify a color for both the title and description text
-                                .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
-                                .dimColor(R.color.white)            // If set, will dim behind the view with 30% opacity of the given color
-                                .drawShadow(true)                   // Whether to draw a drop shadow or not
-                                .cancelable(true)                  // Whether tapping outside the outer circle dismisses the view
-                                .tintTarget(true)                   // Whether to tint the target view's color
-                                .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
-                                .targetRadius(100)
-                        ,                  // Specify the target radius (in dp)
-                        //For Recoding section
-                        TapTarget.forView(getView().findViewById(R.id.recording_seekBar), "Recording length",
-                                getString(R.string.Setting_Record))
-                                .targetCircleColor(R.color.ubBlue)
-                                .outerCircleColor(R.color.ubBlue)
-                                .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
-                                .targetCircleColor(R.color.white)   // Specify a color for the target circle
-                                .titleTextSize(40)                  // Specify the size (in sp) of the title text
-                                .titleTextColor(R.color.white)      // Specify the color of the title text
-                                .descriptionTextSize(20)            // Specify the size (in sp) of the description text
-                                .descriptionTextColor(R.color.white)  // Specify the color of the description text
-                                .textColor(R.color.white)            // Specify a color for both the title and description text
-                                .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
-                                .dimColor(R.color.white)            // If set, will dim behind the view with 30% opacity of the given color
-                                .drawShadow(true)                   // Whether to draw a drop shadow or not
-                                .cancelable(true)                  // Whether tapping outside the outer circle dismisses the view
-                                .tintTarget(true)                   // Whether to tint the target view's color
-                                .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
-                                .targetRadius(200)
-                        ,
-                        //For the Saving Section
-                        TapTarget.forView(getView().findViewById(R.id.autoUploadSwitch), "Auto Upload/Delete",
-                                getString(R.string.Setting_Saving))
-                                .outerCircleColor(R.color.ubBlue)
-                                .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
-                                .targetCircleColor(R.color.white)   // Specify a color for the target circle
-                                .titleTextSize(40)                  // Specify the size (in sp) of the title text
-                                .titleTextColor(R.color.white)      // Specify the color of the title text
-                                .descriptionTextSize(20)            // Specify the size (in sp) of the description text
-                                .descriptionTextColor(R.color.white)  // Specify the color of the description text
-                                .textColor(R.color.white)            // Specify a color for both the title and description text
-                                .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
-                                .dimColor(R.color.white)            // If set, will dim behind the view with 30% opacity of the given color
-                                .drawShadow(true)                   // Whether to draw a drop shadow or not
-                                .cancelable(true)                  // Whether tapping outside the outer circle dismisses the view
-                                .tintTarget(true)                   // Whether to tint the target view's color
-                                .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
-                                .targetRadius(200)
+        if(mtts != null)
+        {
+            mtts.dismiss();
+        }
+        mtts = new MaterialTapTargetSequence();
+        mtts.addPrompt(new MaterialTapTargetPrompt.Builder(getActivity())
+                .setTarget(getView().findViewById(R.id.accountText))
+                .setPrimaryText("Here To Sign in or Sign Out")
+                .setFocalRadius(200f)
+                .setAutoDismiss(true)
+                .setBackButtonDismissEnabled(true)
                 );
+
+        mtts.addPrompt(new MaterialTapTargetPrompt.Builder(getActivity())
+                .setTarget(R.id.recordingHeaderText)
+                .setPrimaryText("Recording length / loop")
+                .setFocalRadius(200f)
+                .setAutoDismiss(true)
+                .setBackButtonDismissEnabled(true)
+                );
+
+        mtts.addPrompt(new MaterialTapTargetPrompt.Builder(getActivity())
+                .setTarget(R.id.SavingText)
+                .setPrimaryText("Auto Upload/Delete")
+                .setFocalRadius(200f)
+                .setAutoDismiss(true)
+                .setBackButtonDismissEnabled(true)
+                .setPromptStateChangeListener(new MaterialTapTargetPrompt.PromptStateChangeListener() {
+                    @Override
+                    public void onPromptStateChanged(@NonNull MaterialTapTargetPrompt prompt, int state) {
+                        if (state == MaterialTapTargetPrompt.STATE_NON_FOCAL_PRESSED || state == MaterialTapTargetPrompt.STATE_FOCAL_PRESSED || state == MaterialTapTargetPrompt.STATE_DISMISSING)
+                        {
+                            Log.d(TAG, "Scrolling to bottom");
+                            settingPage.fullScroll(ScrollView.FOCUS_DOWN);
+                        }
+                    }
+                })
+        );
+
+        mtts.addPrompt(new MaterialTapTargetPrompt.Builder(getActivity())
+                .setTarget(R.id.bioAuthText)
+                .setPrimaryText("Biometric Authentication Setting")
+                .setFocalRadius(200f)
+                .setAutoDismiss(true)
+                .setBackButtonDismissEnabled(true)
+        );
+
+        mtts.addPrompt(new MaterialTapTargetPrompt.Builder(getActivity())
+                .setTarget(R.id.guidanceText)
+                .setPrimaryText("Show Hints on how to use this app?")
+                .setFocalRadius(200f)
+                .setAutoDismiss(true)
+                .setBackButtonDismissEnabled(true)
+        );
+        mtts.show();
     }
 
     public void signIn() {
@@ -303,23 +304,30 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "Scrolling to top");
-        settingPage.fullScroll(ScrollView.FOCUS_UP);
         Log.d(TAG, "Setting MenuItems Invisible");
         activity.setMenuItemsVisible(false);
+        Log.d(TAG, "Scrolling to top");
+        settingPage.fullScroll(ScrollView.FOCUS_UP);
 
-        Log.d(TAG, "Init guidance");
-        initGuidance();
+
         boolean showGuidance = sharedPref.getBoolean(getString(R.string.guidance_on_off),false);
         if(showGuidance) {
             Log.d(TAG, "Showing guidance");
-            introSequence.start();
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    showGuidance();
+                }
+            },300);
+
         }
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        Log.d(TAG,"OnStart called");
         FirebaseUser currentUser = null;
         if (activity.getmAuth() != null) {
             currentUser = activity.getmAuth().getCurrentUser();
@@ -330,6 +338,24 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         } else {
             updateSignInUI(null);
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG,"On pause called");
+
+        if(mtts != null)
+        {
+            Log.d(TAG,"MTTS dismissed");
+            mtts.dismiss();
+            mtts = null;
+        }
+    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d(TAG,"On STOP called");
     }
 
     private class bioAuthChangeListener implements CompoundButton.OnCheckedChangeListener {

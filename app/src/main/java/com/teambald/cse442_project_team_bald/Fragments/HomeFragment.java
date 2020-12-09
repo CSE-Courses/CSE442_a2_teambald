@@ -251,7 +251,8 @@ public class HomeFragment extends Fragment {
 
         initGuidance();
         boolean showGuidance = sharedPref.getBoolean(getString(R.string.guidance_on_off),false);
-        if(showGuidance)
+        //if(showGuidance)
+        if(false)
         {
             introSequence.start();
         }
