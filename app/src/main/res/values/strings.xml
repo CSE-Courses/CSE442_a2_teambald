@@ -44,6 +44,21 @@
          from https://console.developers.google.com/ -->
     <string name="server_client_id">606946566326-ald71c4sljtisqj9v6jgkvr0pna4idui.apps.googleusercontent.com</string>
 
+    <!-- Application Tour Sequence -->
+    <string name="Home_Recorder_Title">This is the Recorder button</string>
+    <string name="Home_Recorder_Description">Click the button Once it will start recording,
+        Click the recording button twice to end the recording!!!</string>
+
+    <string name="Home_SignStatus_Title">This shows your Account Status</string>
+    <string name="Home_SignStatus_description"></string>
+
+
+    <string name="Setting_Account">This the is area for your account</string>
+    <string name="Setting_Record">This the is area to change your record settings</string>
+    <string name="Setting_Saving">This is the Place for you to change your autosaving setting</string>
+    <string name="Setting_BioAuthTex"> You can enable or disable your biometric authentication here</string>
+
+    <string name="Record_List_Back">This will take you to the last page</string>
 
 
     <string name="tutorial_text">   To use our product you can simply click the button on

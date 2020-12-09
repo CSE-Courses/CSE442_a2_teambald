@@ -1,9 +1,15 @@
 package com.teambald.cse442_project_team_bald.Service;
+import android.app.Service;
+import android.content.Intent;
 import android.hardware.SensorListener;
 import android.hardware.SensorManager;
 import android.content.Context;
+import android.os.IBinder;
+
+import androidx.annotation.Nullable;
+
 import java.lang.UnsupportedOperationException;
-public class ShakeListener  implements SensorListener
+public class ShakeListener extends Service implements SensorListener
 {
     private static final int FORCE_THRESHOLD = 350;
     private static final int TIME_THRESHOLD = 100;
@@ -19,6 +25,12 @@ public class ShakeListener  implements SensorListener
     private int mShakeCount = 0;
     private long mLastShake;
     private long mLastForce;
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
 
     public interface OnShakeListener
     {

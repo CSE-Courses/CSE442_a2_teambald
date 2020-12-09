@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import java.io.File;
 
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
@@ -70,6 +71,8 @@ public class RecordingListAdapter extends RecyclerView.Adapter<RecordingListAdap
                         .inflate(R.layout.recording_list_item, parent, false)
         );
     }
+
+
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
