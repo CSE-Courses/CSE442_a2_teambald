@@ -77,6 +77,12 @@ public class CloudListAdapter extends RecordingListAdapter{
                 activity.downloadFileAndPlay(mDataset.get(position));
             }
         });
+
+        //Set index
+        TextView index = holder.recordingItemView.findViewById(R.id.item_index);
+        if(index != null) {
+            index.setText(position+1 < 10 ? String.valueOf("0" + (position+1)) : String.valueOf(position+1));
+        }
     }
 
     // Return the size of your dataset (invoked by the layout manager)

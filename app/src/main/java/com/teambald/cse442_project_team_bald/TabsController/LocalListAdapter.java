@@ -82,6 +82,10 @@ public class LocalListAdapter extends RecordingListAdapter{
             }
         });
 
+        //Set index
+        TextView index = holder.recordingItemView.findViewById(R.id.item_index);
+        index.setText(position+1 < 10 ? String.valueOf("0"+(position+1)) : String.valueOf(position+1));
+
 
         date.setText(mDataset.get(position).getDate());
         duration.setText(mDataset.get(position).getDuration());
