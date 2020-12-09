@@ -47,7 +47,6 @@ import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.R;
 import com.teambald.cse442_project_team_bald.Service.RecordingService;
 import com.teambald.cse442_project_team_bald.Service.ShakeListener;
-import com.teambald.cse442_project_team_bald.Service.ShakeService;
 
 import org.w3c.dom.Text;
 
