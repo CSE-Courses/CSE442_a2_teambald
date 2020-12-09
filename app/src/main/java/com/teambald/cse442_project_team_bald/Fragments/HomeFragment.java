@@ -110,7 +110,7 @@ public class HomeFragment extends Fragment {
 
         //Initialize My ShakeListener and Vibration feedback
         mShaker = new ShakeListener(this.getContext());
-        final Vibrator vibe = (Vibrator)this.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+        mShaker.setOnShakeListener(new shakeListener());
 
         //initilize the Recroding Directory
         initilize_RecordDirctroy();
@@ -130,95 +130,72 @@ public class HomeFragment extends Fragment {
             recordStatusText.setText(getString(R.string.click_to_pause));
         }
 
-        //Set My Shake Listener
-        mShaker.setOnShakeListener(new ShakeListener.OnShakeListener () {
-            public void onShake()
-            {
+        //Set guidance pop ups
+        initGuidance();
+    }//ON view Created End
+    private class shakeListener implements ShakeListener.OnShakeListener
+    {
 
-                boolean shakeVal = sharedPref.getBoolean(getString(R.string.shake_to_save),false);
-                if (shakeVal) {
-                    if (isRecording) {
-                        vibe.vibrate(50);
-                        //Stop Recording
-                        recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
-                        //stopRecording();
-                        System.out.println("Try Stop Recording!!!");
-                        try {
-                            stopService();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        isRecording = false;
-                    } else {
-                        vibe.vibrate(100);
-                        //Start service that record audio consistently;
-                        System.out.println("Try Start Recording!!!");
-                        try{
-                            startService();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                        recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
-                        isRecording = true;
+        public void onShake()
+        {
+            final Vibrator vibe = (Vibrator)activity.getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+            boolean shakeVal = sharedPref.getBoolean(getString(R.string.shake_to_save),false);
+            if (shakeVal) {
+                if (isRecording) {
+                    vibe.vibrate(50);
+                    //Stop Recording
+                    recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
+                    //stopRecording();
+                    System.out.println("Try Stop Recording!!!");
+                    try {
+                        stopService();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    //Save isRecording value.
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putBoolean(getString(R.string.is_recording_key), isRecording);
-                    editor.commit();
+                    isRecording = false;
+                } else {
+                    vibe.vibrate(100);
+                    //Start service that record audio consistently;
+                    System.out.println("Try Start Recording!!!");
+                    try{
+                        startService();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
+                    isRecording = true;
                 }
-
+                //Save isRecording value.
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean(getString(R.string.is_recording_key), isRecording);
+                editor.commit();
             }
-        });
 
-        //Set the TapTargetView Sequence
-//        TapTargetView.showFor(this.activity,                 // `this` is an Activity
-//                TapTarget.forView(view.findViewById(R.id.recorder_button), getString(R.string.Home_Recorder_Title),
-//                        getString(R.string.Home_Recorder_Description))
-//                        // All options below are optional
-//                        .outerCircleColor(R.color.ubBlue)      // Specify a color for the outer circle
-//                        .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
-//                        .targetCircleColor(R.color.white)   // Specify a color for the target circle
-//                        .titleTextSize(40)                  // Specify the size (in sp) of the title text
-//                        .titleTextColor(R.color.white)      // Specify the color of the title text
-//                        .descriptionTextSize(20)            // Specify the size (in sp) of the description text
-//                        .descriptionTextColor(R.color.white)  // Specify the color of the description text
-//                        .textColor(R.color.white)            // Specify a color for both the title and description text
-//                        .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
-//                        .dimColor(R.color.white)            // If set, will dim behind the view with 30% opacity of the given color
-//                        .drawShadow(true)                   // Whether to draw a drop shadow or not
-//                        .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
-//                        .tintTarget(true)                   // Whether to tint the target view's color
-//                        .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
-//                        .targetRadius(120),                  // Specify the target radius (in dp)
-//                new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
-//                    @Override
-//                    public void onTargetClick(TapTargetView view) {
-//                        super.onTargetClick(view);      // This call is optional
-//                        view.dismiss(true);
-//                    }
-//                });
-
-        this.introSequence= new TapTargetSequence(this.activity)
+        }
+    }
+    public void initGuidance()
+    {
+        introSequence= new TapTargetSequence(getActivity())
                 .targets(
-                        TapTarget.forView(view.findViewById(R.id.recorder_button), getString(R.string.Home_Recorder_Title),
+                        TapTarget.forView(getView().findViewById(R.id.recorder_button), getString(R.string.Home_Recorder_Title),
                                 getString(R.string.Home_Recorder_Description))
                                 .outerCircleColor(R.color.ubBlue)      // Specify a color for the outer circle
-                        .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
-                        .targetCircleColor(R.color.white)   // Specify a color for the target circle
-                        .titleTextSize(40)                  // Specify the size (in sp) of the title text
-                        .titleTextColor(R.color.white)      // Specify the color of the title text
-                        .descriptionTextSize(20)            // Specify the size (in sp) of the description text
-                        .descriptionTextColor(R.color.white)  // Specify the color of the description text
-                        .textColor(R.color.white)            // Specify a color for both the title and description text
-                        .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
-                        .dimColor(R.color.white)            // If set, will dim behind the view with 30% opacity of the given color
-                        .drawShadow(true)                   // Whether to draw a drop shadow or not
-                        .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
-                        .tintTarget(true)                   // Whether to tint the target view's color
-                        .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
-                        .targetRadius(120),                  // Specify the target radius (in dp)
-                        TapTarget.forView(view.findViewById(R.id.login_account_text), getString(R.string.Home_SignStatus_Title),
+                                .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
+                                .targetCircleColor(R.color.white)   // Specify a color for the target circle
+                                .titleTextSize(40)                  // Specify the size (in sp) of the title text
+                                .titleTextColor(R.color.white)      // Specify the color of the title text
+                                .descriptionTextSize(20)            // Specify the size (in sp) of the description text
+                                .descriptionTextColor(R.color.white)  // Specify the color of the description text
+                                .textColor(R.color.white)            // Specify a color for both the title and description text
+                                .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
+                                .dimColor(R.color.white)            // If set, will dim behind the view with 30% opacity of the given color
+                                .drawShadow(true)                   // Whether to draw a drop shadow or not
+                                .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
+                                .tintTarget(true)                   // Whether to tint the target view's color
+                                .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
+                                .targetRadius(120),                  // Specify the target radius (in dp)
+                        TapTarget.forView(getView().findViewById(R.id.login_account_text), getString(R.string.Home_SignStatus_Title),
                                 getString(R.string.Home_SignStatus_description))
                                 .outerCircleColor(R.color.ubBlue)
                                 .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
@@ -235,10 +212,8 @@ public class HomeFragment extends Fragment {
                                 .tintTarget(true)                   // Whether to tint the target view's color
                                 .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
                                 .targetRadius(70)
-                        );
-
-    }//ON view Created End
-
+                );
+    }
 
     @Override
     public void onStart() {
@@ -272,6 +247,13 @@ public class HomeFragment extends Fragment {
         }else{
             recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
             recordStatusText.setText(getString(R.string.click_to_pause));
+        }
+
+        initGuidance();
+        boolean showGuidance = sharedPref.getBoolean(getString(R.string.guidance_on_off),false);
+        if(showGuidance)
+        {
+            introSequence.start();
         }
     }
     private void updateUI(FirebaseUser account) {

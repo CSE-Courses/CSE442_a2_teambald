@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -48,7 +49,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     public static final String LogInEmail = "LogInEmail";
     public static final String LogInName = "LogInName";
     public static final String LogedInBl = "LogedInBoolean";
-
 
     //Account Section
     private static SignInButton signInButton;
@@ -84,6 +84,12 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
 
     private Toast toast;
 
+    private Switch guidanceSwitch;
+    private boolean guidanceVal = false;
+    private TapTargetSequence introSequence;
+
+    private ScrollView settingPage;
+
     public SettingFragment(MainActivity mainActivity) {
         activity = mainActivity;
     }
@@ -117,6 +123,9 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         //Biometric Section
         authenVal = sharedPref.getBoolean(getString(R.string.biometric_authentication), false);
         Log.d(TAG, "bioauthen val: " + authenVal);
+        //Guidance Section
+        guidanceVal = sharedPref.getBoolean(getString(R.string.guidance_on_off), false);
+        Log.d(TAG, "guidance val: " + guidanceVal);
 
         toast = Toast.makeText(getContext(), "", Toast.LENGTH_SHORT);
     }
@@ -175,14 +184,38 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         authenSwitch.setChecked(authenVal);
         authenSwitch.setOnCheckedChangeListener(new bioAuthChangeListener());
 
+        //Guide Section
+        guidanceSwitch = view.findViewById(R.id.guideSwitch);
+        guidanceSwitch.setChecked(guidanceVal);
+        guidanceSwitch.setOnCheckedChangeListener(new guideChangeListener());
+        initGuidance();
 
-        final TapTargetSequence sequence = new TapTargetSequence(this.activity)
+        //ScrollView
+        settingPage = view.findViewById(R.id.settingPage);
+    }
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.sign_in_button:
+                signIn();
+                break;
+            case R.id.sign_out_button:
+                signOut();
+                break;
+            default:
+                Log.d(TAG, "Unknown button clicked");
+        }
+    }
+
+    public void initGuidance()
+    {
+        introSequence = new TapTargetSequence(getActivity())
                 .targets(
-                        TapTarget.forView(view.findViewById(R.id.sign_out_button), "Here To Sign in or Sign Out",
+                        TapTarget.forView(getView().findViewById(R.id.sign_out_button), "Here To Sign in or Sign Out",
                                 getString(R.string.Setting_Account))
                                 .targetCircleColor(R.color.ubBlue)
                                 .outerCircleColor(R.color.ubBlue)      // Specify a color for the outer circle
-                                .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
+                                .outerCircleAlpha(0.5f)            // Specify the alpha amount for the outer circle
                                 .targetCircleColor(R.color.white)   // Specify a color for the target circle
                                 .titleTextSize(40)                  // Specify the size (in sp) of the title text
                                 .titleTextColor(R.color.white)      // Specify the color of the title text
@@ -195,10 +228,10 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                                 .cancelable(true)                  // Whether tapping outside the outer circle dismisses the view
                                 .tintTarget(true)                   // Whether to tint the target view's color
                                 .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
-                                .targetRadius(200)
+                                .targetRadius(100)
                         ,                  // Specify the target radius (in dp)
                         //For Recoding section
-                        TapTarget.forView(view.findViewById(R.id.recording_seekBar), "Recording length",
+                        TapTarget.forView(getView().findViewById(R.id.recording_seekBar), "Recording length",
                                 getString(R.string.Setting_Record))
                                 .targetCircleColor(R.color.ubBlue)
                                 .outerCircleColor(R.color.ubBlue)
@@ -218,7 +251,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                                 .targetRadius(200)
                         ,
                         //For the Saving Section
-                        TapTarget.forView(view.findViewById(R.id.autoUploadSwitch), "Auto Upload/Delete",
+                        TapTarget.forView(getView().findViewById(R.id.autoUploadSwitch), "Auto Upload/Delete",
                                 getString(R.string.Setting_Saving))
                                 .outerCircleColor(R.color.ubBlue)
                                 .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
@@ -231,42 +264,11 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                                 .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
                                 .dimColor(R.color.white)            // If set, will dim behind the view with 30% opacity of the given color
                                 .drawShadow(true)                   // Whether to draw a drop shadow or not
-                                .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
+                                .cancelable(true)                  // Whether tapping outside the outer circle dismisses the view
                                 .tintTarget(true)                   // Whether to tint the target view's color
                                 .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
-                                .targetRadius(200)).listener(new TapTargetSequence.Listener() {
-                    @Override
-                    public void onSequenceFinish() {
-
-                    }
-
-                    @Override
-                    public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
-
-                    }
-
-                    @Override
-                    public void onSequenceCanceled(TapTarget lastTarget) {
-
-                    }
-                });
-
-
-        sequence.start();
-
-    }
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.sign_in_button:
-                signIn();
-                break;
-            case R.id.sign_out_button:
-                signOut();
-                break;
-            default:
-                Log.d(TAG, "Unknown button clicked");
-        }
+                                .targetRadius(200)
+                );
     }
 
     public void signIn() {
@@ -301,8 +303,18 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(TAG, "Scrolling to top");
+        settingPage.fullScroll(ScrollView.FOCUS_UP);
         Log.d(TAG, "Setting MenuItems Invisible");
         activity.setMenuItemsVisible(false);
+
+        Log.d(TAG, "Init guidance");
+        initGuidance();
+        boolean showGuidance = sharedPref.getBoolean(getString(R.string.guidance_on_off),false);
+        if(showGuidance) {
+            Log.d(TAG, "Showing guidance");
+            introSequence.start();
+        }
     }
 
     @Override
@@ -569,5 +581,22 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
 
     public void updateAutoDeleteText() {
         autoDeletefreqText.setText(getAutoDeleteFreqString());
+    }
+    private class guideChangeListener implements CompoundButton.OnCheckedChangeListener
+    {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            guidanceVal = isChecked;
+            editor.putBoolean(getString(R.string.guidance_on_off), guidanceVal);
+            Log.d(TAG, "Saving guidance val preference: " + isChecked);
+            editor.commit();
+            if (guidanceVal) {
+                toast.setText("Show Guidance ON");
+                toast.show();
+            } else {
+                toast.setText("Show Guidance OFF");
+                toast.show();
+            }
+        }
     }
 }

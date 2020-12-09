@@ -1,10 +1,12 @@
 package com.teambald.cse442_project_team_bald.Fragments;
 
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,6 +58,11 @@ public class RecordingListFragment extends ListFragment {
 
     private MainActivity activity;
 
+    private TapTargetSequence introSequence;
+
+    private static SharedPreferences sharedPref;
+    private static SharedPreferences.Editor editor;
+
     public RecordingListFragment(MainActivity mainActivity,String path) {
         this.Directory_toRead = path;
         activity = mainActivity;
@@ -65,6 +72,8 @@ public class RecordingListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        editor = sharedPref.edit();
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -103,8 +112,10 @@ public class RecordingListFragment extends ListFragment {
         });
         if(activity!=null)
             showMenu();
-
-        TapTargetSequence sequence= new TapTargetSequence(this.activity)
+    }// On view created end
+    public void initGuidance()
+    {
+        introSequence = new TapTargetSequence(this.activity)
                 .targets(
                         TapTarget.forView(BackButton, "BackButton",
                                 getString(R.string.Home_Recorder_Description))
@@ -125,9 +136,7 @@ public class RecordingListFragment extends ListFragment {
                                 .targetRadius(40)               // Specify the target radius (in dp)
 
                 );
-        sequence.start();
-    }// On view created end
-
+    }
     /*
      * 0-Cloud
      * 1-Local Recorded
@@ -143,6 +152,14 @@ public class RecordingListFragment extends ListFragment {
         else
         {
             Log.d(TAG,"Activity null, menu not shown");
+        }
+
+        Log.d(TAG, "Init guidance");
+        initGuidance();
+        boolean showGuidance = sharedPref.getBoolean(getString(R.string.guidance_on_off),false);
+        if(showGuidance) {
+            Log.d(TAG, "Showing guidance");
+            introSequence.start();
         }
     }
     public String getDirectory_toRead(){return Directory_toRead;}

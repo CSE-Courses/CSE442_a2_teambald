@@ -28,6 +28,10 @@
     <string name="bio_auth_section_text">Authentication</string>
     <string name="biometric_authentication">BIOMETRIC AUTHENTICATION KEY</string>
 
+    <!-- Authentication Section in Setting Frag -->
+    <string name="guide_section_text">Guides</string>
+    <string name="guidance_on_off">GUIDANCE KEY</string>
+
 
     <string name="click_to_start">Click to Start Recording</string>
     <string name="click_to_pause">Click to Pause Recording</string>
@@ -47,16 +51,16 @@
     <!-- Application Tour Sequence -->
     <string name="Home_Recorder_Title">This is the Recorder button</string>
     <string name="Home_Recorder_Description">Click the button Once it will start recording,
-        Click the recording button twice to end the recording!!!</string>
+        Click the recording button a second time to end the recording!!!</string>
 
-    <string name="Home_SignStatus_Title">This shows your Account Status</string>
-    <string name="Home_SignStatus_description"></string>
+    <string name="Home_SignStatus_Title">Here shows your Sign-In Status</string>
+    <string name="Home_SignStatus_description">This is your account</string>
 
 
-    <string name="Setting_Account">This the is area for your account</string>
-    <string name="Setting_Record">This the is area to change your record settings</string>
-    <string name="Setting_Saving">This is the Place for you to change your autosaving setting</string>
-    <string name="Setting_BioAuthTex"> You can enable or disable your biometric authentication here</string>
+    <string name="Setting_Account">This is your account</string>
+    <string name="Setting_Record">Here to change your record settings</string>
+    <string name="Setting_Saving">Here to change your autosaving setting</string>
+    <string name="Setting_BioAuthTex">You can enable or disable your biometric authentication here</string>
 
     <string name="Record_List_Back">This will take you to the last page</string>
 
