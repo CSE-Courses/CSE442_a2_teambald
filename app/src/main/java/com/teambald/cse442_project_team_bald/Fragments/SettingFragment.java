@@ -1,10 +1,13 @@
 package com.teambald.cse442_project_team_bald.Fragments;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -348,12 +351,16 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                     super.onAuthenticationError(errorCode, errString);
                     if (errorCode == BiometricPrompt.ERROR_USER_CANCELED) {
                         // Just negative button tap
+                        final Vibrator vibe = (Vibrator)getContext().getSystemService(Context.VIBRATOR_SERVICE);
+                        vibe.vibrate(VibrationEffect.createOneShot(1000,255));
                         return;
                     }
                     Log.d(TAG, "Authentication error ...");
                     toast.setText("Authentication error");
                     toast.show();
                     buttonView.setChecked(false);
+                    final Vibrator vibe = (Vibrator)getContext().getSystemService(Context.VIBRATOR_SERVICE);
+                    vibe.vibrate(VibrationEffect.createOneShot(1000,255));
                 }
 
                 @Override
@@ -366,6 +373,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                     editor.putBoolean(getString(R.string.biometric_authentication), authenVal);
                     Log.d(TAG, "Saving authentication preference: " + authenVal);
                     editor.commit();
+                    final Vibrator vibe = (Vibrator)getContext().getSystemService(Context.VIBRATOR_SERVICE);
+                    vibe.vibrate(VibrationEffect.createOneShot(500,255));
                 }
 
                 @Override
@@ -375,6 +384,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                     toast.setText("Biometric Authentication Failed");
                     toast.show();
                     buttonView.setChecked(false);
+                    final Vibrator vibe = (Vibrator)getContext().getSystemService(Context.VIBRATOR_SERVICE);
+                    vibe.vibrate(VibrationEffect.createOneShot(1000,255));
                 }
             });
 
