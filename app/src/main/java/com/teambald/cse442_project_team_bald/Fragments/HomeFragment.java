@@ -5,16 +5,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +32,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -39,6 +46,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.teambald.cse442_project_team_bald.MainActivity;
 import com.teambald.cse442_project_team_bald.R;
 import com.teambald.cse442_project_team_bald.Service.RecordingService;
+import com.teambald.cse442_project_team_bald.Service.ShakeListener;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,23 +59,18 @@ import java.util.Locale;
 
 import javax.crypto.SecretKey;
 
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetSequence;
+
 
 public class HomeFragment extends Fragment {
 
     private ImageButton recorderButton;
     private boolean isRecording;
-    private MediaPlayer mediaPlayer = null;
     private String recordPermission = Manifest.permission.RECORD_AUDIO;
     private int PERMISSION_CODE = 21;
-    private String fileToPlay;
-    private MediaRecorder mediaRecorder;
-    private String recordFile;
-    //Path of new recording.
-    private String filePath;
-    //SharedPreference
+    private ShakeListener mShaker;
     private SharedPreferences sharedPref;
-
-    private Chronometer timer;
 
     private static final String TAG = "HOME_FRAGMENT: ";
 
@@ -73,9 +78,11 @@ public class HomeFragment extends Fragment {
 
     private TextView accountText;
 
-    private HomeFragment homeFragObj;
+    private TextView recordStatusText;
 
     private MainActivity activity;
+
+    private MaterialTapTargetSequence mtts;
 
     public HomeFragment(MainActivity mainActivity) {
         activity = mainActivity;
@@ -99,6 +106,12 @@ public class HomeFragment extends Fragment {
         recordButton.setOnClickListener(new recordClickListener());
         accountText = view.findViewById(R.id.login_account_text);
 
+        recordStatusText = view.findViewById(R.id.recordStatus);
+
+        //Initialize My ShakeListener and Vibration feedback
+        mShaker = new ShakeListener(this.getContext());
+        mShaker.setOnShakeListener(new shakeListener());
+
         //initilize the Recroding Directory
         initilize_RecordDirctroy();
 
@@ -111,17 +124,81 @@ public class HomeFragment extends Fragment {
         recorderButton = view.findViewById(R.id.recorder_button);
         if(!isRecording){
             recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
+            recordStatusText.setText(getString(R.string.click_to_start));
         }else{
             recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
+            recordStatusText.setText(getString(R.string.click_to_pause));
+        }
+    }//ON view Created End
+    private class shakeListener implements ShakeListener.OnShakeListener
+    {
+
+        public void onShake()
+        {
+            final Vibrator vibe = (Vibrator)activity.getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+            boolean shakeVal = sharedPref.getBoolean(getString(R.string.shake_to_save),false);
+            if (shakeVal) {
+                if (isRecording) {
+                    vibe.vibrate(50);
+                    //Stop Recording
+                    recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
+                    //stopRecording();
+                    System.out.println("Try Stop Recording!!!");
+                    try {
+                        stopService();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    isRecording = false;
+                } else {
+                    vibe.vibrate(100);
+                    //Start service that record audio consistently;
+                    System.out.println("Try Start Recording!!!");
+                    try{
+                        startService();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
+                    isRecording = true;
+                }
+                //Save isRecording value.
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean(getString(R.string.is_recording_key), isRecording);
+                editor.commit();
+            }
+
         }
     }
+    public void showGuidance()
+    {
+        if(mtts != null)
+        {
+            mtts.dismiss();
+        }
+        mtts = new MaterialTapTargetSequence();
+        mtts.addPrompt(new MaterialTapTargetPrompt.Builder(getActivity())
+                .setTarget(getView().findViewById(R.id.recorder_button))
+                .setPrimaryText("Click here to start/pause recording")
+                .setFocalRadius(200f)
+                .setAutoDismiss(true)
+                .setBackButtonDismissEnabled(true)
+        );
+        mtts.addPrompt(new MaterialTapTargetPrompt.Builder(getActivity())
+                .setTarget(getView().findViewById(R.id.login_account_text))
+                .setPrimaryText("Here is your log in status")
+                .setFocalRadius(200f)
+                .setAutoDismiss(true)
+                .setBackButtonDismissEnabled(true)
+        );
+        mtts.show();
+    }
+
     @Override
     public void onStart() {
         super.onStart();
 
-        // [START on_start_sign_in]
-        // Check for existing Google Sign In account, if the user is already signed in
-        // the GoogleSignInAccount will be non-null.
         if(activity.getmAuth()!=null)
             updateUI(activity.getmAuth().getCurrentUser());
         // [END on_start_sign_in]
@@ -129,6 +206,10 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        //
+
+        Log.d(TAG,"Setting MenuItems Invisible");
+        activity.setMenuItemsVisible(false);
 
         // [START on_start_sign_in]
         // Check for existing Google Sign In account, if the user is already signed in
@@ -142,10 +223,33 @@ public class HomeFragment extends Fragment {
 
         if(!isRecording){
             recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
+            recordStatusText.setText(getString(R.string.click_to_start));
         }else{
             recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
+            recordStatusText.setText(getString(R.string.click_to_pause));
+        }
+
+        boolean showGuidance = sharedPref.getBoolean(getString(R.string.guidance_on_off),false);
+        //if(showGuidance)
+        if(showGuidance)
+        {
+            showGuidance();
         }
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG,"On pause called");
+
+        if(mtts != null)
+        {
+            Log.d(TAG,"MTTS dismissed");
+            mtts.dismiss();
+            mtts = null;
+        }
+    }
+
     private void updateUI(FirebaseUser account) {
         if (account != null) {
             accountText.setText("Signed In as: "+account.getEmail());
@@ -162,6 +266,8 @@ public class HomeFragment extends Fragment {
             if (isRecording) {
                 //Stop Recording
                 recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
+                recordStatusText.setText(getString(R.string.click_to_start));
+
                 //stopRecording();
                 stopService();
                 isRecording = false;
@@ -170,6 +276,7 @@ public class HomeFragment extends Fragment {
                 //Start service that record audio consistently;
                 startService();
                 recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
+                recordStatusText.setText(getString(R.string.click_to_pause));
                 isRecording = true;
             }
             //Save isRecording value.
@@ -223,4 +330,7 @@ public class HomeFragment extends Fragment {
         CloudRecordList.mkdir();
         tmpRecordList.mkdir();
     }
+
+
+
 }

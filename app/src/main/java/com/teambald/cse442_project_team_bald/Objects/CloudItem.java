@@ -4,19 +4,12 @@ import java.io.File;
 
 //TODO: @Chaoping: Modify this template based on your needs.
 public class CloudItem extends RecordingItem{
-    String date;
-    String duration;
-    File audio_file;
-    int StartTime;
-    boolean play;
-    boolean locker;
     boolean existLocal;
 
     public CloudItem(String date, String duration, boolean play,boolean exist) {
         this.date = date;
         this.duration = duration;
         this.play = play;
-        this.locker=true; // set to true
         this.existLocal = exist;
     }
 

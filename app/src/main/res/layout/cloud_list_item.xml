@@ -51,42 +51,11 @@
                     android:text="Recording Duration"
                     android:textSize="20sp"/>
 
-                <Switch
-                    android:id="@+id/locker"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_gravity="end"
-                    android:layout_weight="1"
-                    android:paddingStart="18dp"
-                    android:text="Lock" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <EditText
-                    android:id="@+id/renaming_Text"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:inputType="textPersonName"/>
-
-                <Button
-                    android:id="@+id/rename_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@color/ubBlue"
-                    android:textColor="@color/white"
-                    android:text="Rename"/>
-
                 <CheckBox
                     android:id="@+id/checkBox"
                     android:layout_width="wrap_content"
                     android:layout_height="50dp" />
+
             </LinearLayout>
 
         </LinearLayout>

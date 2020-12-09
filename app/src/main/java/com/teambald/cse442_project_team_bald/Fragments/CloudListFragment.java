@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -41,10 +42,7 @@ import java.util.ArrayList;
 /**
  * A fragment representing a list of Items.
  */
-public class CloudFragment extends Fragment {
-    private ArrayList<RecordingItem> cloudList = new ArrayList<>();
-    private ArrayList<String> durations = new ArrayList<>();
-
+public class CloudListFragment extends ListFragment {
     private static final String durationMetaDataConst = "Duration";
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -52,15 +50,10 @@ public class CloudFragment extends Fragment {
     // TODO: Customize parameters
     private static FirebaseStorage storage;
     private static StorageReference storageRef;
-    private RecyclerView.Adapter mAdapter;
+    private CloudListAdapter mAdapter;
 
     private MainActivity activity;
     private String fireBaseFolder = null;
-    /*
-    private Button down;
-    private Button up;
-    private Button list;
-    */
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -68,7 +61,7 @@ public class CloudFragment extends Fragment {
 
     private static final String TAG = "CloudFrag";
 
-    public CloudFragment(MainActivity mainActivity) {
+    public CloudListFragment(MainActivity mainActivity) {
         activity = mainActivity;
     }
 
@@ -79,6 +72,7 @@ public class CloudFragment extends Fragment {
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
+
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
     }
@@ -88,33 +82,6 @@ public class CloudFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_cloud_list, container, false);
-        /*View view = inflater.inflate(R.layout.dummy_layout_cloud, container, false);
-
-        up = view.findViewById(R.id.uploadbu);
-        down = view.findViewById(R.id.downbu);
-        list = view.findViewById(R.id.listbu);
-        up.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String path = getActivity().getExternalFilesDir("/").getAbsolutePath();
-                uploadFile(path,"Recording_2020_10_21_06_34_00","mp4","baicheng");
-            }
-        });
-
-        down.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String path = getActivity().getExternalFilesDir("/").getAbsolutePath();
-                downloadFile(path,"testRec1","mp4","baicheng");
-            }
-        });
-
-        list.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listFiles("baicheng");
-            }
-        });*/
         return view;
     }
     @Override
@@ -130,11 +97,8 @@ public class CloudFragment extends Fragment {
 
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext());
             recyclerView.setLayoutManager(layoutManager);
-            //ArrayList<String> filenames =
-            //Log.d(TAG,filenames.toString());
-            //Log.d(TAG,filenames.size()+"");
             listFiles(fireBaseFolder);
-            mAdapter = new CloudListAdapter(cloudList, getContext(),this,activity);
+            mAdapter = new CloudListAdapter(itemList, getContext(),this,activity);
             recyclerView.setAdapter(mAdapter);
             ItemTouchHelper itemTouchHelper = new
                     ItemTouchHelper(new SwipeActionHandler((CloudListAdapter) mAdapter,this,"CloudRecording",1, getContext()));
@@ -147,13 +111,37 @@ public class CloudFragment extends Fragment {
 
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext());
             recyclerView.setLayoutManager(layoutManager);
-            //ArrayList<String> filenames =
-            //Log.d(TAG,filenames.toString());
-            //Log.d(TAG,filenames.size()+"");
-            cloudList.clear();
-            cloudList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
-            mAdapter = new CloudListAdapter(cloudList, getContext(),this,activity);
+            itemList.clear();
+            itemList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
+            mAdapter = new CloudListAdapter(itemList, getContext(),this,activity);
             recyclerView.setAdapter(mAdapter);
+            //        TapTargetView.showFor(this.activity,                 // `this` is an Activity
+//                TapTarget.forView(view.findViewById(R.id.recorder_button), getString(R.string.Home_Recorder_Title),
+//                        getString(R.string.Home_Recorder_Description))
+//                        // All options below are optional
+//                        .outerCircleColor(R.color.ubBlue)      // Specify a color for the outer circle
+//                        .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
+//                        .targetCircleColor(R.color.white)   // Specify a color for the target circle
+//                        .titleTextSize(40)                  // Specify the size (in sp) of the title text
+//                        .titleTextColor(R.color.white)      // Specify the color of the title text
+//                        .descriptionTextSize(20)            // Specify the size (in sp) of the description text
+//                        .descriptionTextColor(R.color.white)  // Specify the color of the description text
+//                        .textColor(R.color.white)            // Specify a color for both the title and description text
+//                        .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
+//                        .dimColor(R.color.white)            // If set, will dim behind the view with 30% opacity of the given color
+//                        .drawShadow(true)                   // Whether to draw a drop shadow or not
+//                        .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
+//                        .tintTarget(true)                   // Whether to tint the target view's color
+//                        .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
+//                        .targetRadius(120),                  // Specify the target radius (in dp)
+//                new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
+//                    @Override
+//                    public void onTargetClick(TapTargetView view) {
+//                        super.onTargetClick(view);      // This call is optional
+//                        view.dismiss(true);
+//                    }
+//                });
+
         }
     }
     public void listFiles(String fireBaseFolder)
@@ -173,30 +161,25 @@ public class CloudFragment extends Fragment {
         }
         else
         {
-            cloudList.clear();
-            cloudList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
-            if(mAdapter != null) {
-                mAdapter.notifyDataSetChanged();
-            }
+            itemList.clear();
+            itemList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
+            updateUI();
         }
     }
     public void updateFiles(ArrayList<String> filenames)
     {
-        cloudList.clear();
+        itemList.clear();
         for (int idx = 0;idx<filenames.size();idx++)
         {
             String filename = filenames.get(idx);
-            cloudList.add(new RecordingItem(filename, "Duration: ", filename, true, new File(filename)));
+            itemList.add(new RecordingItem(filename, "Duration: ", filename, true, new File(filename)));
         }
         RecyclerView recyclerView = getView().findViewById(R.id.recording_list_recyclerview_cloud);
         ItemTouchHelper itemTouchHelper = new
                 ItemTouchHelper(new SwipeActionHandler((CloudListAdapter) mAdapter,this,"CloudRecording",1, getContext()));
         itemTouchHelper.attachToRecyclerView(recyclerView);
-        if(mAdapter != null) {
-            mAdapter.notifyDataSetChanged();
-            Log.d(TAG,"mAdapter notified");
-        }
-        Log.d(TAG,"There are "+cloudList.size()+" items in cloud list");
+        updateUI();
+        Log.d(TAG,"There are "+itemList.size()+" items in cloud list");
     }
     private class CloudSuccListener implements OnSuccessListener<ListResult>
     {
@@ -225,7 +208,6 @@ public class CloudFragment extends Fragment {
     }
     private void updateMetaData(ArrayList<String> filenames,String fireBaseFolder)
     {
-        durations = new ArrayList<>();
         ArrayList<CloudMetaSuccListener> succListeners = new ArrayList<>();
         for(int idx = 0;idx<filenames.size();idx++)
         {
@@ -243,14 +225,9 @@ public class CloudFragment extends Fragment {
                         }
                     });
         }
-        if(mAdapter != null) {
-            mAdapter.notifyDataSetChanged();
-            Log.d(TAG,"Update the list for durations");
-        }
-        else
-        {
-            Log.d(TAG,"mAdapter null");
-        }
+
+        updateUI();
+        Log.d(TAG,"Update the list for durations");
     }
     private class CloudMetaSuccListener implements OnSuccessListener<StorageMetadata>
     {
@@ -270,11 +247,9 @@ public class CloudFragment extends Fragment {
         public void onSuccess(StorageMetadata metaDataRst) {
             metaDataValue = metaDataRst.getCustomMetadata(durationMetaDataConst);
             Log.d(TAG,"MetaData for File: "+filename+" Downloaded successfully");
-            cloudList.get(listIdx).setDuration(metaDataValue);
-            if(mAdapter != null) {
-                mAdapter.notifyDataSetChanged();
-                Log.d(TAG,"Update the list for metadata idx: "+listIdx+" Metadata: "+metaDataValue);
-            }
+            itemList.get(listIdx).setDuration(metaDataValue);
+            updateUI();
+            Log.d(TAG,"Update the list for metadata idx: "+listIdx+" Metadata: "+metaDataValue);
         }
     }
 
@@ -282,6 +257,9 @@ public class CloudFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(TAG,"Showing MenuItems");
+        activity.setMenuItemsVisible(this, mAdapter);
+
         if(storageRef!=null) {
             Log.d(TAG,"OnResume: ");
             //Check if signed in to avoid NullPointerException.
@@ -292,20 +270,18 @@ public class CloudFragment extends Fragment {
             }
             else
             {
-                cloudList.clear();
-                cloudList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
+                itemList.clear();
+                itemList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
             }
 
         }
         else
         {
-            cloudList.clear();
-            cloudList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
+            itemList.clear();
+            itemList.add(new RecordingItem("Please Sign In", "To view Cloud Recordings", true));
         }
-        if(mAdapter != null) {
-            mAdapter.notifyDataSetChanged();
-            Log.d(TAG,"Update the list");
-        }
+        updateUI();
+        Log.d(TAG,"Update the list");
     }
 
     @Override
@@ -315,30 +291,19 @@ public class CloudFragment extends Fragment {
             Log.d(TAG,"OnAttach: ");
             fireBaseFolder = activity.getmAuth().getCurrentUser().getEmail();
             listFiles(fireBaseFolder);
-            if(mAdapter != null) {
-                mAdapter.notifyDataSetChanged();
-            }
+            updateUI();
         }
+        Log.d(TAG,"Showing MenuItems");
+        activity.setMenuItemsVisible(this, mAdapter);
     }
-    /*
-    public void updateAllFiles(String bucketname)
+    public void updateUI()
     {
-        ArrayList<String> files = listFiles(bucketname);
-        Log.d(TAG,"There are "+files.size()+" items in files list");
-        cloudList.clear();
-        for (String filename : files)
-        {
-            File f = new File(filename);
-            Uri uri = Uri.parse(f.getAbsolutePath());
-            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-            mmr.setDataSource(getContext(), uri);
-            String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-            int seconds = Integer.parseInt(durationStr) / 1000;
-            durationStr = parseSeconds(seconds);
-            cloudList.add(new RecordingItem(f.getName(), durationStr , f.getPath(), true, f));
+        if(mAdapter != null) {
+            mAdapter.notifyDataSetChanged();
         }
-        Log.d(TAG,"There are "+cloudList.size()+" items in cloud list");
-    }*/
+        else
+        {Log.d(TAG,"madapter null");}
+    }
     public String parseSeconds(int seconds) {
         int min = seconds / 60;
         seconds-=(min * 60);

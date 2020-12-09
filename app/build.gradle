@@ -13,6 +13,10 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
     buildTypes {
         release {
@@ -31,7 +35,9 @@ android {
         resolutionStrategy.force 'com.android.support:support-annotations:27.1.0'
     }
 }
-
+repositories {
+    jcenter()
+}
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.2.0'
@@ -47,6 +53,7 @@ dependencies {
 
     // UiAutomatorTesting
     implementation 'com.google.firebase:firebase-auth:16.0.5'
+    implementation 'androidx.mediarouter:mediarouter:1.1.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test:rules:1.2.0'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
@@ -60,5 +67,9 @@ dependencies {
 
     //Biometrics
     implementation 'androidx.biometric:biometric:1.0.1'
+
+    //TaptargetView
+    implementation 'com.getkeepsafe.taptargetview:taptargetview:1.13.0'
+    implementation 'uk.co.samuelwall:material-tap-target-prompt:3.0.1'
 }
 apply plugin: 'com.google.gms.google-services'

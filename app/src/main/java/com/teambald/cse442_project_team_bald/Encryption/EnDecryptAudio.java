@@ -1,12 +1,15 @@
 package com.teambald.cse442_project_team_bald.Encryption;
 
 import android.content.Context;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class EnDecryptAudio {
 
@@ -20,7 +23,7 @@ public class EnDecryptAudio {
     public static byte[] encrypt(String filePath, Context context) {
         try {
             byte[] fileData = FileUtils.readFile(filePath);
-            byte[] encodedBytes = AudioEncryptionUtils.encode(AudioEncryptionUtils.getInstance(context).getSecretKey(), fileData);
+            byte[] encodedBytes = AudioEncryptionUtils.encode(AudioEncryptionUtils.getInstance(context).getSecretKey(context), fileData);
 //            FileUtils.saveFile(encodedBytes, filePath);
             return encodedBytes;
         } catch (Exception e) {
@@ -38,7 +41,7 @@ public class EnDecryptAudio {
         String filePath = file.getPath();
         try {
             byte[] fileData = FileUtils.readFile(filePath);
-            byte[] decryptedBytes = AudioEncryptionUtils.decode(AudioEncryptionUtils.getInstance(context).getSecretKey(), fileData);
+            byte[] decryptedBytes = AudioEncryptionUtils.decode(AudioEncryptionUtils.getInstance(context).getSecretKey(context), fileData);
             return decryptedBytes;
         } catch (Exception e) {
             Log.e("Decryption failed: ", e+"");
@@ -53,7 +56,6 @@ public class EnDecryptAudio {
             // Initialize a pointer
             // in file using OutputStream
             OutputStream os = new FileOutputStream(filePath);
-
             // Starts writing the bytes in it
             os.write(bytes);
             System.out.println("Successfully" + " byte inserted");

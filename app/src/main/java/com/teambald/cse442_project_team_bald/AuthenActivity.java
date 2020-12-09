@@ -1,10 +1,13 @@
 package com.teambald.cse442_project_team_bald;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +20,8 @@ import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 
 import java.util.concurrent.Executor;
+
+import static android.os.VibrationEffect.DEFAULT_AMPLITUDE;
 
 /**
  * Activity to demonstrate basic retrieval of the Google user's ID, email address, and basic
@@ -34,9 +39,7 @@ public class AuthenActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         //Decide whether to use biometric
 
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        Intent intent;
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         boolean authenVal = sharedPref.getBoolean(getString(R.string.biometric_authentication),false);
         Log.d(TAG,"Reading authentication preference:"+authenVal);
@@ -86,6 +89,8 @@ public class AuthenActivity extends AppCompatActivity
                             super.onAuthenticationError(errorCode, errString);
                             if (errorCode == BiometricPrompt.ERROR_USER_CANCELED) {
                                 // Just negative button tap
+                                final Vibrator vibe = (Vibrator)getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+                                vibe.vibrate(VibrationEffect.createOneShot(1000,255));
                                 return;
                             }
                             Log.d(TAG,"Authentication error ...");
@@ -95,6 +100,8 @@ public class AuthenActivity extends AppCompatActivity
                                     .create()
                                     .show();
 
+                            final Vibrator vibe = (Vibrator)getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+                            vibe.vibrate(VibrationEffect.createOneShot(1000,255));
                         }
 
                         @Override
@@ -103,13 +110,18 @@ public class AuthenActivity extends AppCompatActivity
                             Log.d(TAG,"Authentication Success ...");
                             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            final Vibrator vibe = (Vibrator)getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+                            vibe.vibrate(VibrationEffect.createOneShot(500,255));
                             startActivity(intent);
+
                         }
 
                         @Override
                         public void onAuthenticationFailed() {
                             super.onAuthenticationFailed();
                             Log.d(TAG,"Authentication failed ...");
+                            final Vibrator vibe = (Vibrator)getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+                            vibe.vibrate(VibrationEffect.createOneShot(1000,255));
                         }
                     });
 
