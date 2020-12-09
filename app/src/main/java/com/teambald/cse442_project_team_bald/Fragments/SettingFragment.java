@@ -622,6 +622,11 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
             } else {
                 toast.setText("Show Guidance OFF");
                 toast.show();
+                if(mtts!=null)
+                {
+                    mtts.dismiss();
+                    mtts=null;
+                }
             }
         }
     }

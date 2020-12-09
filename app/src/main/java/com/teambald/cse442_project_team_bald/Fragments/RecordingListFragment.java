@@ -47,6 +47,9 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetSequence;
+
 public class RecordingListFragment extends ListFragment {
     private MediaPlayer mediaPlayer = null;
     private ImageButton BackButton;
@@ -58,10 +61,11 @@ public class RecordingListFragment extends ListFragment {
 
     private MainActivity activity;
 
-    private TapTargetSequence introSequence;
-
     private static SharedPreferences sharedPref;
     private static SharedPreferences.Editor editor;
+
+
+    private MaterialTapTargetSequence mtts;
 
     public RecordingListFragment(MainActivity mainActivity,String path) {
         this.Directory_toRead = path;
@@ -113,29 +117,33 @@ public class RecordingListFragment extends ListFragment {
         if(activity!=null)
             showMenu();
     }// On view created end
-    public void initGuidance()
+    public void showGuidance()
     {
-        introSequence = new TapTargetSequence(this.activity)
-                .targets(
-                        TapTarget.forView(BackButton, "BackButton",
-                                getString(R.string.Home_Recorder_Description))
-                                .outerCircleColor(R.color.ubBlue)      // Specify a color for the outer circle
-                                .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
-                                .targetCircleColor(R.color.white)   // Specify a color for the target circle
-                                .titleTextSize(40)                  // Specify the size (in sp) of the title text
-                                .titleTextColor(R.color.white)      // Specify the color of the title text
-                                .descriptionTextSize(20)            // Specify the size (in sp) of the description text
-                                .descriptionTextColor(R.color.white)  // Specify the color of the description text
-                                .textColor(R.color.white)            // Specify a color for both the title and description text
-                                .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
-                                .dimColor(R.color.white)            // If set, will dim behind the view with 30% opacity of the given color
-                                .drawShadow(true)                   // Whether to draw a drop shadow or not
-                                .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
-                                .tintTarget(true)                   // Whether to tint the target view's color
-                                .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
-                                .targetRadius(40)               // Specify the target radius (in dp)
+        if(mtts != null)
+        {
+            mtts.dismiss();
+        }
+        mtts = new MaterialTapTargetSequence();
+        mtts.addPrompt(new MaterialTapTargetPrompt.Builder(getActivity())
+                .setTarget(getView().findViewById(R.id.Back_Button))
+                .setPrimaryText("Click here for the previous page")
+                .setFocalRadius(200f)
+                .setAutoDismiss(true)
+                .setBackButtonDismissEnabled(true)
+        );
+        mtts.show();
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG,"On pause called");
 
-                );
+        if(mtts != null)
+        {
+            Log.d(TAG,"MTTS dismissed");
+            mtts.dismiss();
+            mtts = null;
+        }
     }
     /*
      * 0-Cloud
@@ -154,12 +162,10 @@ public class RecordingListFragment extends ListFragment {
             Log.d(TAG,"Activity null, menu not shown");
         }
 
-        Log.d(TAG, "Init guidance");
-        initGuidance();
         boolean showGuidance = sharedPref.getBoolean(getString(R.string.guidance_on_off),false);
         if(showGuidance) {
             Log.d(TAG, "Showing guidance");
-            introSequence.start();
+            showGuidance();
         }
     }
     public String getDirectory_toRead(){return Directory_toRead;}

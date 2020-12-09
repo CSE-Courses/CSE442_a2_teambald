@@ -59,6 +59,9 @@ import java.util.Locale;
 
 import javax.crypto.SecretKey;
 
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetSequence;
+
 
 public class HomeFragment extends Fragment {
 
@@ -72,7 +75,6 @@ public class HomeFragment extends Fragment {
     private static final String TAG = "HOME_FRAGMENT: ";
 
     private ImageButton recordButton;
-    private ImageButton HomeInfoBut;
 
     private TextView accountText;
 
@@ -80,7 +82,7 @@ public class HomeFragment extends Fragment {
 
     private MainActivity activity;
 
-    private TapTargetSequence introSequence;
+    private MaterialTapTargetSequence mtts;
 
     public HomeFragment(MainActivity mainActivity) {
         activity = mainActivity;
@@ -102,8 +104,6 @@ public class HomeFragment extends Fragment {
         view.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
         recordButton = view.findViewById(R.id.recorder_button);
         recordButton.setOnClickListener(new recordClickListener());
-        HomeInfoBut = view.findViewById(R.id.Home_info);
-        HomeInfoBut.setOnClickListener(new infoClickListener());
         accountText = view.findViewById(R.id.login_account_text);
 
         recordStatusText = view.findViewById(R.id.recordStatus);
@@ -129,9 +129,6 @@ public class HomeFragment extends Fragment {
             recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_button, null));
             recordStatusText.setText(getString(R.string.click_to_pause));
         }
-
-        //Set guidance pop ups
-        initGuidance();
     }//ON view Created End
     private class shakeListener implements ShakeListener.OnShakeListener
     {
@@ -174,45 +171,28 @@ public class HomeFragment extends Fragment {
 
         }
     }
-    public void initGuidance()
+    public void showGuidance()
     {
-        introSequence= new TapTargetSequence(getActivity())
-                .targets(
-                        TapTarget.forView(getView().findViewById(R.id.recorder_button), getString(R.string.Home_Recorder_Title),
-                                getString(R.string.Home_Recorder_Description))
-                                .outerCircleColor(R.color.ubBlue)      // Specify a color for the outer circle
-                                .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
-                                .targetCircleColor(R.color.white)   // Specify a color for the target circle
-                                .titleTextSize(40)                  // Specify the size (in sp) of the title text
-                                .titleTextColor(R.color.white)      // Specify the color of the title text
-                                .descriptionTextSize(20)            // Specify the size (in sp) of the description text
-                                .descriptionTextColor(R.color.white)  // Specify the color of the description text
-                                .textColor(R.color.white)            // Specify a color for both the title and description text
-                                .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
-                                .dimColor(R.color.white)            // If set, will dim behind the view with 30% opacity of the given color
-                                .drawShadow(true)                   // Whether to draw a drop shadow or not
-                                .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
-                                .tintTarget(true)                   // Whether to tint the target view's color
-                                .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
-                                .targetRadius(120),                  // Specify the target radius (in dp)
-                        TapTarget.forView(getView().findViewById(R.id.login_account_text), getString(R.string.Home_SignStatus_Title),
-                                getString(R.string.Home_SignStatus_description))
-                                .outerCircleColor(R.color.ubBlue)
-                                .outerCircleAlpha(0.96f)            // Specify the alpha amount for the outer circle
-                                .targetCircleColor(R.color.white)   // Specify a color for the target circle
-                                .titleTextSize(40)                  // Specify the size (in sp) of the title text
-                                .titleTextColor(R.color.white)      // Specify the color of the title text
-                                .descriptionTextSize(20)            // Specify the size (in sp) of the description text
-                                .descriptionTextColor(R.color.white)  // Specify the color of the description text
-                                .textColor(R.color.white)            // Specify a color for both the title and description text
-                                .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
-                                .dimColor(R.color.white)            // If set, will dim behind the view with 30% opacity of the given color
-                                .drawShadow(true)                   // Whether to draw a drop shadow or not
-                                .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
-                                .tintTarget(true)                   // Whether to tint the target view's color
-                                .transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
-                                .targetRadius(70)
-                );
+        if(mtts != null)
+        {
+            mtts.dismiss();
+        }
+        mtts = new MaterialTapTargetSequence();
+        mtts.addPrompt(new MaterialTapTargetPrompt.Builder(getActivity())
+                .setTarget(getView().findViewById(R.id.recorder_button))
+                .setPrimaryText("Click here to start/pause recording")
+                .setFocalRadius(200f)
+                .setAutoDismiss(true)
+                .setBackButtonDismissEnabled(true)
+        );
+        mtts.addPrompt(new MaterialTapTargetPrompt.Builder(getActivity())
+                .setTarget(getView().findViewById(R.id.login_account_text))
+                .setPrimaryText("Here is your log in status")
+                .setFocalRadius(200f)
+                .setAutoDismiss(true)
+                .setBackButtonDismissEnabled(true)
+        );
+        mtts.show();
     }
 
     @Override
@@ -249,14 +229,27 @@ public class HomeFragment extends Fragment {
             recordStatusText.setText(getString(R.string.click_to_pause));
         }
 
-        initGuidance();
         boolean showGuidance = sharedPref.getBoolean(getString(R.string.guidance_on_off),false);
         //if(showGuidance)
-        if(false)
+        if(showGuidance)
         {
-            introSequence.start();
+            showGuidance();
         }
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG,"On pause called");
+
+        if(mtts != null)
+        {
+            Log.d(TAG,"MTTS dismissed");
+            mtts.dismiss();
+            mtts = null;
+        }
+    }
+
     private void updateUI(FirebaseUser account) {
         if (account != null) {
             accountText.setText("Signed In as: "+account.getEmail());
@@ -290,12 +283,6 @@ public class HomeFragment extends Fragment {
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putBoolean(getString(R.string.is_recording_key), isRecording);
             editor.commit();
-        }
-    }
-    private class infoClickListener implements View.OnClickListener{
-        @Override
-        public void onClick(View view) {
-            introSequence.startAt(0);
         }
     }
 
