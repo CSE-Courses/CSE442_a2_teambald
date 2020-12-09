@@ -139,7 +139,7 @@ public class HomeFragment extends Fragment {
             boolean shakeVal = sharedPref.getBoolean(getString(R.string.shake_to_save),false);
             if (shakeVal) {
                 if (isRecording) {
-                    vibe.vibrate(50);
+                    vibe.vibrate(200);
                     //Stop Recording
                     recorderButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recorder_icon_150, null));
                     //stopRecording();
@@ -151,7 +151,7 @@ public class HomeFragment extends Fragment {
                     }
                     isRecording = false;
                 } else {
-                    vibe.vibrate(100);
+                    vibe.vibrate(400);
                     //Start service that record audio consistently;
                     System.out.println("Try Start Recording!!!");
                     try{
